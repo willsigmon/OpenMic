@@ -7,11 +7,11 @@ max_rows = 1000
 
 [auth]
 enabled = true
-site_url = "com.willsigmon.carchat://"
+site_url = "com.willsigmon.openmic://"
 
 [auth.external.apple]
 enabled = true
-client_id = "com.willsigmon.carchat"
+client_id = "com.willsigmon.openmic"
 secret = ""
 
 [auth.email]

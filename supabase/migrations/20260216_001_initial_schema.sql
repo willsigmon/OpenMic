@@ -1,4 +1,4 @@
--- CarChat Freemium Schema
+-- OpenMic Freemium Schema
 -- Initial migration: usage tracking, quotas, subscriptions
 
 -- Voice session usage tracking

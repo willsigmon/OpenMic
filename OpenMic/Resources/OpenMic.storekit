@@ -1,0 +1,137 @@
+{
+  "identifier" : "F4829AD7-3A6D-4B55-9E8C-B71A37CDED4F",
+  "nonRenewableSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "credit50standard",
+      "localizations" : [
+        {
+          "description" : "50 standard voice minutes",
+          "displayName" : "50 Standard Minutes",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "openmic.credits.50standard",
+      "referenceName" : "50 Standard Minutes",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "credit100standard",
+      "localizations" : [
+        {
+          "description" : "100 standard voice minutes",
+          "displayName" : "100 Standard Minutes",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "openmic.credits.100standard",
+      "referenceName" : "100 Standard Minutes",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "credit50premium",
+      "localizations" : [
+        {
+          "description" : "50 premium realtime voice minutes",
+          "displayName" : "50 Premium Minutes",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "openmic.credits.50premium",
+      "referenceName" : "50 Premium Minutes",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "familyShareable" : false,
+      "internalID" : "credit100premium",
+      "localizations" : [
+        {
+          "description" : "100 premium realtime voice minutes",
+          "displayName" : "100 Premium Minutes",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "openmic.credits.100premium",
+      "referenceName" : "100 Premium Minutes",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "OpenMic",
+    "_developerTeamID" : "49HAGQE8FB"
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "openmic.subscriptions",
+      "localizations" : [],
+      "name" : "OpenMic Voice AI",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "9.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "standard_monthly",
+          "introductoryOffer" : {
+            "displayPrice" : "0",
+            "internalID" : "standard_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Premium voices, 120 min/mo, all AI providers",
+              "displayName" : "Standard",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "openmic.standard.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Standard Monthly",
+          "subscriptionGroupID" : "openmic.subscriptions",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "24.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "premium_monthly",
+          "introductoryOffer" : {
+            "displayPrice" : "0",
+            "internalID" : "premium_trial",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Realtime voice AI, emotional intelligence, 120 min/mo",
+              "displayName" : "Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "openmic.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Premium Monthly",
+          "subscriptionGroupID" : "openmic.subscriptions",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

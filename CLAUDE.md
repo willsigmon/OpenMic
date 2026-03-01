@@ -1,4 +1,4 @@
-# CarChat - Voice AI for the Road
+# OpenMic - Voice AI for the Road
 
 Voice-first AI assistant for iOS with CarPlay, Watch app, and 8 TTS engines.
 
@@ -23,10 +23,10 @@ SFSpeechSTT -> VoiceEndpointDetector -> AIProvider.streamChat() -> TTSEngine.spe
 ### AI Providers (7)
 | Provider | Type | Key |
 |----------|------|-----|
-| OpenAI | Cloud BYOK | `carchat.apikey.openai` |
-| Anthropic | Cloud BYOK | `carchat.apikey.anthropic` |
-| Gemini | Cloud BYOK | `carchat.apikey.gemini` |
-| Grok | Cloud BYOK | `carchat.apikey.grok` |
+| OpenAI | Cloud BYOK | `openmic.apikey.openai` |
+| Anthropic | Cloud BYOK | `openmic.apikey.anthropic` |
+| Gemini | Cloud BYOK | `openmic.apikey.gemini` |
+| Grok | Cloud BYOK | `openmic.apikey.grok` |
 | Ollama | Local | No key |
 | Apple | Local (stub) | No key |
 | OpenClaw | Self-hosted | Optional |
@@ -41,7 +41,7 @@ All cloud TTS engines use BYOK pattern with AVAudioPlayer playback and SystemTTS
 | File | Purpose |
 |------|---------|
 | `App/AppServices.swift` | DI root: ModelContainer, KeychainManager, ConversationStore |
-| `App/CarChatApp.swift` | App entry, seeds default persona |
+| `App/OpenMicApp.swift` | App entry, seeds default persona |
 | `ViewModels/ConversationViewModel.swift` | Voice session lifecycle, bubble management, conversation persistence |
 | `Services/Voice/PipelineVoiceSession.swift` | STT -> AI -> TTS pipeline loop |
 | `Services/Voice/STT/SFSpeechSTT.swift` | On-device speech recognition |
@@ -51,7 +51,7 @@ All cloud TTS engines use BYOK pattern with AVAudioPlayer playback and SystemTTS
 | `Models/Provider.swift` | AIProviderType enum with all metadata |
 | `Models/VoiceConfig.swift` | TTSEngineType enum |
 | `Models/Persona.swift` | SwiftData model with per-engine voice IDs |
-| `DesignSystem/` | CarChatTheme, GlassCard, AmbientBackground, haptics |
+| `DesignSystem/` | OpenMicTheme, GlassCard, AmbientBackground, haptics |
 
 ## Commands
 

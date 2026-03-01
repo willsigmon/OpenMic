@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy Supabase backend for CarChat
+# Deploy Supabase backend for OpenMic
 # Prerequisites: npm install -g supabase
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "=== CarChat Supabase Deployment ==="
+echo "=== OpenMic Supabase Deployment ==="
 echo ""
 
 # Check supabase CLI
@@ -57,7 +57,7 @@ echo "  Get these from your Supabase dashboard → Settings → API:"
 echo "  - Project URL: https://<ref>.supabase.co"
 echo "  - Anon Key: eyJ..."
 echo ""
-echo "  Then update CarChat/Services/Auth/SupabaseClient.swift"
+echo "  Then update OpenMic/Services/Auth/SupabaseClient.swift"
 echo "  or set SUPABASE_URL and SUPABASE_ANON_KEY in Info.plist / xcconfig."
 echo ""
 

@@ -4,7 +4,7 @@ Use this checklist for release validation of Apple provider rollout across iPhon
 
 ## Local Build Gate (No watchOS runtime required)
 
-1. Use scheme `CarChat-iOSBuildOnly` for local compile checks on machines without watchOS 26.2 runtime.
+1. Use scheme `OpenMic-iOSBuildOnly` for local compile checks on machines without watchOS 26.2 runtime.
 2. Confirm iOS build succeeds before manual QA passes.
 
 ## Test Matrix

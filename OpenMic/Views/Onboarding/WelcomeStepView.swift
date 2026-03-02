@@ -82,7 +82,7 @@ struct WelcomeStepView: View {
                     Haptics.impact()
                     viewModel.advance()
                 }
-                .buttonStyle(.carChatPrimary)
+                .buttonStyle(.openMicPrimary)
                 .padding(.horizontal, OpenMicTheme.Spacing.xl)
                 .padding(.bottom, OpenMicTheme.Spacing.xxxl)
                 .opacity(showButton ? 1 : 0)

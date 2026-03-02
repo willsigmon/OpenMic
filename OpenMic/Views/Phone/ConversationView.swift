@@ -155,11 +155,14 @@ struct ConversationView: View {
                         micOffset = value.translation
                     }
                     .onEnded { value in
+                        // Clamp to screen bounds to prevent dragging off-screen
+                        let screenWidth = UIScreen.main.bounds.width
+                        let screenHeight = UIScreen.main.bounds.height
+                        let maxOffset: CGFloat = 200
                         let newRest = CGSize(
-                            width: micRestPosition.width + value.translation.width,
-                            height: micRestPosition.height + value.translation.height
+                            width: max(-screenWidth + maxOffset, min(0, micRestPosition.width + value.translation.width)),
+                            height: max(-screenHeight + maxOffset, min(0, micRestPosition.height + value.translation.height))
                         )
-                        // Snap animation with bounce
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0.1)) {
                             micRestPosition = newRest
                             micOffset = .zero
@@ -284,7 +287,7 @@ struct ConversationView: View {
             // Voice state badge
             VoiceStateBadge(state: vm.voiceState)
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("OpenMic, \(vm.voiceState.isActive ? "Live" : "Ready")")
     }
 
@@ -345,8 +348,8 @@ struct ConversationView: View {
                     proxy.scrollTo(newID, anchor: .bottom)
                 }
             }
-            .onChange(of: vm.bubbles.last?.text) { _, _ in
-                guard let lastID = vm.bubbles.last?.id else { return }
+            .onChange(of: vm.bubbles.last?.isFinal) { _, isFinal in
+                guard isFinal == true, let lastID = vm.bubbles.last?.id else { return }
                 withAnimation(OpenMicTheme.Animation.micro) {
                     proxy.scrollTo(lastID, anchor: .bottom)
                 }
@@ -389,7 +392,7 @@ struct ConversationView: View {
                             .font(OpenMicTheme.Typography.caption)
                     }
                 }
-                .buttonStyle(.carChatActionPill(tone: .danger))
+                .buttonStyle(.openMicActionPill(tone: .danger))
                 .accessibilityLabel("Try again")
                 .accessibilityHint("Retries the voice conversation")
 
@@ -404,7 +407,7 @@ struct ConversationView: View {
                                 .font(OpenMicTheme.Typography.caption)
                         }
                     }
-                    .buttonStyle(.carChatActionPill(tone: .accent))
+                    .buttonStyle(.openMicActionPill(tone: .accent))
                     .accessibilityLabel("Open settings")
                     .accessibilityHint("Configure your API key")
                 }

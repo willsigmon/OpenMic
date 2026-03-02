@@ -40,16 +40,19 @@ final class GoogleCloudTTS: NSObject, TTSEngineProtocol {
         try? AudioSessionManager.shared.configureForSpeaking()
         isSpeaking = true
 
-        do {
-            let audioData = try await synthesize(text: text)
-            guard isSpeaking else { return }
-            try await playAudio(data: audioData)
-        } catch {
-            log.error("Google Cloud TTS failed: \(error.localizedDescription, privacy: .public) — falling back to system TTS")
-            try? AudioSessionManager.shared.configureForSpeaking(.speechSynthesizer)
-            await fallbackTTS.speak(text)
+        currentTask = Task {
+            do {
+                let audioData = try await synthesize(text: text)
+                guard !Task.isCancelled, isSpeaking else { return }
+                try await playAudio(data: audioData)
+            } catch {
+                guard !Task.isCancelled else { return }
+                log.error("Google Cloud TTS failed: \(error.localizedDescription, privacy: .public) — falling back to system TTS")
+                try? AudioSessionManager.shared.configureForSpeaking(.speechSynthesizer)
+                await fallbackTTS.speak(text)
+            }
         }
-
+        await currentTask?.value
         isSpeaking = false
     }
 
@@ -81,7 +84,7 @@ final class GoogleCloudTTS: NSObject, TTSEngineProtocol {
         let body: [String: Any] = [
             "input": ["text": text],
             "voice": [
-                "languageCode": "en-US",
+                "languageCode": voiceId.components(separatedBy: "-").prefix(2).joined(separator: "-"),
                 "name": voiceId
             ],
             "audioConfig": [
@@ -133,7 +136,10 @@ final class GoogleCloudTTS: NSObject, TTSEngineProtocol {
 
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             self.playbackContinuation = continuation
-            player.play()
+            if !player.play() {
+                self.playbackContinuation = nil
+                continuation.resume()
+            }
         }
     }
 }

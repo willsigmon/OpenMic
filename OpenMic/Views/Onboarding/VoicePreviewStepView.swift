@@ -64,7 +64,7 @@ struct VoicePreviewStepView: View {
                         Haptics.tap()
                         viewModel.advance()
                     }
-                    .buttonStyle(.carChatPrimary)
+                    .buttonStyle(.openMicPrimary)
 
                     Button("View Plans") {
                         Haptics.tap()

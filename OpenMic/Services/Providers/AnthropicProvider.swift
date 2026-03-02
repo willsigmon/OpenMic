@@ -6,7 +6,7 @@ final class AnthropicProvider: AIProvider, @unchecked Sendable {
     private let service: AnthropicService
     private let model: String
 
-    init(apiKey: String, model: String = "claude-sonnet-4-5-20250929") {
+    init(apiKey: String, model: String = "claude-sonnet-4-5-20250214") {
         self.service = AnthropicServiceFactory.service(
             apiKey: apiKey,
             betaHeaders: nil
@@ -23,7 +23,11 @@ final class AnthropicProvider: AIProvider, @unchecked Sendable {
         for msg in messages {
             switch msg.role {
             case .system:
-                systemPrompt = msg.content
+                if let existing = systemPrompt {
+                    systemPrompt = existing + "\n\n" + msg.content
+                } else {
+                    systemPrompt = msg.content
+                }
             case .user:
                 anthropicMessages.append(
                     .init(role: .user, content: .text(msg.content))

@@ -72,17 +72,17 @@ struct PermissionsStepView: View {
                         Button("Continue") {
                             viewModel.advance()
                         }
-                        .buttonStyle(.carChatPrimary)
+                        .buttonStyle(.openMicPrimary)
                     } else {
                         Button("Grant Permissions") {
                             viewModel.requestPermissions()
                         }
-                        .buttonStyle(.carChatPrimary)
+                        .buttonStyle(.openMicPrimary)
 
                         Button("Skip for Now") {
                             viewModel.advance()
                         }
-                        .buttonStyle(.carChatGhost)
+                        .buttonStyle(.openMicGhost)
                     }
                 }
                 .padding(.horizontal, OpenMicTheme.Spacing.xl)

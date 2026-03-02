@@ -53,12 +53,12 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
     var defaultModel: String {
         switch self {
         case .openAI: "gpt-4o"
-        case .anthropic: "claude-sonnet-4-5-20250929"
+        case .anthropic: "claude-sonnet-4-5-20250214"
         case .gemini: "gemini-2.0-flash"
         case .grok: "grok-2"
         case .apple: "apple-foundation"
         case .ollama: "llama3.2"
-        case .openclaw: "gemini-3-flash-preview"
+        case .openclaw: "gemini-2.0-flash"
         }
     }
 

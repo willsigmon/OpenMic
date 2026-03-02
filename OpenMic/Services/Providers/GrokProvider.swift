@@ -10,7 +10,7 @@ final class GrokProvider: AIProvider, @unchecked Sendable {
         // Grok uses OpenAI-compatible API at api.x.ai
         self.service = OpenAIServiceFactory.service(
             apiKey: apiKey,
-            overrideBaseURL: "https://api.x.ai"
+            overrideBaseURL: "https://api.x.ai/v1"
         )
         self.model = model
     }

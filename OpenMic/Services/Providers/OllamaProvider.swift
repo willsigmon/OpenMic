@@ -80,7 +80,7 @@ final class OllamaProvider: AIProvider, @unchecked Sendable {
                 }
                 continuation.finish()
             } catch {
-                continuation.finish(throwing: error)
+                continuation.finish(throwing: AIProviderError.translate(error))
             }
         }
 

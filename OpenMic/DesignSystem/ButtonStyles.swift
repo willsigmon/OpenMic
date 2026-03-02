@@ -141,19 +141,19 @@ struct OpenMicActionPillButtonStyle: ButtonStyle {
 // MARK: - Convenience Extensions
 
 extension ButtonStyle where Self == OpenMicPrimaryButtonStyle {
-    static var carChatPrimary: OpenMicPrimaryButtonStyle { .init() }
+    static var openMicPrimary: OpenMicPrimaryButtonStyle { .init() }
 }
 
 extension ButtonStyle where Self == OpenMicSecondaryButtonStyle {
-    static var carChatSecondary: OpenMicSecondaryButtonStyle { .init() }
+    static var openMicSecondary: OpenMicSecondaryButtonStyle { .init() }
 }
 
 extension ButtonStyle where Self == OpenMicGhostButtonStyle {
-    static var carChatGhost: OpenMicGhostButtonStyle { .init() }
+    static var openMicGhost: OpenMicGhostButtonStyle { .init() }
 }
 
 extension ButtonStyle where Self == OpenMicActionPillButtonStyle {
-    static func carChatActionPill(
+    static func openMicActionPill(
         tone: OpenMicActionPillTone
     ) -> OpenMicActionPillButtonStyle {
         .init(tone: tone)

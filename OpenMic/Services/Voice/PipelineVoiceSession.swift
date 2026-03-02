@@ -61,9 +61,13 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
         try AudioSessionManager.shared.configureForListening()
         setUpAudioObservers()
 
-        let prompt = systemPrompt.isEmpty ? self.systemPrompt : systemPrompt
-        if !prompt.isEmpty {
-            conversationHistory.append((.system, prompt))
+        // Only append system prompt if not already seeded via seedHistory
+        let hasSystemEntry = conversationHistory.contains { $0.role == .system }
+        if !hasSystemEntry {
+            let prompt = systemPrompt.isEmpty ? self.systemPrompt : systemPrompt
+            if !prompt.isEmpty {
+                conversationHistory.append((.system, prompt))
+            }
         }
 
         startListeningLoop()
@@ -132,20 +136,24 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                     let sentence = String(sentenceBuffer[..<range.upperBound])
                     sentenceBuffer = String(sentenceBuffer[range.upperBound...])
                     await ttsEngine.speak(sentence)
+                    if Task.isCancelled { break }
                 }
             }
 
-            if !sentenceBuffer.isEmpty {
+            if !sentenceBuffer.isEmpty, !Task.isCancelled {
                 await ttsEngine.speak(sentenceBuffer)
             }
 
             conversationHistory.append((.assistant, fullResponse))
+            trimHistoryIfNeeded()
             transcriptContinuation?.yield(
                 VoiceTranscript(text: fullResponse, isFinal: true, role: .assistant)
             )
 
             // Return to listening after speaking
-            startListeningLoop()
+            if !Task.isCancelled {
+                startListeningLoop()
+            }
         } catch {
             updateState(.error(error.localizedDescription))
         }
@@ -243,15 +251,17 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                                 sentenceBuffer[range.upperBound...]
                             )
                             await ttsEngine.speak(sentence)
+                            if Task.isCancelled { break }
                         }
                     }
 
                     // Speak remaining text
-                    if !sentenceBuffer.isEmpty {
+                    if !sentenceBuffer.isEmpty, !Task.isCancelled {
                         await ttsEngine.speak(sentenceBuffer)
                     }
 
                     conversationHistory.append((.assistant, fullResponse))
+                    trimHistoryIfNeeded()
                     transcriptContinuation?.yield(
                         VoiceTranscript(
                             text: fullResponse,
@@ -264,6 +274,18 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                 }
             }
         }
+    }
+
+    /// Keep conversation history within token-safe bounds.
+    /// Preserves the system prompt and last 20 turns (10 exchanges).
+    private func trimHistoryIfNeeded() {
+        let maxTurns = 20
+        guard conversationHistory.count > maxTurns + 1 else { return }
+
+        let systemMessages = conversationHistory.filter { $0.role == .system }
+        let nonSystemMessages = conversationHistory.filter { $0.role != .system }
+        let kept = nonSystemMessages.suffix(maxTurns)
+        conversationHistory = systemMessages + kept
     }
 
     private func updateState(_ newState: VoiceSessionState) {

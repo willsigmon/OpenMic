@@ -21,7 +21,7 @@ enum SubscriptionTier: String, Codable, Sendable, CaseIterable, Identifiable {
         switch self {
         case .free: 10
         case .standard: 120
-        case .premium: 120
+        case .premium: 300
         case .byok: .max
         }
     }
@@ -92,7 +92,7 @@ enum SubscriptionTier: String, Codable, Sendable, CaseIterable, Identifiable {
             ]
         case .premium:
             [
-                "120 minutes/month",
+                "300 minutes/month",
                 "Realtime voice AI",
                 "All providers included",
                 "Emotional intelligence (Hume)",

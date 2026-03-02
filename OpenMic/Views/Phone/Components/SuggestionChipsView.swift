@@ -52,12 +52,18 @@ struct SuggestionChipsView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
                 }
-                .buttonStyle(.carChatActionPill(tone: .accent))
+                .buttonStyle(.openMicActionPill(tone: .accent))
                 .padding(.top, OpenMicTheme.Spacing.xxs)
             }
         }
         .onAppear {
             withAnimation {
+                appeared = true
+            }
+        }
+        .onChange(of: suggestions) { _, _ in
+            appeared = false
+            withAnimation(.easeOut(duration: 0.1)) {
                 appeared = true
             }
         }

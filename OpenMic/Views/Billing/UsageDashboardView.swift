@@ -3,6 +3,7 @@ import SwiftUI
 struct UsageDashboardView: View {
     @Environment(AppServices.self) private var appServices
     @State private var showContent = false
+    @State private var showPaywall = false
 
     private var tier: SubscriptionTier { appServices.effectiveTier }
     private var remaining: Int { appServices.usageTracker.remainingMinutes }
@@ -206,8 +207,12 @@ struct UsageDashboardView: View {
 
                 Button("View Plans") {
                     Haptics.tap()
+                    showPaywall = true
                 }
-                .buttonStyle(.carChatPrimary)
+                .buttonStyle(.openMicPrimary)
+                .sheet(isPresented: $showPaywall) {
+                    PaywallView()
+                }
             }
         }
     }

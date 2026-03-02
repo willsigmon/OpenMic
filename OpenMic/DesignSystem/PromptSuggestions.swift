@@ -5,7 +5,7 @@ import Foundation
 enum PromptSuggestions {
 
     struct Suggestion: Identifiable, Equatable {
-        let id = UUID()
+        var id: String { text }
         let text: String
         let icon: String
     }

@@ -29,7 +29,7 @@ enum ProviderAccessPolicy {
 
     private static let selectedProviderKey = "selectedProvider"
     private static let fallbackOrder: [AIProviderType] = [
-        .openAI, .anthropic, .gemini, .grok, .openclaw, .ollama
+        .openAI, .anthropic, .gemini, .grok, .openclaw, .ollama, .apple
     ]
 
     static func canShowInUI(

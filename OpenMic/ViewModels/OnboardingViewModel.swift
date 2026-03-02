@@ -14,6 +14,7 @@ final class OnboardingViewModel {
     var hasMicPermission = false
     var hasSpeechPermission = false
     var showPaywall = false
+    private var demoSynthesizer: AVSpeechSynthesizer?
 
     var effectiveTier: SubscriptionTier {
         appServices.effectiveTier
@@ -53,11 +54,12 @@ final class OnboardingViewModel {
 
     /// Try a free voice interaction during onboarding (system TTS, no API cost)
     func tryFreeVoice() {
-        // Trigger a quick system TTS demo
         let utterance = AVSpeechUtterance(string: "Hi there! I'm your AI copilot for the road. Ask me anything.")
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.rate = 0.52
-        AVSpeechSynthesizer().speak(utterance)
+        let synth = AVSpeechSynthesizer()
+        demoSynthesizer = synth
+        synth.speak(utterance)
     }
 
     func completeOnboarding() {

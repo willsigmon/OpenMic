@@ -241,13 +241,13 @@ struct APIKeyStepView: View {
                     Button("Continue") {
                         viewModel.advance()
                     }
-                    .buttonStyle(.carChatPrimary)
+                    .buttonStyle(.openMicPrimary)
                     .disabled(selectedCategory == .cloud && viewModel.apiKey.isEmpty)
 
                     Button("Skip for Now") {
                         viewModel.advance()
                     }
-                    .buttonStyle(.carChatGhost)
+                    .buttonStyle(.openMicGhost)
                 }
                 .padding(.horizontal, OpenMicTheme.Spacing.xl)
                 .padding(.bottom, OpenMicTheme.Spacing.xxxl)

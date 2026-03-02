@@ -97,7 +97,7 @@ final class GeminiProvider: AIProvider, @unchecked Sendable {
                 }
                 continuation.finish()
             } catch {
-                continuation.finish(throwing: error)
+                continuation.finish(throwing: AIProviderError.translate(error))
             }
         }
 

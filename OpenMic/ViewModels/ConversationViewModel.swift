@@ -52,7 +52,7 @@ final class ConversationViewModel {
     // MARK: - Voice Control
 
     func toggleListening() {
-        if isActive || voiceSession != nil || startTask != nil {
+        if isActive || voiceSession != nil || startTask != nil || sendTask != nil {
             stopListening()
         } else {
             startListening()
@@ -204,7 +204,8 @@ final class ConversationViewModel {
     }
 
     func stopListening() {
-        Task {
+        Task { [weak self] in
+            guard let self else { return }
             startTask?.cancel()
             startTask = nil
             sendTask?.cancel()

@@ -51,7 +51,7 @@ struct UpgradePromptView: View {
                     Haptics.tap()
                     onUpgrade()
                 }
-                .buttonStyle(.carChatPrimary)
+                .buttonStyle(.openMicPrimary)
 
                 Button("Not Now") {
                     onDismiss()

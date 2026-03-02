@@ -1,5 +1,8 @@
 import Foundation
 import SwiftData
+import os.log
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "ConversationStore")
 
 @MainActor
 final class ConversationStore {
@@ -22,7 +25,7 @@ final class ConversationStore {
             personaName: personaName
         )
         modelContext.insert(conversation)
-        try? modelContext.save()
+        save()
         return conversation
     }
 
@@ -54,18 +57,26 @@ final class ConversationStore {
         message.conversation = conversation
         conversation.messages.append(message)
         conversation.updatedAt = Date()
-        try? modelContext.save()
+        save()
         return message
     }
 
     func delete(_ conversation: Conversation) {
         modelContext.delete(conversation)
-        try? modelContext.save()
+        save()
     }
 
     func updateTitle(_ conversation: Conversation, title: String) {
         conversation.title = title
         conversation.updatedAt = Date()
-        try? modelContext.save()
+        save()
+    }
+
+    private func save() {
+        do {
+            try modelContext.save()
+        } catch {
+            log.error("SwiftData save failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }

@@ -1,8 +1,7 @@
 import Foundation
 
 /// Fetches and caches available ElevenLabs voices.
-@MainActor
-final class ElevenLabsVoiceManager {
+actor ElevenLabsVoiceManager {
     private var cachedVoices: [ElevenLabsVoice] = []
     private var lastFetchDate: Date?
     private let cacheLifetime: TimeInterval = 300 // 5 minutes

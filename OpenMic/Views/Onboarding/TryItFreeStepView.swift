@@ -68,13 +68,13 @@ struct TryItFreeStepView: View {
                                 Haptics.tap()
                                 viewModel.advance()
                             }
-                            .buttonStyle(.carChatPrimary)
+                            .buttonStyle(.openMicPrimary)
 
                             Button("Start Free") {
                                 Haptics.tap()
                                 viewModel.skipToReady()
                             }
-                            .buttonStyle(.carChatSecondary)
+                            .buttonStyle(.openMicSecondary)
                         }
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))

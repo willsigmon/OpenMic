@@ -131,12 +131,6 @@ struct ConversationListView: View {
         }
     }
 
-    private func deleteConversations(at offsets: IndexSet) {
-        Haptics.thud()
-        for index in offsets {
-            appServices.conversationStore.delete(conversations[index])
-        }
-    }
 }
 
 // MARK: - Conversation Row

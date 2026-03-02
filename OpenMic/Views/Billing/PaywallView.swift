@@ -78,7 +78,7 @@ struct PaywallView: View {
                                         Text("Subscribe to \(selectedTier.displayName)")
                                     }
                                 }
-                                .buttonStyle(.carChatPrimary)
+                                .buttonStyle(.openMicPrimary)
                                 .disabled(isPurchasing)
                             }
 

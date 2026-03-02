@@ -8,7 +8,7 @@ final class OpenClawProvider: AIProvider, @unchecked Sendable {
     private let service: OpenAIService
     private let model: String
 
-    init(apiKey: String = "", baseURL: String, model: String = "gemini-3-flash-preview") {
+    init(apiKey: String = "", baseURL: String, model: String = "gemini-2.0-flash") {
         self.service = OpenAIServiceFactory.service(
             apiKey: apiKey,
             overrideBaseURL: baseURL

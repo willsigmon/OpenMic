@@ -231,7 +231,7 @@ struct ReadyStepView: View {
                 Button("Get Started") {
                     viewModel.completeOnboarding()
                 }
-                .buttonStyle(.carChatPrimary)
+                .buttonStyle(.openMicPrimary)
                 .padding(.horizontal, OpenMicTheme.Spacing.xl)
                 .padding(.bottom, OpenMicTheme.Spacing.xxxl)
                 .opacity(showContent ? 1 : 0)

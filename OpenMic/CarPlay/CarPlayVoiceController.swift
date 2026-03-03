@@ -113,23 +113,35 @@ final class CarPlayVoiceController {
             "reason=\(resolution.fallbackReason?.rawValue ?? "none")"
         )
 
-        let apiKey: String?
-        if providerType.requiresAPIKey {
-            apiKey = try? await keychainManager.getAPIKey(for: providerType)
-            guard let apiKey, !apiKey.isEmpty else {
-                voiceTemplate.activateVoiceControlState(withIdentifier: StateID.noConfig)
-                return
-            }
-        } else {
-            apiKey = nil
-        }
-
         guard !Task.isCancelled else { return }
 
         // Build AI provider
         let aiProvider: AIProvider
         do {
-            aiProvider = try AIProviderFactory.create(type: providerType, apiKey: apiKey)
+            if tier == .byok {
+                let apiKey: String?
+                if providerType.requiresAPIKey {
+                    apiKey = try? await keychainManager.getAPIKey(for: providerType)
+                    guard let apiKey, !apiKey.isEmpty else {
+                        voiceTemplate.activateVoiceControlState(withIdentifier: StateID.noConfig)
+                        return
+                    }
+                } else {
+                    apiKey = nil
+                }
+
+                aiProvider = try AIProviderFactory.create(
+                    type: providerType,
+                    apiKey: apiKey
+                )
+            } else if providerType.requiresAPIKey {
+                aiProvider = AIProviderFactory.createManaged(type: providerType)
+            } else {
+                aiProvider = try AIProviderFactory.create(
+                    type: providerType,
+                    apiKey: nil
+                )
+            }
         } catch {
             voiceTemplate.activateVoiceControlState(withIdentifier: StateID.noConfig)
             return

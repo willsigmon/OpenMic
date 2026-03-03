@@ -21,6 +21,20 @@ enum SupabaseConfig {
         // Fallback for development — set your anon key here or via xcconfig
         return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6a3Fvd2t2dnZoaXlrdGthaXNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNzE4MTgsImV4cCI6MjA4Njg0NzgxOH0.BMzW-LZsQtAGrTNvi_g57u-kAHFO9TehHpVH-v2DVXM"
     }()
+
+    static var functionsBaseURL: URL {
+        url
+            .appendingPathComponent("functions")
+            .appendingPathComponent("v1")
+    }
+
+    static var realtimeProxyURL: URL {
+        functionsBaseURL.appendingPathComponent("realtime-proxy")
+    }
+
+    static var managedChatFunctionURL: URL {
+        functionsBaseURL.appendingPathComponent("managed-chat")
+    }
 }
 
 @MainActor

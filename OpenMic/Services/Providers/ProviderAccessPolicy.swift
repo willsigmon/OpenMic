@@ -60,6 +60,7 @@ enum ProviderAccessPolicy {
             isConfigured: { candidate in
                 await hasRequiredConfiguration(
                     for: candidate,
+                    tier: tier,
                     keychainManager: keychainManager
                 )
             },
@@ -113,6 +114,7 @@ enum ProviderAccessPolicy {
             isConfigured: { candidate in
                 await hasRequiredConfiguration(
                     for: candidate,
+                    tier: tier,
                     keychainManager: keychainManager
                 )
             },
@@ -298,22 +300,27 @@ enum ProviderAccessPolicy {
         case .providerUnavailable:
             return "\(requested.displayName) is unavailable right now. Using \(effective.displayName). You can switch providers in Settings."
         case .missingConfiguration:
-            return "\(requested.displayName) is not configured. Using \(effective.displayName). Add or update your key in Settings."
+            return "\(requested.displayName) is not configured. Using \(effective.displayName). Add or update its setup in Settings."
         }
     }
 
     private static func hasRequiredConfiguration(
         for provider: AIProviderType,
+        tier: SubscriptionTier,
         keychainManager: KeychainManager
     ) async -> Bool {
-        if provider == .openclaw {
-            guard let baseURL = UserDefaults.standard.string(forKey: "openclawBaseURL") else {
+        if provider == .openclaw || provider == .ollama {
+            let key = provider == .openclaw ? "openclawBaseURL" : "ollamaBaseURL"
+            guard let baseURL = UserDefaults.standard.string(forKey: key) else {
                 return false
             }
             return !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
 
         if provider.requiresAPIKey {
+            if tier != .byok {
+                return true
+            }
             return (try? await keychainManager.hasAPIKey(for: provider)) == true
         }
 

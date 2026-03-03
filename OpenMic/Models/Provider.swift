@@ -44,7 +44,7 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
         case .gemini: "Google's multimodal brainchild."
         case .grok: "Unfiltered. Built by xAI."
         case .apple: "Private. On-device. Just works."
-        case .ollama: "Run your own models, locally."
+        case .ollama: "Run your own models on your own server."
         case .openclaw: "Your personal AI agent. Self-hosted."
         }
     }
@@ -126,8 +126,9 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
     /// Whether this provider runs on-device (no network needed)
     var isLocal: Bool {
         switch self {
-        case .apple, .ollama: true
+        case .apple: true
         case .openclaw: false
+        case .ollama: false
         default: false
         }
     }
@@ -135,7 +136,8 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
     var baseURL: String? {
         switch self {
         case .grok: "https://api.x.ai/v1"
-        case .ollama: "http://localhost:11434/v1"
+        case .ollama:
+            UserDefaults.standard.string(forKey: "ollamaBaseURL")
         case .openclaw:
             UserDefaults.standard.string(forKey: "openclawBaseURL")
         default: nil
@@ -146,10 +148,30 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
         "openmic.apikey.\(rawValue)"
     }
 
+    var apiKeyPortalURL: URL? {
+        switch self {
+        case .openAI:
+            return URL(string: "https://platform.openai.com/api-keys")
+        case .anthropic:
+            return URL(string: "https://console.anthropic.com/settings/keys")
+        case .gemini:
+            return URL(string: "https://ai.google.dev/gemini-api/docs/api-key")
+        case .grok:
+            return URL(string: "https://console.x.ai")
+        case .apple, .ollama, .openclaw:
+            return nil
+        }
+    }
+
+    var apiKeyHelpText: String? {
+        guard requiresAPIKey else { return nil }
+        return "Need a key? Sign in to \(displayName) and create one."
+    }
+
     /// Whether this provider is self-hosted (needs network but not a commercial API key)
     var isSelfHosted: Bool {
         switch self {
-        case .openclaw: true
+        case .openclaw, .ollama: true
         default: false
         }
     }

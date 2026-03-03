@@ -80,6 +80,16 @@ actor KeychainManager {
         return try get(key: secondary)
     }
 
+    func clearStoredCredentials() throws {
+        for provider in AIProviderType.allCases {
+            try? deleteAPIKey(for: provider)
+        }
+
+        for engine in TTSEngineType.allCases {
+            try? deleteTTSKey(for: engine)
+        }
+    }
+
     // MARK: - Legacy Per-Engine Methods (forwards to generic)
 
     func saveElevenLabsKey(_ key: String) throws { try saveTTSKey(for: .elevenLabs, key: key) }

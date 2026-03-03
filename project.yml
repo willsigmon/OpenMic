@@ -83,6 +83,7 @@ targets:
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
       configs:
         Debug:
+          CODE_SIGN_ENTITLEMENTS: OpenMic/Resources/OpenMicDemo.entitlements
           ENABLE_TESTABILITY: YES
           SWIFT_OPTIMIZATION_LEVEL: "-Onone"
     dependencies:

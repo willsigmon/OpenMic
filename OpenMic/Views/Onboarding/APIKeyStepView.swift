@@ -68,10 +68,17 @@ struct APIKeyStepView: View {
     private var categorySummary: String {
         switch selectedCategory {
         case .cloud:
-            return "Cloud models need an API key."
+            if viewModel.effectiveTier == .byok {
+                return "Cloud models need your API key in Power User Mode."
+            }
+            return "Managed mode is active. API keys are optional."
         case .local:
             return "On-device models are private and key-free."
         }
+    }
+
+    private var selectedProviderKeyPortalURL: URL? {
+        viewModel.selectedProvider.apiKeyPortalURL
     }
 
     var body: some View {
@@ -195,18 +202,37 @@ struct APIKeyStepView: View {
                 // API key field (only for cloud providers)
                 if selectedCategory == .cloud {
                     GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
-                        HStack(spacing: OpenMicTheme.Spacing.sm) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 14))
-                                .foregroundStyle(
-                                    OpenMicTheme.Colors.providerColor(viewModel.selectedProvider).opacity(0.6)
-                                )
+                        VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xs) {
+                            HStack(spacing: OpenMicTheme.Spacing.sm) {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(
+                                        OpenMicTheme.Colors.providerColor(viewModel.selectedProvider).opacity(0.6)
+                                    )
 
-                            SecureField("Paste your API key", text: $viewModel.apiKey)
-                                .foregroundStyle(OpenMicTheme.Colors.textPrimary)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                                .tint(OpenMicTheme.Colors.providerColor(viewModel.selectedProvider))
+                                SecureField(
+                                    viewModel.effectiveTier == .byok
+                                        ? "Paste your API key"
+                                        : "Optional: paste your own API key",
+                                    text: $viewModel.apiKey
+                                )
+                                    .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+                                    .autocorrectionDisabled()
+                                    .textInputAutocapitalization(.never)
+                                    .tint(OpenMicTheme.Colors.providerColor(viewModel.selectedProvider))
+                            }
+
+                            if let portalURL = selectedProviderKeyPortalURL {
+                                Link(destination: portalURL) {
+                                    HStack(spacing: OpenMicTheme.Spacing.xxxs) {
+                                        Image(systemName: "arrow.up.right.square")
+                                            .font(.system(size: 11, weight: .semibold))
+                                        Text("Need a key? Open \(viewModel.selectedProvider.displayName)")
+                                            .font(OpenMicTheme.Typography.micro)
+                                    }
+                                    .foregroundStyle(OpenMicTheme.Colors.providerColor(viewModel.selectedProvider))
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal, OpenMicTheme.Spacing.xl)
@@ -242,7 +268,11 @@ struct APIKeyStepView: View {
                         viewModel.advance()
                     }
                     .buttonStyle(.openMicPrimary)
-                    .disabled(selectedCategory == .cloud && viewModel.apiKey.isEmpty)
+                    .disabled(
+                        selectedCategory == .cloud
+                        && viewModel.effectiveTier == .byok
+                        && viewModel.apiKey.isEmpty
+                    )
 
                     Button("Skip for Now") {
                         viewModel.advance()

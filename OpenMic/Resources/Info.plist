@@ -36,6 +36,15 @@
 	<string>OpenMic needs microphone access for voice conversations with AI.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>OpenMic uses speech recognition to transcribe your voice for AI conversations.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>OPENMIC_PRIVACY_POLICY_URL</key>
+	<string>https://openmic.ai/privacy</string>
+	<key>OPENMIC_TERMS_OF_USE_URL</key>
+	<string>https://www.apple.com/legal/internet-services/itunes/dev/stdeula/</string>
 
 	<!-- Export Compliance -->
 	<key>ITSAppUsesNonExemptEncryption</key>

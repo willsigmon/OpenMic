@@ -5,8 +5,12 @@ struct SettingsView: View {
     @State private var versionTapCount = 0
     @State private var showPaywall = false
     @State private var showBYOKConfirm = false
+    @State private var showDeleteAccountConfirm = false
+    @State private var isDeletingAccount = false
+    @State private var accountDeletionError: String?
 
     private var isBYOK: Bool { appServices.authManager.authState.isBYOK }
+    private var isAuthenticated: Bool { appServices.authManager.authState.isAuthenticated }
     private var tier: SubscriptionTier { appServices.effectiveTier }
 
     var body: some View {
@@ -110,7 +114,7 @@ struct SettingsView: View {
                                             .font(OpenMicTheme.Typography.headline)
                                             .foregroundStyle(OpenMicTheme.Colors.textPrimary)
 
-                                        Text("Use your own API keys")
+                                        Text("Managed by default. Enable for direct BYOK routing.")
                                             .font(OpenMicTheme.Typography.caption)
                                             .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                                     }
@@ -142,6 +146,33 @@ struct SettingsView: View {
                                         Text("Power User Mode — No usage limits, direct API connections")
                                             .font(OpenMicTheme.Typography.caption)
                                             .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                                    }
+                                }
+                            }
+                        }
+
+                        if isAuthenticated {
+                            SettingsSection(title: "Account", subtitle: "Authentication and data controls") {
+                                SettingsActionCard(
+                                    icon: "trash",
+                                    title: "Delete Account",
+                                    subtitle: "Permanently delete your OpenMic account and cloud data",
+                                    color: OpenMicTheme.Colors.error,
+                                    isLoading: isDeletingAccount,
+                                    role: .destructive
+                                ) {
+                                    Haptics.tap()
+                                    showDeleteAccountConfirm = true
+                                }
+
+                                if let accountDeletionError {
+                                    GlassCard(
+                                        cornerRadius: OpenMicTheme.Radius.md,
+                                        padding: OpenMicTheme.Spacing.sm
+                                    ) {
+                                        Text(accountDeletionError)
+                                            .font(OpenMicTheme.Typography.caption)
+                                            .foregroundStyle(OpenMicTheme.Colors.error)
                                     }
                                 }
                             }
@@ -201,6 +232,16 @@ struct SettingsView: View {
         } message: {
             Text("This disables managed billing and uses your own API keys directly. You'll need to configure keys in AI Providers.")
         }
+        .alert("Delete account permanently?", isPresented: $showDeleteAccountConfirm) {
+            Button("Delete Account", role: .destructive) {
+                Task {
+                    await deleteAccount()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This action cannot be undone. Your OpenMic account and server-side data will be permanently removed.")
+        }
     }
 
     private var tierColor: Color {
@@ -218,6 +259,24 @@ struct SettingsView: View {
             return "\(version) (you found me!)"
         }
         return version
+    }
+
+    private func deleteAccount() async {
+        guard !isDeletingAccount else { return }
+
+        isDeletingAccount = true
+        accountDeletionError = nil
+
+        do {
+            try await appServices.authManager.deleteAccount()
+            await appServices.handleAccountDeletionCleanup()
+            Haptics.success()
+        } catch {
+            accountDeletionError = error.localizedDescription
+            Haptics.error()
+        }
+
+        isDeletingAccount = false
     }
 }
 
@@ -297,5 +356,55 @@ private struct SettingsRow<Destination: View>: View {
         .sensoryFeedback(.selection, trigger: false)
         .accessibilityLabel(title)
         .accessibilityHint("Opens \(title.lowercased())")
+    }
+}
+
+private struct SettingsActionCard: View {
+    let icon: String
+    let title: String
+    let subtitle: String?
+    let color: Color
+    var isLoading: Bool = false
+    var role: ButtonRole?
+    let action: () -> Void
+
+    var body: some View {
+        Button(role: role, action: action) {
+            GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
+                HStack(spacing: OpenMicTheme.Spacing.sm) {
+                    LayeredFeatureIcon(
+                        systemName: icon,
+                        color: color,
+                        accentShape: .none
+                    )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(OpenMicTheme.Typography.headline)
+                            .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+
+                        if let subtitle {
+                            Text(subtitle)
+                                .font(OpenMicTheme.Typography.caption)
+                                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                        }
+                    }
+
+                    Spacer()
+
+                    if isLoading {
+                        ProgressView()
+                            .tint(color)
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    }
+                }
+            }
+        }
+        .disabled(isLoading)
+        .accessibilityLabel(title)
+        .accessibilityHint(subtitle ?? title)
     }
 }

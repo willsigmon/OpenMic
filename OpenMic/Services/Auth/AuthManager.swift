@@ -26,6 +26,20 @@ enum AuthState: Sendable, Equatable {
     }
 }
 
+enum AuthManagerError: LocalizedError {
+    case notAuthenticated
+    case deleteAccountFailed(reason: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .notAuthenticated:
+            return "You need to be signed in to delete your account."
+        case let .deleteAccountFailed(reason):
+            return "Account deletion failed: \(reason)"
+        }
+    }
+}
+
 @Observable
 @MainActor
 final class AuthManager {
@@ -112,6 +126,42 @@ final class AuthManager {
         currentUserID = nil
         currentEmail = nil
         authState = .anonymous
+    }
+
+    // MARK: - Account Deletion
+
+    func deleteAccount() async throws {
+        guard authState.isAuthenticated else {
+            throw AuthManagerError.notAuthenticated
+        }
+
+        do {
+            let session = try await supabase.auth.session
+            try await supabase.functions.invoke(
+                "delete-account",
+                options: .init(
+                    method: .post,
+                    headers: [
+                        "Authorization": "Bearer \(session.accessToken)"
+                    ]
+                )
+            )
+        } catch {
+            throw AuthManagerError.deleteAccountFailed(
+                reason: error.localizedDescription
+            )
+        }
+
+        currentUserID = nil
+        currentEmail = nil
+        authState = .anonymous
+        UserDefaults.standard.set(false, forKey: "byokMode")
+
+        do {
+            try await supabase.auth.signOut()
+        } catch {
+            // Best effort. Session may already be invalidated after deletion.
+        }
     }
 
     // MARK: - BYOK Mode

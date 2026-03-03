@@ -125,12 +125,7 @@ struct ConversationView: View {
                         .padding(.top, OpenMicTheme.Spacing.xs)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 } else if let fallbackMessage = vm.providerFallbackMessage, !fallbackMessage.isEmpty {
-                    Text(fallbackMessage)
-                        .font(OpenMicTheme.Typography.caption)
-                        .foregroundStyle(OpenMicTheme.Colors.textSecondary)
-                        .padding(.horizontal, OpenMicTheme.Spacing.md)
-                        .padding(.vertical, OpenMicTheme.Spacing.xs)
-                        .glassBackground(cornerRadius: OpenMicTheme.Radius.md)
+                    fallbackBanner(fallbackMessage)
                         .padding(.horizontal, OpenMicTheme.Spacing.xl)
                         .padding(.top, OpenMicTheme.Spacing.xs)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -359,10 +354,42 @@ struct ConversationView: View {
 
     // MARK: - Error Banner
 
-    private var isAPIKeyError: Bool {
-        guard let error = viewModel?.errorMessage?.lowercased() else { return false }
-        return error.contains("api") || error.contains("key") || error.contains("auth")
-            || error.contains("401") || error.contains("403")
+    private func isAPIKeyError(_ error: String) -> Bool {
+        let normalized = error.lowercased()
+        return normalized.contains("api") || normalized.contains("key") || normalized.contains("auth")
+            || normalized.contains("401") || normalized.contains("403")
+            || normalized.contains("configured providers")
+            || normalized.contains("configure in settings")
+    }
+
+    private var currentProviderPortalURL: URL? {
+        guard let provider = viewModel?.activeProvider else { return nil }
+        guard provider.requiresAPIKey else { return nil }
+        return provider.apiKeyPortalURL
+    }
+
+    @ViewBuilder
+    private func fallbackBanner(_ message: String) -> some View {
+        HStack(spacing: OpenMicTheme.Spacing.xs) {
+            Image(systemName: "info.circle.fill")
+                .font(.system(size: 13))
+                .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+
+            Text(message)
+                .font(OpenMicTheme.Typography.caption)
+                .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                .lineLimit(2)
+
+            Spacer(minLength: OpenMicTheme.Spacing.xs)
+
+            Button("Setup") {
+                showSettings = true
+            }
+            .buttonStyle(.carChatActionPill(tone: .accent))
+        }
+        .padding(.horizontal, OpenMicTheme.Spacing.md)
+        .padding(.vertical, OpenMicTheme.Spacing.xs)
+        .glassBackground(cornerRadius: OpenMicTheme.Radius.md)
     }
 
     @ViewBuilder
@@ -396,7 +423,7 @@ struct ConversationView: View {
                 .accessibilityLabel("Try again")
                 .accessibilityHint("Retries the voice conversation")
 
-                if isAPIKeyError {
+                if isAPIKeyError(error) {
                     Button {
                         showSettings = true
                     } label: {
@@ -410,6 +437,20 @@ struct ConversationView: View {
                     .buttonStyle(.openMicActionPill(tone: .accent))
                     .accessibilityLabel("Open settings")
                     .accessibilityHint("Configure your API key")
+
+                    if let portalURL = currentProviderPortalURL {
+                        Link(destination: portalURL) {
+                            HStack(spacing: OpenMicTheme.Spacing.xxs) {
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.system(size: 10, weight: .bold))
+                                Text("Get Key")
+                                    .font(OpenMicTheme.Typography.caption)
+                            }
+                        }
+                        .buttonStyle(.carChatActionPill(tone: .accent))
+                        .accessibilityLabel("Get API key")
+                        .accessibilityHint("Opens provider website to create an API key")
+                    }
                 }
 
                 Spacer()

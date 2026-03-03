@@ -9,6 +9,10 @@ struct APIKeySettingsView: View {
         appServices.effectiveTier
     }
 
+    private var isBYOKMode: Bool {
+        effectiveTier == .byok
+    }
+
     private var selectedProvider: AIProviderType? {
         guard let raw = UserDefaults.standard.string(forKey: "selectedProvider") else {
             return nil
@@ -80,6 +84,10 @@ struct APIKeySettingsView: View {
                         CurrentProviderStatus(provider: selectedProvider)
                     }
 
+                    if !isBYOKMode {
+                        ManagedModeNotice()
+                    }
+
                     if let appleVisibilityNote {
                         AppleVisibilityNote(text: appleVisibilityNote)
                     }
@@ -89,7 +97,9 @@ struct APIKeySettingsView: View {
                         SectionHeader(
                             icon: "cloud.fill",
                             title: "Cloud",
-                            subtitle: "Powerful models, needs an API key"
+                            subtitle: isBYOKMode
+                                ? "Direct provider access with your API keys"
+                                : "Managed mode recommended. Keys are optional."
                         )
 
                         ForEach(Array(visibleCloudProviders.enumerated()), id: \.element.id) { index, provider in
@@ -97,6 +107,7 @@ struct APIKeySettingsView: View {
                                 ProviderCard(
                                     provider: provider,
                                     viewModel: viewModel,
+                                    isBYOKMode: isBYOKMode,
                                     isActive: selectedProvider == provider
                                 )
                                 .opacity(appeared ? 1 : 0)
@@ -219,6 +230,23 @@ private struct CurrentProviderStatus: View {
     }
 }
 
+private struct ManagedModeNotice: View {
+    var body: some View {
+        HStack(spacing: OpenMicTheme.Spacing.xs) {
+            Image(systemName: "shield.lefthalf.filled.badge.checkmark")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(OpenMicTheme.Colors.success)
+
+            Text("Managed mode is active. You can chat without adding API keys.")
+                .font(OpenMicTheme.Typography.caption)
+                .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+
+            Spacer()
+        }
+        .padding(.horizontal, OpenMicTheme.Spacing.sm)
+    }
+}
+
 private struct AppleVisibilityNote: View {
     let text: String
 
@@ -243,6 +271,7 @@ private struct AppleVisibilityNote: View {
 private struct ProviderCard: View {
     let provider: AIProviderType
     @Bindable var viewModel: SettingsViewModel
+    let isBYOKMode: Bool
     let isActive: Bool
     @State private var isEditing = false
     @State private var editedKey = ""
@@ -254,6 +283,20 @@ private struct ProviderCard: View {
 
     private var brandColor: Color {
         OpenMicTheme.Colors.providerColor(provider)
+    }
+
+    private var actionLabel: String {
+        if hasKey {
+            return "Update"
+        }
+        return isBYOKMode ? "Add Key" : "Optional Key"
+    }
+
+    private var missingKeyMessage: String {
+        if isBYOKMode {
+            return provider.apiKeyHelpText ?? "Add your \(provider.displayName) API key."
+        }
+        return "Managed mode handles this provider for you. Add a key only if you enable Power User Mode."
     }
 
     var body: some View {
@@ -306,7 +349,7 @@ private struct ProviderCard: View {
                             isEditing = true
                         }
                     } label: {
-                        Text(hasKey ? "Update" : "Add Key")
+                        Text(actionLabel)
                             .font(OpenMicTheme.Typography.caption)
                             .foregroundStyle(hasKey ? OpenMicTheme.Colors.textTertiary : brandColor)
                             .padding(.horizontal, OpenMicTheme.Spacing.sm)
@@ -331,6 +374,43 @@ private struct ProviderCard: View {
                 }
             }
             .padding(OpenMicTheme.Spacing.md)
+
+            if !hasKey, !isEditing {
+                Divider()
+                    .background(brandColor.opacity(0.15))
+
+                HStack(alignment: .top, spacing: OpenMicTheme.Spacing.sm) {
+                    VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xxxs) {
+                        Text(missingKeyMessage)
+                            .font(OpenMicTheme.Typography.micro)
+                            .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    }
+
+                    Spacer(minLength: OpenMicTheme.Spacing.sm)
+
+                    if let portalURL = provider.apiKeyPortalURL {
+                        Link(destination: portalURL) {
+                            HStack(spacing: OpenMicTheme.Spacing.xxs) {
+                                Image(systemName: "arrow.up.right.square")
+                                    .font(.system(size: 10, weight: .semibold))
+                                Text("Get Key")
+                                    .font(OpenMicTheme.Typography.caption)
+                            }
+                            .foregroundStyle(brandColor)
+                            .padding(.horizontal, OpenMicTheme.Spacing.sm)
+                            .padding(.vertical, OpenMicTheme.Spacing.xxs)
+                            .background(
+                                Capsule().fill(brandColor.opacity(0.12))
+                            )
+                            .overlay(
+                                Capsule().strokeBorder(brandColor.opacity(0.25), lineWidth: 0.5)
+                            )
+                        }
+                    }
+                }
+                .padding(.horizontal, OpenMicTheme.Spacing.md)
+                .padding(.vertical, OpenMicTheme.Spacing.sm)
+            }
 
             // Expanded key input
             if isEditing {
@@ -542,6 +622,62 @@ private struct SelfHostedProviderCard: View {
         OpenMicTheme.Colors.providerColor(provider)
     }
 
+    private var baseURLKey: String {
+        switch provider {
+        case .openclaw:
+            return "openclawBaseURL"
+        case .ollama:
+            return "ollamaBaseURL"
+        default:
+            return "\(provider.rawValue)BaseURL"
+        }
+    }
+
+    private var baseURLPlaceholder: String {
+        switch provider {
+        case .openclaw:
+            return "http://your-server:8101"
+        case .ollama:
+            return "http://192.168.1.10:11434"
+        default:
+            return "http://your-server"
+        }
+    }
+
+    private var endpointTitle: String {
+        switch provider {
+        case .ollama:
+            return "Ollama Endpoint"
+        default:
+            return "Base URL"
+        }
+    }
+
+    private var guidanceText: String? {
+        switch provider {
+        case .ollama:
+            return "Use http:// with your computer's LAN IP (not localhost). If needed, run Ollama with OLLAMA_HOST=0.0.0.0:11434."
+        case .openclaw:
+            return nil
+        default:
+            return nil
+        }
+    }
+
+    private var normalizedBaseURL: String {
+        let trimmed = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "" }
+
+        let withScheme: String
+        if trimmed.contains("://") {
+            withScheme = trimmed
+        } else {
+            withScheme = "http://\(trimmed)"
+        }
+
+        return withScheme.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: OpenMicTheme.Spacing.md) {
@@ -586,7 +722,7 @@ private struct SelfHostedProviderCard: View {
 
                 if !isEditing {
                     Button {
-                        baseURL = UserDefaults.standard.string(forKey: "openclawBaseURL") ?? ""
+                        baseURL = UserDefaults.standard.string(forKey: baseURLKey) ?? ""
                         withAnimation(OpenMicTheme.Animation.fast) {
                             isEditing = true
                         }
@@ -614,7 +750,7 @@ private struct SelfHostedProviderCard: View {
                         .background(brandColor.opacity(0.2))
 
                     VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xs) {
-                        Text("Base URL")
+                        Text(endpointTitle)
                             .font(OpenMicTheme.Typography.micro)
                             .foregroundStyle(OpenMicTheme.Colors.textTertiary)
 
@@ -623,7 +759,7 @@ private struct SelfHostedProviderCard: View {
                                 .font(.system(size: 12))
                                 .foregroundStyle(brandColor.opacity(0.6))
 
-                            TextField("http://your-server:8101", text: $baseURL)
+                            TextField(baseURLPlaceholder, text: $baseURL)
                                 .font(OpenMicTheme.Typography.body)
                                 .foregroundStyle(OpenMicTheme.Colors.textPrimary)
                                 .autocorrectionDisabled()
@@ -639,6 +775,12 @@ private struct SelfHostedProviderCard: View {
                             RoundedRectangle(cornerRadius: OpenMicTheme.Radius.sm)
                                 .strokeBorder(brandColor.opacity(0.15), lineWidth: 0.5)
                         )
+
+                        if let guidanceText {
+                            Text(guidanceText)
+                                .font(OpenMicTheme.Typography.micro)
+                                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                        }
                     }
 
                     HStack(spacing: OpenMicTheme.Spacing.xs) {
@@ -681,7 +823,8 @@ private struct SelfHostedProviderCard: View {
                         Spacer()
 
                         Button {
-                            UserDefaults.standard.set(baseURL, forKey: "openclawBaseURL")
+                            UserDefaults.standard.set(normalizedBaseURL, forKey: baseURLKey)
+                            UserDefaults.standard.set(provider.rawValue, forKey: "selectedProvider")
                             Haptics.tap()
                             withAnimation(OpenMicTheme.Animation.fast) {
                                 isEditing = false
@@ -703,8 +846,8 @@ private struct SelfHostedProviderCard: View {
                                 )
                         }
                         .buttonStyle(.plain)
-                        .disabled(baseURL.isEmpty)
-                        .opacity(baseURL.isEmpty ? 0.5 : 1)
+                        .disabled(normalizedBaseURL.isEmpty)
+                        .opacity(normalizedBaseURL.isEmpty ? 0.5 : 1)
                     }
                 }
                 .padding(.horizontal, OpenMicTheme.Spacing.md)
@@ -739,15 +882,34 @@ private struct SelfHostedProviderCard: View {
     }
 
     private func testConnection() {
+        let baseURLToTest = normalizedBaseURL
+        guard !baseURLToTest.isEmpty else {
+            testResult = false
+            return
+        }
+
         isTesting = true
         testResult = nil
         Task {
             do {
-                let provider = try AIProviderFactory.create(
-                    type: .openclaw,
-                    apiKey: nil
-                )
-                let result = try await provider.validateKey()
+                let providerToTest: any AIProvider
+                switch provider {
+                case .openclaw:
+                    providerToTest = OpenClawProvider(
+                        apiKey: "",
+                        baseURL: baseURLToTest,
+                        model: provider.defaultModel
+                    )
+                case .ollama:
+                    providerToTest = OllamaProvider(
+                        baseURL: baseURLToTest,
+                        model: provider.defaultModel
+                    )
+                default:
+                    throw AIProviderError.configurationMissing("Unsupported self-hosted provider")
+                }
+
+                let result = try await providerToTest.validateKey()
                 testResult = result
             } catch {
                 testResult = false

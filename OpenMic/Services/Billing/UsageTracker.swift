@@ -106,6 +106,16 @@ final class UsageTracker {
         }
     }
 
+    func resetToFreeDefaults() {
+        sessionTimer?.cancel()
+        sessionTimer = nil
+        isSessionActive = false
+        currentSessionStart = nil
+        sessionCount = 0
+        usedMinutesThisMonth = 0
+        remainingMinutes = SubscriptionTier.free.monthlyMinutes
+    }
+
     // MARK: - Usage Event Logging
 
     private func logUsageEvent(

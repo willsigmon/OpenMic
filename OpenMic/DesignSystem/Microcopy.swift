@@ -98,6 +98,36 @@ enum Microcopy {
         }
     }
 
+    // MARK: - Legal Links
+
+    enum Legal {
+        static var privacyPolicyURL: URL {
+            configuredURL(
+                plistKey: "OPENMIC_PRIVACY_POLICY_URL",
+                fallback: "https://openmic.ai/privacy"
+            )
+        }
+
+        static var termsOfUseURL: URL {
+            configuredURL(
+                plistKey: "OPENMIC_TERMS_OF_USE_URL",
+                fallback: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+            )
+        }
+
+        private static func configuredURL(plistKey: String, fallback: String) -> URL {
+            if
+                let configured = Bundle.main.object(forInfoDictionaryKey: plistKey) as? String,
+                let url = URL(string: configured),
+                !configured.isEmpty
+            {
+                return url
+            }
+
+            return URL(string: fallback)!
+        }
+    }
+
     // MARK: - Settings Subtitles
 
     enum Settings {

@@ -48,6 +48,8 @@ enum AIProviderError: LocalizedError {
                 return .networkError("Can't reach the server — check your connection")
             case NSURLErrorTimedOut:
                 return .networkError("Request timed out — try again")
+            case NSURLErrorAppTransportSecurityRequiresSecureConnection:
+                return .networkError("iOS blocked the connection (ATS). Use HTTPS or a local-network endpoint.")
             default:
                 return .networkError(error.localizedDescription)
             }

@@ -110,6 +110,16 @@ struct PaywallView: View {
                                 .font(OpenMicTheme.Typography.micro)
                                 .foregroundStyle(OpenMicTheme.Colors.textTertiary.opacity(0.5))
                                 .multilineTextAlignment(.center)
+
+                            HStack(spacing: OpenMicTheme.Spacing.xs) {
+                                Link("Terms of Use", destination: Microcopy.Legal.termsOfUseURL)
+                                Text("•")
+                                Link("Privacy Policy", destination: Microcopy.Legal.privacyPolicyURL)
+                            }
+                            .font(OpenMicTheme.Typography.micro)
+                            .foregroundStyle(OpenMicTheme.Colors.accentGradientStart.opacity(0.9))
+                            .tint(OpenMicTheme.Colors.accentGradientStart)
+                            .accessibilityElement(children: .contain)
                         }
                         .padding(.horizontal, OpenMicTheme.Spacing.xl)
                         .padding(.bottom, OpenMicTheme.Spacing.xxxl)

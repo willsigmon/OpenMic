@@ -267,8 +267,9 @@ final class ConversationViewModel {
 
         // Use realtime session for premium tier with realtime-capable providers
         if tier.supportsRealtime,
+           tier != .byok,
            providerType.supportsRealtimeVoice,
-           !tier.rawValue.isEmpty, // not BYOK using pipeline
+           providerType.requiresAPIKey,
            appServices.authManager.currentUserID != nil
         {
             isRealtimeSession = true
@@ -276,14 +277,14 @@ final class ConversationViewModel {
 
             let authToken: String
             do {
-                authToken = try await supabase.auth.session.accessToken
+                authToken = try await ManagedSessionTokenProvider.accessToken()
             } catch {
-                throw AIProviderError.configurationMissing("Not authenticated for realtime")
+                throw AIProviderError.configurationMissing("Unable to start a managed session")
             }
 
             return RealtimeVoiceSession(
                 provider: providerType,
-                proxyBaseURL: URL(string: "\(SupabaseConfig.url)/functions/v1/realtime-proxy")!,
+                proxyBaseURL: SupabaseConfig.realtimeProxyURL,
                 authToken: authToken,
                 deviceID: appServices.authManager.effectiveDeviceID,
                 voice: fetchActivePersona()?.openAIRealtimeVoice ?? "alloy"
@@ -293,19 +294,23 @@ final class ConversationViewModel {
         // Fall back to pipeline session (BYOK or standard tier)
         isRealtimeSession = false
 
-        // For BYOK, use user's own API keys
-        let apiKey: String?
+        let aiProvider: AIProvider
         if tier == .byok {
-            apiKey = try? await appServices.keychainManager.getAPIKey(for: providerType)
+            let apiKey = try? await appServices.keychainManager.getAPIKey(
+                for: providerType
+            )
+            aiProvider = try AIProviderFactory.create(
+                type: providerType,
+                apiKey: apiKey
+            )
+        } else if providerType.requiresAPIKey {
+            aiProvider = AIProviderFactory.createManaged(type: providerType)
         } else {
-            // For managed tiers, use proxy or built-in free model
-            apiKey = try? await appServices.keychainManager.getAPIKey(for: providerType)
+            aiProvider = try AIProviderFactory.create(
+                type: providerType,
+                apiKey: nil
+            )
         }
-
-        let aiProvider = try AIProviderFactory.create(
-            type: providerType,
-            apiKey: apiKey
-        )
 
         let stt = SFSpeechSTT(paceProfile: .fast)
         let tts = try await buildTTSEngine()

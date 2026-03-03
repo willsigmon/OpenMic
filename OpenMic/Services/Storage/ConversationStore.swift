@@ -66,6 +66,18 @@ final class ConversationStore {
         save()
     }
 
+    func deleteAllConversations() {
+        do {
+            let all = try fetchAll()
+            for conversation in all {
+                modelContext.delete(conversation)
+            }
+            try modelContext.save()
+        } catch {
+            // Best effort cleanup for account deletion/sign-out flows
+        }
+    }
+
     func updateTitle(_ conversation: Conversation, title: String) {
         conversation.title = title
         conversation.updatedAt = Date()

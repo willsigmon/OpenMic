@@ -1,6 +1,20 @@
 import Foundation
 
 enum AIProviderFactory {
+    private static func normalizedEndpoint(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "" }
+
+        let withScheme: String
+        if trimmed.contains("://") {
+            withScheme = trimmed
+        } else {
+            withScheme = "http://\(trimmed)"
+        }
+
+        return withScheme.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
+
     static func create(
         type: AIProviderType,
         apiKey: String?,
@@ -45,7 +59,12 @@ enum AIProviderFactory {
             )
 
         case .ollama:
+            guard let baseURL = UserDefaults.standard.string(forKey: "ollamaBaseURL"),
+                  !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw AIProviderError.configurationMissing("Ollama base URL not configured")
+            }
             return OllamaProvider(
+                baseURL: normalizedEndpoint(baseURL),
                 model: model ?? type.defaultModel
             )
 
@@ -66,9 +85,25 @@ enum AIProviderFactory {
             }
             return OpenClawProvider(
                 apiKey: apiKey ?? "",
-                baseURL: baseURL,
+                baseURL: normalizedEndpoint(baseURL),
                 model: model ?? type.defaultModel
             )
         }
+    }
+
+    static func createManaged(
+        type: AIProviderType,
+        model: String? = nil,
+        endpointURL: URL = SupabaseConfig.managedChatFunctionURL,
+        authTokenProvider: @escaping @Sendable () async throws -> String = {
+            try await ManagedSessionTokenProvider.accessToken()
+        }
+    ) -> AIProvider {
+        ManagedProxyProvider(
+            providerType: type,
+            endpointURL: endpointURL,
+            model: model ?? type.defaultModel,
+            authTokenProvider: authTokenProvider
+        )
     }
 }

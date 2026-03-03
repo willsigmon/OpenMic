@@ -90,6 +90,20 @@ final class AppServices {
         syncTierToWatch()
     }
 
+    func handleAccountDeletionCleanup() async {
+        conversationStore.deleteAllConversations()
+        usageTracker.resetToFreeDefaults()
+
+        do {
+            try await keychainManager.clearStoredCredentials()
+        } catch {
+            // Best effort cleanup
+        }
+
+        UserDefaults.standard.removeObject(forKey: "byokMode")
+        syncTierToWatch()
+    }
+
     /// Sync subscription tier to Watch and UserDefaults (for CarPlay scene)
     func syncTierToWatch() {
         let tier = effectiveTier

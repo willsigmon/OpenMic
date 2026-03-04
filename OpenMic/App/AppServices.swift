@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+import os.log
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "AppServices")
 
 @Observable
 @MainActor
@@ -14,6 +17,9 @@ final class AppServices {
     let notificationManager: NotificationManager
 
     private(set) var isOnboardingComplete: Bool
+    /// True when SwiftData failed to open the persistent store and fell back to in-memory storage.
+    /// Data will NOT survive an app restart in this state.
+    private(set) var isUsingInMemoryFallback: Bool = false
 
     /// The effective subscription tier considering auth state and StoreKit
     var effectiveTier: SubscriptionTier {
@@ -31,6 +37,7 @@ final class AppServices {
         ])
 
         let container: ModelContainer
+        var inMemoryFallback = false
         do {
             let config = ModelConfiguration(
                 schema: schema,
@@ -41,8 +48,9 @@ final class AppServices {
                 for: schema,
                 configurations: [config]
             )
-        } catch {
+        } catch let persistentError {
             // Fallback to in-memory if persistent store fails (corrupted DB, etc.)
+            log.fault("SwiftData persistent store failed — falling back to in-memory storage. Data will NOT be persisted. Error: \(persistentError.localizedDescription, privacy: .public)")
             do {
                 let fallbackConfig = ModelConfiguration(
                     schema: schema,
@@ -52,6 +60,7 @@ final class AppServices {
                     for: schema,
                     configurations: [fallbackConfig]
                 )
+                inMemoryFallback = true
             } catch {
                 fatalError("OpenMic: Failed to create even in-memory ModelContainer: \(error)")
             }
@@ -73,6 +82,7 @@ final class AppServices {
         self.isOnboardingComplete = UserDefaults.standard.bool(
             forKey: "onboardingComplete"
         )
+        self.isUsingInMemoryFallback = inMemoryFallback
     }
 
     func completeOnboarding() {

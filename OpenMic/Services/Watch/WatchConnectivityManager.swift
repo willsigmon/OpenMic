@@ -1,5 +1,8 @@
 import Foundation
+import os.log
 @preconcurrency import WatchConnectivity
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "WatchConnectivity")
 
 private enum WatchMessageKey {
     static let action = "action"
@@ -124,12 +127,7 @@ final class WatchConnectivityManager: NSObject {
                 keychainManager: keychainManager
             )
             let providerType = resolution.effective
-            print(
-                "[ProviderAccess][\(ProviderSurface.watch.rawValue)] " +
-                "requested=\(requestedProvider.rawValue) " +
-                "effective=\(providerType.rawValue) " +
-                "reason=\(resolution.fallbackReason?.rawValue ?? "none")"
-            )
+            log.debug("[ProviderAccess][\(ProviderSurface.watch.rawValue, privacy: .public)] requested=\(requestedProvider.rawValue, privacy: .public) effective=\(providerType.rawValue, privacy: .public) reason=\(resolution.fallbackReason?.rawValue ?? "none", privacy: .public)")
 
             let provider: AIProvider
             if tier == .byok {

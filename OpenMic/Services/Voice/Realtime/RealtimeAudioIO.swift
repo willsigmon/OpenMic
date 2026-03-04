@@ -53,25 +53,29 @@ final class RealtimeAudioIO {
         let inputNode = engine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
 
+        // Capture continuations and closures by value to avoid data races:
+        // the tap block fires on a private audio thread, not on MainActor.
+        let audioLevelContinuation = self.audioLevelContinuation
+        let captureFormat = Self.captureFormat
+
         // Install tap on mic input
         inputNode.installTap(
             onBus: 0,
             bufferSize: 4096,
             format: inputFormat
-        ) { [weak self] buffer, _ in
-            guard let self else { return }
-
+        ) { [onChunk, audioLevelContinuation, captureFormat] buffer, _ in
             // Calculate audio level
-            let level = self.calculateRMS(buffer: buffer)
-            self.audioLevelContinuation?.yield(level)
+            let level = RealtimeAudioIO.calculateRMSStatic(buffer: buffer)
+            audioLevelContinuation?.yield(level)
 
             // Convert to PCM16 24kHz and send
-            guard let converted = self.convertToPCM16(
+            guard let converted = RealtimeAudioIO.convertToPCM16Static(
                 buffer: buffer,
-                from: inputFormat
+                from: inputFormat,
+                to: captureFormat
             ) else { return }
 
-            self.onAudioChunk?(converted)
+            onChunk(converted)
         }
 
         try engine.start()
@@ -119,20 +123,21 @@ final class RealtimeAudioIO {
 
     // MARK: - Private Helpers
 
-    private func convertToPCM16(
+    private static func convertToPCM16Static(
         buffer: AVAudioPCMBuffer,
-        from sourceFormat: AVAudioFormat
+        from sourceFormat: AVAudioFormat,
+        to captureFormat: AVAudioFormat
     ) -> Data? {
         guard let converter = AVAudioConverter(
             from: sourceFormat,
-            to: Self.captureFormat
+            to: captureFormat
         ) else { return nil }
 
-        let ratio = Self.captureFormat.sampleRate / sourceFormat.sampleRate
+        let ratio = captureFormat.sampleRate / sourceFormat.sampleRate
         let outputFrameCount = UInt32(Double(buffer.frameLength) * ratio)
 
         guard let outputBuffer = AVAudioPCMBuffer(
-            pcmFormat: Self.captureFormat,
+            pcmFormat: captureFormat,
             frameCapacity: outputFrameCount
         ) else { return nil }
 
@@ -150,7 +155,7 @@ final class RealtimeAudioIO {
         return Data(bytes: channelData, count: byteCount)
     }
 
-    private func calculateRMS(buffer: AVAudioPCMBuffer) -> Float {
+    private static func calculateRMSStatic(buffer: AVAudioPCMBuffer) -> Float {
         guard let channelData = buffer.floatChannelData?[0] else { return 0 }
         let frameCount = Int(buffer.frameLength)
         guard frameCount > 0 else { return 0 }

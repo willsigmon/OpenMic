@@ -122,9 +122,9 @@ final class SFSpeechSTT: STTEngine {
         recognitionTask?.cancel()
         recognitionTask = nil
 
+        audioEngine.inputNode.removeTap(onBus: 0)
         if audioEngine.isRunning {
             audioEngine.stop()
-            audioEngine.inputNode.removeTap(onBus: 0)
         }
 
         isListening = false

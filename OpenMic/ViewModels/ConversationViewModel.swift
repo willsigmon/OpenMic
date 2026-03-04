@@ -1,6 +1,9 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import os.log
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "ConversationViewModel")
 
 @Observable
 @MainActor
@@ -81,7 +84,7 @@ final class ConversationViewModel {
 
                 if conversation == nil {
                     let persona = fetchActivePersona()
-                    conversation = appServices.conversationStore.create(
+                    conversation = try appServices.conversationStore.create(
                         providerType: activeProvider,
                         personaName: persona?.name ?? "Sigmon"
                     )
@@ -153,7 +156,7 @@ final class ConversationViewModel {
 
                 if conversation == nil {
                     let persona = fetchActivePersona()
-                    conversation = appServices.conversationStore.create(
+                    conversation = try appServices.conversationStore.create(
                         providerType: activeProvider,
                         personaName: persona?.name ?? "Sigmon"
                     )
@@ -217,8 +220,8 @@ final class ConversationViewModel {
     }
 
     func interrupt() {
-        Task {
-            await voiceSession?.interrupt()
+        Task { [weak self] in
+            await self?.voiceSession?.interrupt()
         }
     }
 
@@ -258,12 +261,7 @@ final class ConversationViewModel {
         activeProvider = providerType
         providerFallbackMessage = resolution.fallbackMessage
 
-        print(
-            "[ProviderAccess][\(ProviderSurface.iPhone.rawValue)] " +
-            "requested=\(requestedProvider.rawValue) " +
-            "effective=\(providerType.rawValue) " +
-            "reason=\(resolution.fallbackReason?.rawValue ?? "none")"
-        )
+        log.debug("[ProviderAccess][\(ProviderSurface.iPhone.rawValue, privacy: .public)] requested=\(requestedProvider.rawValue, privacy: .public) effective=\(providerType.rawValue, privacy: .public) reason=\(resolution.fallbackReason?.rawValue ?? "none", privacy: .public)")
 
         // Use realtime session for premium tier with realtime-capable providers
         if tier.supportsRealtime,
@@ -520,16 +518,20 @@ final class ConversationViewModel {
 
     private func persistMessage(role: MessageRole, content: String) {
         guard let conversation else { return }
-        _ = appServices.conversationStore.addMessage(
-            to: conversation,
-            role: role,
-            content: content
-        )
+        do {
+            _ = try appServices.conversationStore.addMessage(
+                to: conversation,
+                role: role,
+                content: content
+            )
 
-        if role == .user, conversation.title == "New Conversation" {
-            let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-            let title = String(trimmed.prefix(60))
-            appServices.conversationStore.updateTitle(conversation, title: title)
+            if role == .user, conversation.title == "New Conversation" {
+                let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+                let title = String(trimmed.prefix(60))
+                try appServices.conversationStore.updateTitle(conversation, title: title)
+            }
+        } catch {
+            log.error("Failed to persist message: \(error.localizedDescription, privacy: .public)")
         }
     }
 

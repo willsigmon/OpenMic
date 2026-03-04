@@ -19,13 +19,13 @@ final class ConversationStore {
     func create(
         providerType: AIProviderType = .openAI,
         personaName: String = "Sigmon"
-    ) -> Conversation {
+    ) throws -> Conversation {
         let conversation = Conversation(
             providerType: providerType,
             personaName: personaName
         )
         modelContext.insert(conversation)
-        save()
+        try save()
         return conversation
     }
 
@@ -48,7 +48,7 @@ final class ConversationStore {
         role: MessageRole,
         content: String,
         durationSeconds: Double? = nil
-    ) -> Message {
+    ) throws -> Message {
         let message = Message(
             role: role,
             content: content,
@@ -57,13 +57,13 @@ final class ConversationStore {
         message.conversation = conversation
         conversation.messages.append(message)
         conversation.updatedAt = Date()
-        save()
+        try save()
         return message
     }
 
-    func delete(_ conversation: Conversation) {
+    func delete(_ conversation: Conversation) throws {
         modelContext.delete(conversation)
-        save()
+        try save()
     }
 
     func deleteAllConversations() {
@@ -78,17 +78,13 @@ final class ConversationStore {
         }
     }
 
-    func updateTitle(_ conversation: Conversation, title: String) {
+    func updateTitle(_ conversation: Conversation, title: String) throws {
         conversation.title = title
         conversation.updatedAt = Date()
-        save()
+        try save()
     }
 
-    private func save() {
-        do {
-            try modelContext.save()
-        } catch {
-            log.error("SwiftData save failed: \(error.localizedDescription, privacy: .public)")
-        }
+    private func save() throws {
+        try modelContext.save()
     }
 }

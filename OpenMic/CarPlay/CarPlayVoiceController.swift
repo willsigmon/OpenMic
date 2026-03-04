@@ -1,6 +1,9 @@
 import CarPlay
 import Speech
 import AVFoundation
+import os.log
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "CarPlayVoiceController")
 
 @MainActor
 final class CarPlayVoiceController {
@@ -106,12 +109,7 @@ final class CarPlayVoiceController {
         }
 
         let providerType = resolution.effective
-        print(
-            "[ProviderAccess][\(ProviderSurface.carPlay.rawValue)] " +
-            "requested=\(requestedProvider.rawValue) " +
-            "effective=\(providerType.rawValue) " +
-            "reason=\(resolution.fallbackReason?.rawValue ?? "none")"
-        )
+        log.debug("[ProviderAccess][\(ProviderSurface.carPlay.rawValue, privacy: .public)] requested=\(requestedProvider.rawValue, privacy: .public) effective=\(providerType.rawValue, privacy: .public) reason=\(resolution.fallbackReason?.rawValue ?? "none", privacy: .public)")
 
         guard !Task.isCancelled else { return }
 

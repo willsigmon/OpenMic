@@ -32,6 +32,12 @@
 	</array>
 
 	<!-- Privacy Permissions -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>OpenMic connects to Ollama on your local network for AI conversations.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_http._tcp</string>
+	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>OpenMic needs microphone access for voice conversations with AI.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

@@ -156,4 +156,14 @@ extension GoogleCloudTTS: AVAudioPlayerDelegate {
             self.playbackContinuation = nil
         }
     }
+
+    nonisolated func audioPlayerDecodeErrorDidOccur(
+        _ player: AVAudioPlayer,
+        error: (any Error)?
+    ) {
+        Task { @MainActor in
+            self.playbackContinuation?.resume()
+            self.playbackContinuation = nil
+        }
+    }
 }

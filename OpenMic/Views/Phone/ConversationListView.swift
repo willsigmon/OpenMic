@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+import os.log
+
+private let log = Logger(subsystem: "com.willsigmon.openmic", category: "ConversationListView")
 
 struct ConversationListView: View {
     let onResumeConversation: (Conversation) -> Void
@@ -36,7 +39,11 @@ struct ConversationListView: View {
                     if let conversation = conversationToDelete {
                         Haptics.thud()
                         withAnimation {
-                            appServices.conversationStore.delete(conversation)
+                            do {
+                                try appServices.conversationStore.delete(conversation)
+                            } catch {
+                                log.error("Failed to delete conversation: \(error.localizedDescription, privacy: .public)")
+                            }
                         }
                         conversationToDelete = nil
                     }

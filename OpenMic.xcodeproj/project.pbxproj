@@ -140,6 +140,7 @@
 		8638046B086FCAF748C2A77D /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB62EC578DB529100DBB2EE /* KeychainManager.swift */; };
 		8742EC3881CE235B5B1526D7 /* AmazonPollyTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB0854BA2C73F2E819CBE47 /* AmazonPollyTTS.swift */; };
 		89C2B7EB757BBE422A349A86 /* SpeechEndpointingConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2685392F1184688134B244 /* SpeechEndpointingConfig.swift */; };
+		8B6F6642DD49C1B264FC0984 /* CloudTTSBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F4F2CABD35356D6BA4813 /* CloudTTSBase.swift */; };
 		8D29D7BA74B84D886A7E0DB1 /* SigmonPersona.json in Resources */ = {isa = PBXBuildFile; fileRef = 647D399E111AC023A0F564DB /* SigmonPersona.json */; };
 		8E118B5D41D170E547C4783F /* GoogleCloudVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E91ED0695BBA21FB2C9BB2 /* GoogleCloudVoiceSettingsSection.swift */; };
 		8E18DFA5BF85DB8591C7FA01 /* CarPlayVoiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE2EA4065490C04F15A0DD1 /* CarPlayVoiceController.swift */; };
@@ -196,6 +197,7 @@
 		BDEE5FCAA55A3F5ED9FAB4BB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C52089149F997E29D05322 /* ContentView.swift */; };
 		BF855F6270A7AAA0FB62FFA0 /* AIProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59B3222746225BECC8BB542 /* AIProviderFactory.swift */; };
 		BF9E4BA9D972EE8BE5568A71 /* AmbientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70CC55131C967BDA63D994B0 /* AmbientBackground.swift */; };
+		C061C0C94E2ECD20006C9947 /* CloudTTSBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F4F2CABD35356D6BA4813 /* CloudTTSBase.swift */; };
 		C14F134CF1B8A35567CA57E9 /* AudioSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BB526C38B6047766B51EF8 /* AudioSessionManager.swift */; };
 		C29AF37A6B9C2D26EED4BB88 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571CB351C311AD0C57FDFE8C /* Message.swift */; };
 		C2AA1E7B199946D5A5489553 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2320EA27016348C0874E7582 /* DesignTokens.swift */; };
@@ -326,6 +328,7 @@
 		1DB7F1210BC24B08B5F5CC74 /* OpenAIVoiceSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIVoiceSettingsSection.swift; sourceTree = "<group>"; };
 		2320EA27016348C0874E7582 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		24EABE430E7BCC224C318C5D /* WatchConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConversationViewModel.swift; sourceTree = "<group>"; };
+		272F4F2CABD35356D6BA4813 /* CloudTTSBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudTTSBase.swift; sourceTree = "<group>"; };
 		2757FA731D110449D26754FF /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		2925105F3DE26014336A57CD /* WatchAsyncBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAsyncBridge.swift; sourceTree = "<group>"; };
 		2B2685392F1184688134B244 /* SpeechEndpointingConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechEndpointingConfig.swift; sourceTree = "<group>"; };
@@ -715,6 +718,7 @@
 				BBB0854BA2C73F2E819CBE47 /* AmazonPollyTTS.swift */,
 				42900D84E1DEBF1A91BE0DDE /* CartesiaModels.swift */,
 				5856F60028602D9EEEFBBFA8 /* CartesiaTTS.swift */,
+				272F4F2CABD35356D6BA4813 /* CloudTTSBase.swift */,
 				9B94177EF753AAEEFD37318E /* DeepgramModels.swift */,
 				F5DD0B7DA72F6418880495F7 /* DeepgramTTS.swift */,
 				2F1AF9074F3F2DEBCC9D2FFB /* ElevenLabsTTS.swift */,
@@ -1111,6 +1115,7 @@
 				07521037CD552CDDC2BD8821 /* CartesiaModels.swift in Sources */,
 				74894E3EE2F3124FF5A018CE /* CartesiaTTS.swift in Sources */,
 				5050C54A415C8D3E7989F145 /* CartesiaVoiceSettingsSection.swift in Sources */,
+				8B6F6642DD49C1B264FC0984 /* CloudTTSBase.swift in Sources */,
 				353CA5C3B23F0A8A5647E6C3 /* ContentView.swift in Sources */,
 				A91CCE239A0D1C7507ED6158 /* Conversation.swift in Sources */,
 				529771EA661C917188BBC75D /* ConversationListView.swift in Sources */,
@@ -1224,6 +1229,7 @@
 				04A33BABD4D925BDE315A5BD /* CartesiaModels.swift in Sources */,
 				E01D6D69B4FC7F40588228F2 /* CartesiaTTS.swift in Sources */,
 				1F2DB0B96035C9AD39EAE8CE /* CartesiaVoiceSettingsSection.swift in Sources */,
+				C061C0C94E2ECD20006C9947 /* CloudTTSBase.swift in Sources */,
 				BDEE5FCAA55A3F5ED9FAB4BB /* ContentView.swift in Sources */,
 				C83FA05561A1F5FCC9CF77DB /* Conversation.swift in Sources */,
 				F92EBE8C7B76282B0C60111A /* ConversationListView.swift in Sources */,
@@ -1394,7 +1400,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
@@ -1413,7 +1419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/App/Info.plist;
@@ -1465,7 +1471,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
@@ -1484,7 +1490,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/Extension/Info.plist;
@@ -1504,7 +1510,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
@@ -1525,7 +1531,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/Extension/Info.plist;
@@ -1543,7 +1549,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/App/Info.plist;
@@ -1563,7 +1569,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMicDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;

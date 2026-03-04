@@ -74,7 +74,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic
         PRODUCT_NAME: OpenMic
         MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_STRICT_CONCURRENCY: complete
@@ -120,7 +120,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild
         PRODUCT_NAME: OpenMic iOS Build
         MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_STRICT_CONCURRENCY: complete
@@ -159,7 +159,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.watchkitapp
         PRODUCT_NAME: OpenMic Watch
         MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "2"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: OpenMicWatch/App/Info.plist
     dependencies:
@@ -183,7 +183,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.watchkitapp.watchkitextension
         PRODUCT_NAME: OpenMic Watch Extension
         MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "2"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: OpenMicWatch/Extension/Info.plist
 

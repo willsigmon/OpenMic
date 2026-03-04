@@ -6,7 +6,8 @@
 	<array>
 		<string>Default</string>
 	</array>
-	<key>com.apple.developer.carplay-audio</key>
-	<true/>
+	<!-- CarPlay entitlement: re-enable after configuring on Apple Developer portal -->
+	<!-- <key>com.apple.developer.carplay-audio</key>
+	<true/> -->
 </dict>
 </plist>

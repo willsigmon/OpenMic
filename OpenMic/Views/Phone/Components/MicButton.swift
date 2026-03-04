@@ -164,6 +164,7 @@ struct MicButton: View {
                 .frame(width: size, height: size)
                 .scaleEffect(ring3Scale)
         }
+        .accessibilityHidden(true)
         .onAppear { startPulsingAnimation() }
         .onChange(of: isActive) { _, active in
             if active { startPulsingAnimation() }

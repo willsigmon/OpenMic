@@ -9,26 +9,18 @@ private let log = Logger(subsystem: "com.willsigmon.openmic", category: "AmazonP
 /// Uses AWS SigV4 signing for authentication.
 /// Falls back to SystemTTS on failure.
 @MainActor
-final class AmazonPollyTTS: NSObject, TTSEngineProtocol {
+final class AmazonPollyTTS: CloudTTSBase {
     private let accessKey: String
     private let secretKey: String
     private let region: String
     private var voiceId: String
-
-    private var audioPlayer: AVAudioPlayer?
-    private var playbackContinuation: CheckedContinuation<Void, Never>?
-    private var currentTask: Task<Void, Never>?
-    private lazy var fallbackTTS = SystemTTS()
-
-    private(set) var isSpeaking = false
-    let audioRequirement: TTSAudioRequirement = .audioPlayer
 
     init(accessKey: String, secretKey: String, region: String = "us-east-1", voiceId: String = "Joanna") {
         self.accessKey = accessKey
         self.secretKey = secretKey
         self.region = region
         self.voiceId = voiceId
-        super.init()
+        super.init(log: log)
     }
 
     // MARK: - Configuration
@@ -37,46 +29,9 @@ final class AmazonPollyTTS: NSObject, TTSEngineProtocol {
         self.voiceId = id
     }
 
-    // MARK: - TTSEngineProtocol
-
-    func speak(_ text: String) async {
-        guard !text.isEmpty else { return }
-
-        stop()
-        try? AudioSessionManager.shared.configureForSpeaking()
-        isSpeaking = true
-
-        currentTask = Task {
-            do {
-                let audioData = try await synthesize(text: text)
-                guard !Task.isCancelled, isSpeaking else { return }
-                try await playAudio(data: audioData)
-            } catch {
-                guard !Task.isCancelled else { return }
-                log.error("Amazon Polly TTS failed: \(error.localizedDescription, privacy: .public) — falling back to system TTS")
-                try? AudioSessionManager.shared.configureForSpeaking(.speechSynthesizer)
-                await fallbackTTS.speak(text)
-            }
-        }
-        await currentTask?.value
-        isSpeaking = false
-    }
-
-    func stop() {
-        currentTask?.cancel()
-        currentTask = nil
-        audioPlayer?.stop()
-        audioPlayer?.delegate = nil
-        audioPlayer = nil
-        playbackContinuation?.resume()
-        playbackContinuation = nil
-        fallbackTTS.stop()
-        isSpeaking = false
-    }
-
     // MARK: - Synthesis
 
-    private func synthesize(text: String) async throws -> Data {
+    override func synthesize(text: String) async throws -> Data {
         let host = "polly.\(region).amazonaws.com"
         let path = "/v1/speech"
         guard let url = URL(string: "https://\(host)\(path)") else {
@@ -114,8 +69,8 @@ final class AmazonPollyTTS: NSObject, TTSEngineProtocol {
             if httpResponse.statusCode == 429 {
                 throw AmazonPollyError.rateLimited
             }
-            let body = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Amazon Polly HTTP \(httpResponse.statusCode): \(body, privacy: .public)")
+            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
+            log.error("Amazon Polly HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
             throw AmazonPollyError.synthesizeFailed
         }
 
@@ -164,20 +119,35 @@ final class AmazonPollyTTS: NSObject, TTSEngineProtocol {
             payloadHash
         ].joined(separator: "\n")
 
+        guard let canonicalRequestData = canonicalRequest.data(using: .utf8) else {
+            throw AmazonPollyError.synthesizeFailed
+        }
+
         let credentialScope = "\(dateStamp)/\(region)/\(service)/aws4_request"
         let stringToSign = [
             "AWS4-HMAC-SHA256",
             amzDate,
             credentialScope,
-            sha256Hex(canonicalRequest.data(using: .utf8)!)
+            sha256Hex(canonicalRequestData)
         ].joined(separator: "\n")
 
-        let kDate = hmacSHA256(key: "AWS4\(secretKey)".data(using: .utf8)!, data: dateStamp.data(using: .utf8)!)
-        let kRegion = hmacSHA256(key: kDate, data: region.data(using: .utf8)!)
-        let kService = hmacSHA256(key: kRegion, data: service.data(using: .utf8)!)
-        let kSigning = hmacSHA256(key: kService, data: "aws4_request".data(using: .utf8)!)
+        guard
+            let secretKeyData = "AWS4\(secretKey)".data(using: .utf8),
+            let dateStampData = dateStamp.data(using: .utf8),
+            let regionData = region.data(using: .utf8),
+            let serviceData = service.data(using: .utf8),
+            let aws4RequestData = "aws4_request".data(using: .utf8),
+            let stringToSignData = stringToSign.data(using: .utf8)
+        else {
+            throw AmazonPollyError.synthesizeFailed
+        }
 
-        let signature = hmacSHA256(key: kSigning, data: stringToSign.data(using: .utf8)!)
+        let kDate = hmacSHA256(key: secretKeyData, data: dateStampData)
+        let kRegion = hmacSHA256(key: kDate, data: regionData)
+        let kService = hmacSHA256(key: kRegion, data: serviceData)
+        let kSigning = hmacSHA256(key: kService, data: aws4RequestData)
+
+        let signature = hmacSHA256(key: kSigning, data: stringToSignData)
             .map { String(format: "%02x", $0) }
             .joined()
 
@@ -204,46 +174,5 @@ final class AmazonPollyTTS: NSObject, TTSEngineProtocol {
             }
         }
         return Data(hash)
-    }
-
-    // MARK: - Playback
-
-    private func playAudio(data: Data) async throws {
-        let player = try AVAudioPlayer(data: data)
-        audioPlayer = player
-        player.delegate = self
-        player.prepareToPlay()
-
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            self.playbackContinuation = continuation
-            if !player.play() {
-                self.playbackContinuation = nil
-                continuation.resume()
-            }
-        }
-    }
-}
-
-// MARK: - AVAudioPlayerDelegate
-
-extension AmazonPollyTTS: AVAudioPlayerDelegate {
-    nonisolated func audioPlayerDidFinishPlaying(
-        _ player: AVAudioPlayer,
-        successfully flag: Bool
-    ) {
-        Task { @MainActor in
-            self.playbackContinuation?.resume()
-            self.playbackContinuation = nil
-        }
-    }
-
-    nonisolated func audioPlayerDecodeErrorDidOccur(
-        _ player: AVAudioPlayer,
-        error: (any Error)?
-    ) {
-        Task { @MainActor in
-            self.playbackContinuation?.resume()
-            self.playbackContinuation = nil
-        }
     }
 }

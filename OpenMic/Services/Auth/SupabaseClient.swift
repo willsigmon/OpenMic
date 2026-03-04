@@ -9,8 +9,12 @@ enum SupabaseConfig {
            let url = URL(string: urlString) {
             return url
         }
-        // Fallback for development — set your project URL here or via xcconfig
-        return URL(string: "https://jzkqowkvvvhiyktkaisb.supabase.co")!
+        // Fallback for development — set your project URL here or via xcconfig.
+        // This string is a compile-time constant; if it ever fails to parse that is a programmer error.
+        guard let url = URL(string: "https://jzkqowkvvvhiyktkaisb.supabase.co") else {
+            preconditionFailure("Hardcoded Supabase URL is invalid — check SupabaseClient.swift")
+        }
+        return url
     }()
 
     static let anonKey: String = {

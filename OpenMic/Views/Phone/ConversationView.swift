@@ -49,12 +49,15 @@ struct ConversationView: View {
                     .font(.system(size: 32, weight: .medium))
                     .foregroundStyle(OpenMicTheme.Gradients.accent)
                     .symbolEffect(.pulse.byLayer, options: .repeating)
+                    .accessibilityHidden(true)
 
                 Text(Microcopy.Loading.message)
                     .font(OpenMicTheme.Typography.callout)
                     .foregroundStyle(OpenMicTheme.Colors.textTertiary)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Microcopy.Loading.message)
     }
 
     @ViewBuilder
@@ -240,11 +243,14 @@ struct ConversationView: View {
                 Image(systemName: "car.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
+                    .accessibilityHidden(true)
 
                 Text("OpenMic")
                     .font(OpenMicTheme.Typography.callout)
                     .foregroundStyle(OpenMicTheme.Colors.textSecondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("OpenMic")
 
             Spacer()
 
@@ -374,6 +380,7 @@ struct ConversationView: View {
             Image(systemName: "info.circle.fill")
                 .font(.system(size: 13))
                 .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                .accessibilityHidden(true)
 
             Text(message)
                 .font(OpenMicTheme.Typography.caption)
@@ -399,6 +406,7 @@ struct ConversationView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 14))
                     .foregroundStyle(OpenMicTheme.Colors.error)
+                    .accessibilityHidden(true)
 
                 Text(error)
                     .font(OpenMicTheme.Typography.caption)
@@ -573,6 +581,7 @@ private struct SpeakingCueView: View {
             }
         }
         .onAppear { animate = true }
+        .accessibilityHidden(true)
     }
 }
 

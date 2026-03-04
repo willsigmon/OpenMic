@@ -133,6 +133,8 @@ struct SettingsView: View {
                                     ))
                                     .labelsHidden()
                                     .tint(OpenMicTheme.Colors.accentGradientStart)
+                                    .accessibilityLabel("Power User Mode")
+                                    .accessibilityHint("Switches between managed billing and direct API key connections")
                                 }
                             }
 
@@ -142,6 +144,7 @@ struct SettingsView: View {
                                         Image(systemName: "bolt.fill")
                                             .font(.system(size: 12, weight: .bold))
                                             .foregroundStyle(OpenMicTheme.Colors.processing)
+                                            .accessibilityHidden(true)
 
                                         Text("Power User Mode — No usage limits, direct API connections")
                                             .font(OpenMicTheme.Typography.caption)

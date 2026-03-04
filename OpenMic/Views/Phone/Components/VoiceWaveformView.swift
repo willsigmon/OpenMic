@@ -97,6 +97,7 @@ struct VoiceWaveformView: View {
         .padding(.horizontal, OpenMicTheme.Spacing.xl)
         .animation(OpenMicTheme.Animation.fast, value: state)
         .onAppear { appeared = true }
+        .accessibilityHidden(true)
     }
 
     /// Stagger entrance from center outward

@@ -8,19 +8,11 @@ private let elLog = Logger(subsystem: "com.willsigmon.openmic", category: "Eleve
 /// Sends text to ElevenLabs API, receives audio chunks, plays them as they arrive
 /// for minimal perceived latency. Falls back to system TTS on failure.
 @MainActor
-final class ElevenLabsTTS: NSObject, TTSEngineProtocol {
+final class ElevenLabsTTS: CloudTTSBase {
     private let apiKey: String
     private var voiceID: String
     private var modelID: ElevenLabsModel
     private var voiceSettings: ElevenLabsVoiceSettings
-
-    private var audioPlayer: AVAudioPlayer?
-    private var playbackContinuation: CheckedContinuation<Void, Never>?
-    private var currentTask: Task<Void, Never>?
-    private lazy var fallbackTTS = SystemTTS()
-
-    private(set) var isSpeaking = false
-    let audioRequirement: TTSAudioRequirement = .audioPlayer
 
     init(
         apiKey: String,
@@ -32,7 +24,7 @@ final class ElevenLabsTTS: NSObject, TTSEngineProtocol {
         self.voiceID = voiceID
         self.modelID = model
         self.voiceSettings = voiceSettings
-        super.init()
+        super.init(log: elLog)
     }
 
     // MARK: - Configuration
@@ -49,48 +41,11 @@ final class ElevenLabsTTS: NSObject, TTSEngineProtocol {
         self.voiceSettings = settings
     }
 
-    // MARK: - TTSEngineProtocol
-
-    func speak(_ text: String) async {
-        guard !text.isEmpty else { return }
-
-        stop()
-        try? AudioSessionManager.shared.configureForSpeaking()
-        isSpeaking = true
-
-        currentTask = Task {
-            do {
-                let audioData = try await synthesize(text: text)
-                guard !Task.isCancelled, isSpeaking else { return }
-                try await playAudio(data: audioData)
-            } catch {
-                guard !Task.isCancelled else { return }
-                elLog.error("ElevenLabs failed: \(error.localizedDescription, privacy: .public) — falling back to system TTS")
-                try? AudioSessionManager.shared.configureForSpeaking(.speechSynthesizer)
-                await fallbackTTS.speak(text)
-            }
-        }
-        await currentTask?.value
-        isSpeaking = false
-    }
-
-    func stop() {
-        currentTask?.cancel()
-        currentTask = nil
-        audioPlayer?.stop()
-        audioPlayer?.delegate = nil
-        audioPlayer = nil
-        playbackContinuation?.resume()
-        playbackContinuation = nil
-        fallbackTTS.stop()
-        isSpeaking = false
-    }
-
-    // MARK: - Streaming Synthesis
+    // MARK: - Synthesis
 
     /// Synthesizes text to audio using ElevenLabs streaming endpoint.
     /// Returns complete audio data for playback.
-    private func synthesize(text: String) async throws -> Data {
+    override func synthesize(text: String) async throws -> Data {
         let urlString = "https://api.elevenlabs.io/v1/text-to-speech/\(voiceID)/stream"
 
         guard let url = URL(string: urlString) else {
@@ -147,47 +102,6 @@ final class ElevenLabsTTS: NSObject, TTSEngineProtocol {
         }
 
         return audioData
-    }
-
-    // MARK: - Audio Playback
-
-    private func playAudio(data: Data) async throws {
-        let player = try AVAudioPlayer(data: data)
-        audioPlayer = player
-        player.delegate = self
-        player.prepareToPlay()
-
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            self.playbackContinuation = continuation
-            if !player.play() {
-                self.playbackContinuation = nil
-                continuation.resume()
-            }
-        }
-    }
-}
-
-// MARK: - AVAudioPlayerDelegate
-
-extension ElevenLabsTTS: AVAudioPlayerDelegate {
-    nonisolated func audioPlayerDidFinishPlaying(
-        _ player: AVAudioPlayer,
-        successfully flag: Bool
-    ) {
-        Task { @MainActor in
-            self.playbackContinuation?.resume()
-            self.playbackContinuation = nil
-        }
-    }
-
-    nonisolated func audioPlayerDecodeErrorDidOccur(
-        _ player: AVAudioPlayer,
-        error: (any Error)?
-    ) {
-        Task { @MainActor in
-            self.playbackContinuation?.resume()
-            self.playbackContinuation = nil
-        }
     }
 }
 

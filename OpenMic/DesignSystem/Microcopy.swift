@@ -36,11 +36,11 @@ enum Microcopy {
         ]
 
         static var historyTitle: String {
-            historyTitles.randomElement()!
+            historyTitles.randomElement() ?? historyTitles[0]
         }
 
         static var historySubtitle: String {
-            historySubtitles.randomElement()!
+            historySubtitles.randomElement() ?? historySubtitles[0]
         }
     }
 
@@ -78,7 +78,7 @@ enum Microcopy {
         }()
 
         static var greeting: String {
-            timeOfDayGreetings.randomElement()!
+            timeOfDayGreetings.randomElement() ?? "Hey! What can I help with?"
         }
     }
 
@@ -94,37 +94,43 @@ enum Microcopy {
         ]
 
         static var message: String {
-            phrases.randomElement()!
+            phrases.randomElement() ?? phrases[0]
         }
     }
 
     // MARK: - Legal Links
 
     enum Legal {
+        private static let defaultPrivacyURL = URL(string: "https://openmic.ai/privacy")
+        private static let defaultTermsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
+
         static var privacyPolicyURL: URL {
             configuredURL(
                 plistKey: "OPENMIC_PRIVACY_POLICY_URL",
-                fallback: "https://openmic.ai/privacy"
+                default: defaultPrivacyURL
             )
         }
 
         static var termsOfUseURL: URL {
             configuredURL(
                 plistKey: "OPENMIC_TERMS_OF_USE_URL",
-                fallback: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+                default: defaultTermsURL
             )
         }
 
-        private static func configuredURL(plistKey: String, fallback: String) -> URL {
+        private static func configuredURL(plistKey: String, default fallbackURL: URL?) -> URL {
             if
                 let configured = Bundle.main.object(forInfoDictionaryKey: plistKey) as? String,
-                let url = URL(string: configured),
-                !configured.isEmpty
+                !configured.isEmpty,
+                let url = URL(string: configured)
             {
                 return url
             }
-
-            return URL(string: fallback)!
+            guard let fallbackURL else {
+                // This only happens if the compile-time constant above is malformed — treat as a programmer error.
+                preconditionFailure("Default legal URL is invalid — this is a build-time configuration error")
+            }
+            return fallbackURL
         }
     }
 

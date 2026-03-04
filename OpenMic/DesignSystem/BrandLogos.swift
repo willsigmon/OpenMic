@@ -59,12 +59,23 @@ struct BrandLogo: View {
                         .frame(width: size, height: size)
                 }
             case .gemini:
-                // Gemini has its own multicolor logo — always render original
-                Image("ProviderLogos/gemini-logo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: size * 0.75, height: size * 0.75)
-                    .frame(width: size, height: size)
+                if let tint {
+                    // Monochrome variant for card contexts
+                    Image("ProviderLogos/gemini-logo")
+                        .renderingMode(.template)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(tint)
+                        .frame(width: size * 0.75, height: size * 0.75)
+                        .frame(width: size, height: size)
+                } else {
+                    // Preferred: official multicolor branding
+                    Image("ProviderLogos/gemini-logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: size * 0.75, height: size * 0.75)
+                        .frame(width: size, height: size)
+                }
             default:
                 if let tint {
                     // Monochrome variant for constrained UI contexts.
@@ -92,7 +103,7 @@ struct BrandLogo: View {
         case .openAI: "openai"
         case .anthropic: "claude"
         case .gemini: "gemini"
-        case .grok: "xai"
+        case .grok: "grok"
         case .ollama: "ollama"
         case .apple: "apple" // unused — handled by SF Symbol above
         case .openclaw: "openclaw" // unused — handled by SF Symbol above
@@ -125,8 +136,8 @@ struct BrandLogoCard: View {
                 )
                 .frame(width: size, height: size)
 
-            // Logo mark
-            BrandLogo(provider, size: size * 0.65)
+            // Logo mark — white on dark card backgrounds
+            BrandLogo(provider, size: size * 0.65, tint: .white)
         }
         .shadow(color: brandGlowColor.opacity(0.3), radius: 8, y: 2)
     }

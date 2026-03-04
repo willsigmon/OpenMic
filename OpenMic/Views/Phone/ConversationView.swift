@@ -385,7 +385,7 @@ struct ConversationView: View {
             Button("Setup") {
                 showSettings = true
             }
-            .buttonStyle(.carChatActionPill(tone: .accent))
+            .buttonStyle(.openMicActionPill(tone: .accent))
         }
         .padding(.horizontal, OpenMicTheme.Spacing.md)
         .padding(.vertical, OpenMicTheme.Spacing.xs)
@@ -447,7 +447,7 @@ struct ConversationView: View {
                                     .font(OpenMicTheme.Typography.caption)
                             }
                         }
-                        .buttonStyle(.carChatActionPill(tone: .accent))
+                        .buttonStyle(.openMicActionPill(tone: .accent))
                         .accessibilityLabel("Get API key")
                         .accessibilityHint("Opens provider website to create an API key")
                     }

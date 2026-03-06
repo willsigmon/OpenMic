@@ -24,6 +24,7 @@ schemes:
       config: Debug
       targets:
         - OpenMicTests
+        - OpenMicUITests
     profile:
       config: Release
       executable: OpenMic
@@ -101,6 +102,7 @@ targets:
     scheme:
       testTargets:
         - OpenMicTests
+        - OpenMicUITests
 
   OpenMiciOSBuildOnly:
     type: application
@@ -211,3 +213,23 @@ targets:
           - "$(inherited)"
           - "@loader_path/Frameworks"
           - "@executable_path/Frameworks"
+
+  OpenMicUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    supportedDestinations: [iOS]
+    sources:
+      - path: OpenMicUITests
+    dependencies:
+      - target: OpenMic
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.6"
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_NAME: OpenMicUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.uitests
+        SDKROOT: iphoneos
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
+        TEST_TARGET_NAME: OpenMic

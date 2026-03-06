@@ -6,8 +6,10 @@ struct ContentView: View {
     var body: some View {
         if appServices.isOnboardingComplete {
             MainTabView()
+                .accessibilityIdentifier(AppAccessibilityID.rootContent)
         } else {
             OnboardingContainerView()
+                .accessibilityIdentifier(AppAccessibilityID.rootContent)
         }
     }
 }

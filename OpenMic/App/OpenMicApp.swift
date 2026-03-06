@@ -16,6 +16,7 @@ struct OpenMicApp: App {
         switch launchState {
         case .loading:
             ProgressView("Launching OpenMic…")
+                .accessibilityIdentifier(AppAccessibilityID.rootLoading)
                 .task {
                     await loadAppServicesIfNeeded()
                 }
@@ -67,5 +68,6 @@ private struct AppLaunchFailureView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .accessibilityIdentifier(AppAccessibilityID.rootFailure)
     }
 }

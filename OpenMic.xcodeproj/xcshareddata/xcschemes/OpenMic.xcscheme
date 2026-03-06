@@ -50,6 +50,17 @@
                ReferencedContainer = "container:OpenMic.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3961A7510E056E6E137B8D85"
+               BuildableName = "OpenMicUITests.xctest"
+               BlueprintName = "OpenMicUITests"
+               ReferencedContainer = "container:OpenMic.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

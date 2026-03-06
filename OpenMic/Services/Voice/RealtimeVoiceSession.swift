@@ -1,12 +1,22 @@
 import Foundation
 
-/// Realtime voice session router — delegates to provider-specific session
-/// (OpenAI Realtime, Gemini Live, Hume EVI 3, ElevenLabs Conv AI).
+enum RealtimeVoiceSessionError: LocalizedError {
+    case unsupportedProvider(AIProviderType)
+
+    var errorDescription: String? {
+        switch self {
+        case .unsupportedProvider(let provider):
+            return "\(provider.displayName) does not support realtime voice yet"
+        }
+    }
+}
+
+/// Realtime voice session router for supported managed realtime providers.
 @MainActor
 final class RealtimeVoiceSession: VoiceSessionProtocol {
     private let innerSession: any VoiceSessionProtocol
 
-    private(set) var state: VoiceSessionState = .idle
+    var state: VoiceSessionState { innerSession.state }
 
     var stateStream: AsyncStream<VoiceSessionState> { innerSession.stateStream }
     var transcriptStream: AsyncStream<VoiceTranscript> { innerSession.transcriptStream }
@@ -18,7 +28,7 @@ final class RealtimeVoiceSession: VoiceSessionProtocol {
         authToken: String,
         deviceID: String,
         voice: String = "alloy"
-    ) {
+    ) throws {
         switch provider {
         case .openAI:
             innerSession = OpenAIRealtimeSession(
@@ -39,13 +49,7 @@ final class RealtimeVoiceSession: VoiceSessionProtocol {
             )
 
         default:
-            // Fallback to OpenAI for unsupported realtime providers
-            innerSession = OpenAIRealtimeSession(
-                proxyBaseURL: proxyBaseURL,
-                authToken: authToken,
-                deviceID: deviceID,
-                voice: voice
-            )
+            throw RealtimeVoiceSessionError.unsupportedProvider(provider)
         }
     }
 

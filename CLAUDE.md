@@ -5,7 +5,7 @@ Voice-first AI assistant for iOS with CarPlay, Watch app, and 8 TTS engines.
 ## Tech Stack
 
 - **Language**: Swift 6 (strict concurrency)
-- **UI**: SwiftUI, iOS 17+, watchOS 10+
+- **UI**: SwiftUI, iOS 18.6+, watchOS 10+
 - **Data**: SwiftData (Conversation, Message, Persona models)
 - **Audio**: SFSpeechRecognizer (STT) + Pipeline voice session (STT -> AI -> TTS)
 - **Build**: XcodeGen (`xcodegen generate` to rebuild)
@@ -28,7 +28,7 @@ SFSpeechSTT -> VoiceEndpointDetector -> AIProvider.streamChat() -> TTSEngine.spe
 | Gemini | Cloud BYOK | `openmic.apikey.gemini` |
 | Grok | Cloud BYOK | `openmic.apikey.grok` |
 | Ollama | Local | No key |
-| Apple | Local (stub) | No key |
+| Apple | Local (runtime-gated) | No key |
 | OpenClaw | Self-hosted | Optional |
 
 ### TTS Engines (8)
@@ -63,8 +63,9 @@ xcodegen generate   # Rebuild Xcode project after adding files
 
 - Google Cloud TTS uses `X-Goog-Api-Key` header (NOT query string)
 - Amazon Polly uses AWS SigV4 signing (implemented in AmazonPollyTTS)
-- RealtimeVoiceSession (OpenAI WebSocket) is a stub/TODO
-- Apple Intelligence provider is a placeholder using OllamaProvider
+- RealtimeVoiceSession routes managed OpenAI/Gemini realtime sessions via the proxy
+- Apple Intelligence uses FoundationModels when available on supported runtimes
+- CarPlay entitlement is currently commented out pending Apple Developer portal configuration
 - Conversation history is seeded into PipelineVoiceSession on resume
 - Topics tab navigates to Talk tab via `pendingPrompt` binding
 - History tab resumes conversations via `pendingConversation` binding

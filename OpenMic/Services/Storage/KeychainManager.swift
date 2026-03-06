@@ -2,25 +2,43 @@ import Foundation
 import KeychainAccess
 
 actor KeychainManager {
-    private let keychain: Keychain
+    private let keychain: Keychain?
+    private var inMemoryStore: [String: String]
 
     init(service: String = "com.willsigmon.openmic") {
         self.keychain = Keychain(service: service)
             .accessibility(.afterFirstUnlock)
+        self.inMemoryStore = [:]
+    }
+
+    init(inMemorySeed: [String: String]) {
+        self.keychain = nil
+        self.inMemoryStore = inMemorySeed
     }
 
     // MARK: - Core Operations
 
     func save(key: String, value: String) throws {
-        try keychain.set(value, key: key)
+        if let keychain {
+            try keychain.set(value, key: key)
+        } else {
+            inMemoryStore[key] = value
+        }
     }
 
     func get(key: String) throws -> String? {
-        try keychain.get(key)
+        if let keychain {
+            return try keychain.get(key)
+        }
+        return inMemoryStore[key]
     }
 
     func delete(key: String) throws {
-        try keychain.remove(key)
+        if let keychain {
+            try keychain.remove(key)
+        } else {
+            inMemoryStore.removeValue(forKey: key)
+        }
     }
 
     // MARK: - AI Provider Keys

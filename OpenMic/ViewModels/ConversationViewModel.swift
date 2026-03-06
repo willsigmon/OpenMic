@@ -77,6 +77,7 @@ final class ConversationViewModel {
         startTask = Task { [weak self] in
             guard let self else { return }
             defer { startTask = nil }
+            var didStartUsage = false
 
             do {
                 let session = try await buildSession()
@@ -110,14 +111,22 @@ final class ConversationViewModel {
                     pipeline.seedHistory(history)
                 }
 
-                // Start usage tracking
-                appServices.usageTracker.startSession()
-
                 let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
                 try await session.start(systemPrompt: systemPrompt)
+                appServices.usageTracker.startSession()
+                didStartUsage = true
                 ProviderAccessPolicy.markProviderAsWorking(activeProvider)
             } catch {
                 if Task.isCancelled { return }
+                await voiceSession?.stop()
+                if didStartUsage {
+                    await appServices.usageTracker.endSession(
+                        provider: activeProvider.rawValue,
+                        tier: appServices.effectiveTier,
+                        deviceID: appServices.authManager.effectiveDeviceID,
+                        userID: appServices.authManager.currentUserID
+                    )
+                }
                 voiceState = .idle
                 errorMessage = error.localizedDescription
                 tearDownObservers()
@@ -142,6 +151,7 @@ final class ConversationViewModel {
         sendTask = Task { [weak self] in
             guard let self else { return }
             defer { sendTask = nil }
+            var didStartUsage = false
 
             do {
                 startTask?.cancel()
@@ -182,21 +192,32 @@ final class ConversationViewModel {
                     pipeline.seedHistory(history)
                 }
 
-                appServices.usageTracker.startSession()
-
                 // sendText only works for pipeline sessions
                 if let pipeline = pipelineSession {
+                    appServices.usageTracker.startSession()
+                    didStartUsage = true
                     let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
-                    await pipeline.sendText(text, systemPrompt: systemPrompt)
+                    try await pipeline.sendText(text, systemPrompt: systemPrompt)
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
                 } else {
                     // For realtime sessions, start the session and the user will speak
                     let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
                     try await session.start(systemPrompt: systemPrompt)
+                    appServices.usageTracker.startSession()
+                    didStartUsage = true
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
                 }
             } catch {
                 if Task.isCancelled { return }
+                await voiceSession?.stop()
+                if didStartUsage {
+                    await appServices.usageTracker.endSession(
+                        provider: activeProvider.rawValue,
+                        tier: appServices.effectiveTier,
+                        deviceID: appServices.authManager.effectiveDeviceID,
+                        userID: appServices.authManager.currentUserID
+                    )
+                }
                 voiceState = .idle
                 errorMessage = error.localizedDescription
                 tearDownObservers()
@@ -280,7 +301,7 @@ final class ConversationViewModel {
                 throw AIProviderError.configurationMissing("Unable to start a managed session")
             }
 
-            return RealtimeVoiceSession(
+            return try RealtimeVoiceSession(
                 provider: providerType,
                 proxyBaseURL: SupabaseConfig.realtimeProxyURL,
                 authToken: authToken,

@@ -4,6 +4,21 @@ import os.log
 
 private let log = Logger(subsystem: "com.willsigmon.openmic", category: "AppServices")
 
+struct AppServicesBootstrapError: LocalizedError {
+    let persistentStoreError: Error?
+    let fallbackStoreError: Error
+
+    var errorDescription: String? {
+        if let persistentStoreError {
+            return """
+            OpenMic couldn't start its local data store. Persistent store error: \(persistentStoreError.localizedDescription). Fallback store error: \(fallbackStoreError.localizedDescription).
+            """
+        }
+
+        return "OpenMic couldn't start its local data store: \(fallbackStoreError.localizedDescription)"
+    }
+}
+
 @Observable
 @MainActor
 final class AppServices {
@@ -29,7 +44,7 @@ final class AppServices {
         return storeManager.currentTier
     }
 
-    init() {
+    static func make() throws -> AppServices {
         let schema = Schema([
             Conversation.self,
             Message.self,
@@ -62,14 +77,27 @@ final class AppServices {
                 )
                 inMemoryFallback = true
             } catch {
-                fatalError("OpenMic: Failed to create even in-memory ModelContainer: \(error)")
+                throw AppServicesBootstrapError(
+                    persistentStoreError: persistentError,
+                    fallbackStoreError: error
+                )
             }
         }
 
-        self.modelContainer = container
+        return AppServices(
+            modelContainer: container,
+            inMemoryFallback: inMemoryFallback
+        )
+    }
+
+    private init(
+        modelContainer: ModelContainer,
+        inMemoryFallback: Bool
+    ) {
+        self.modelContainer = modelContainer
         self.keychainManager = KeychainManager()
         self.conversationStore = ConversationStore(
-            modelContainer: container
+            modelContainer: modelContainer
         )
         self.watchConnectivityManager = WatchConnectivityManager(
             keychainManager: self.keychainManager

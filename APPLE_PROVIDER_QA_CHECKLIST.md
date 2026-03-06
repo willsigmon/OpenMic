@@ -13,7 +13,7 @@ Use this checklist for release validation of Apple provider rollout across iPhon
 2. Device set B: iOS 18.6, Premium tier.
 3. Device set C: iOS 26.4 beta, Premium tier.
 4. Device set D: iOS 26.4 beta, BYOK tier.
-5. CarPlay enabled profile on test builds.
+5. CarPlay-enabled provisioning profile on dedicated test builds once the portal entitlement is configured.
 6. Watch paired to iPhone for watch messaging path checks.
 
 ## Settings and Onboarding Visibility
@@ -83,7 +83,7 @@ Use this checklist for release validation of Apple provider rollout across iPhon
 ## Release Gate
 
 1. iPhone path validated on iOS 18.6 and iOS 26.4 beta.
-2. CarPlay path validated with entitlement profile refresh.
+2. CarPlay path validated only after enabling the entitlement and refreshing provisioning profiles.
 3. Watch path validated through phone relay flow.
 4. Apple provider usable only on iOS 26+ with Premium or BYOK.
 5. Fallback works for tier, OS, runtime unavailability, and missing config.

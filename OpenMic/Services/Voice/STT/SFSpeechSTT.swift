@@ -10,6 +10,8 @@ final class SFSpeechSTT: STTEngine {
     private var recognitionTask: SFSpeechRecognitionTask?
     private var finalizationFallbackTask: Task<Void, Never>?
     private let audioEngine = AVAudioEngine()
+    private var latestTranscriptText = ""
+    private var hasEmittedTerminalTranscript = false
 
     private var transcriptContinuation: AsyncStream<VoiceTranscript>.Continuation?
     private var audioLevelContinuation: AsyncStream<Float>.Continuation?
@@ -39,6 +41,8 @@ final class SFSpeechSTT: STTEngine {
     func startListening() async throws {
         guard !isListening else { return }
         cancelFinalizationFallback()
+        latestTranscriptText = ""
+        hasEmittedTerminalTranscript = false
 
         guard let speechRecognizer, speechRecognizer.isAvailable else {
             throw STTError.speechRecognizerUnavailable
@@ -88,25 +92,39 @@ final class SFSpeechSTT: STTEngine {
 
         isListening = true
 
-        let cleanup: @Sendable () -> Void = { [weak self] in
-            Task { @MainActor [weak self] in
-                self?.cleanupRecognition()
-            }
-        }
-        let cancelFallback: @Sendable () -> Void = { [weak self] in
-            Task { @MainActor [weak self] in
-                self?.cancelFinalizationFallback()
-            }
-        }
-        let transcriptContinuation = self.transcriptContinuation
-
         recognitionTask = speechRecognizer.recognitionTask(
             with: recognitionRequest,
-            resultHandler: makeRecognitionResultHandler(
-                transcriptContinuation: transcriptContinuation,
-                cleanup: cleanup,
-                cancelFallback: cancelFallback
-            )
+            resultHandler: { [weak self] result, error in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+
+                    if let result {
+                        let text = result.bestTranscription.formattedString
+                        latestTranscriptText = text
+
+                        if result.isFinal {
+                            emitTerminalTranscriptIfNeeded(text: text)
+                        } else {
+                            transcriptContinuation?.yield(
+                                VoiceTranscript(
+                                    text: text,
+                                    isFinal: false,
+                                    role: .user
+                                )
+                            )
+                        }
+                    }
+
+                    if error != nil {
+                        cancelFinalizationFallback()
+                        emitTerminalTranscriptIfNeeded(text: "")
+                        cleanupRecognition()
+                    } else if result?.isFinal == true {
+                        cancelFinalizationFallback()
+                        cleanupRecognition()
+                    }
+                }
+            }
         )
     }
 
@@ -128,6 +146,7 @@ final class SFSpeechSTT: STTEngine {
         }
 
         isListening = false
+        latestTranscriptText = ""
     }
 
     private func startFinalizationFallback() {
@@ -138,6 +157,10 @@ final class SFSpeechSTT: STTEngine {
                 for: .seconds(endpointingConfig.postEndFinalResultTimeout)
             )
             guard !Task.isCancelled else { return }
+            let finalText = latestTranscriptText.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+            emitTerminalTranscriptIfNeeded(text: finalText)
             cleanupRecognition()
         }
     }
@@ -145,6 +168,18 @@ final class SFSpeechSTT: STTEngine {
     private func cancelFinalizationFallback() {
         finalizationFallbackTask?.cancel()
         finalizationFallbackTask = nil
+    }
+
+    private func emitTerminalTranscriptIfNeeded(text: String) {
+        guard !hasEmittedTerminalTranscript else { return }
+        hasEmittedTerminalTranscript = true
+        transcriptContinuation?.yield(
+            VoiceTranscript(
+                text: text,
+                isFinal: true,
+                role: .user
+            )
+        )
     }
 
 }
@@ -187,51 +222,6 @@ private func makeAudioTapBlock(
             request.endAudio()
             onDidRequestEndAudio()
         }
-    }
-}
-
-private func recognitionResultHandler(
-    transcriptContinuation: AsyncStream<VoiceTranscript>.Continuation?,
-    result: SFSpeechRecognitionResult?,
-    error: (any Error)?,
-    cleanup: @escaping @Sendable () -> Void,
-    cancelFallback: @escaping @Sendable () -> Void
-) {
-    if let result {
-        transcriptContinuation?.yield(
-            VoiceTranscript(
-                text: result.bestTranscription.formattedString,
-                isFinal: result.isFinal,
-                role: .user
-            )
-        )
-    }
-
-    if error != nil {
-        cancelFallback()
-        transcriptContinuation?.yield(
-            VoiceTranscript(text: "", isFinal: true, role: .user)
-        )
-        cleanup()
-    } else if result?.isFinal == true {
-        cancelFallback()
-        cleanup()
-    }
-}
-
-private func makeRecognitionResultHandler(
-    transcriptContinuation: AsyncStream<VoiceTranscript>.Continuation?,
-    cleanup: @escaping @Sendable () -> Void,
-    cancelFallback: @escaping @Sendable () -> Void
-) -> (SFSpeechRecognitionResult?, (any Error)?) -> Void {
-    return { result, error in
-        recognitionResultHandler(
-            transcriptContinuation: transcriptContinuation,
-            result: result,
-            error: error,
-            cleanup: cleanup,
-            cancelFallback: cancelFallback
-        )
     }
 }
 

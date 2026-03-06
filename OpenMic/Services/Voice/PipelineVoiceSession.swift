@@ -90,7 +90,10 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
 
     /// Send text directly to AI (skipping STT), then speak the response.
     /// After the AI responds via TTS, transitions to the normal listening loop.
-    func sendText(_ text: String, systemPrompt override: String? = nil) async {
+    func sendText(
+        _ text: String,
+        systemPrompt override: String? = nil
+    ) async throws {
         // Initialize system prompt if this is the first interaction
         if conversationHistory.isEmpty {
             let prompt = override ?? systemPrompt
@@ -106,44 +109,7 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
         )
 
         do {
-            var fullResponse = ""
-            let stream = try await aiProvider.streamChat(
-                messages: conversationHistory.map {
-                    ChatMessage(role: $0.role, content: $0.content)
-                }
-            )
-
-            try? AudioSessionManager.shared.configureForSpeaking(ttsEngine.audioRequirement)
-            updateState(.speaking)
-
-            var sentenceBuffer = ""
-            for try await chunk in stream {
-                if Task.isCancelled { break }
-                fullResponse += chunk
-                sentenceBuffer += chunk
-                transcriptContinuation?.yield(
-                    VoiceTranscript(
-                        text: fullResponse,
-                        isFinal: false,
-                        role: .assistant
-                    )
-                )
-
-                if let range = sentenceBuffer.range(
-                    of: "[.!?] ",
-                    options: .regularExpression
-                ) {
-                    let sentence = String(sentenceBuffer[..<range.upperBound])
-                    sentenceBuffer = String(sentenceBuffer[range.upperBound...])
-                    await ttsEngine.speak(sentence)
-                    if Task.isCancelled { break }
-                }
-            }
-
-            if !sentenceBuffer.isEmpty, !Task.isCancelled {
-                await ttsEngine.speak(sentenceBuffer)
-            }
-
+            let fullResponse = try await streamAssistantResponse()
             conversationHistory.append((.assistant, fullResponse))
             trimHistoryIfNeeded()
             transcriptContinuation?.yield(
@@ -154,8 +120,11 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
             if !Task.isCancelled {
                 startListeningLoop()
             }
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
             updateState(.error(error.localizedDescription))
+            throw error
         }
     }
 
@@ -215,51 +184,7 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                 conversationHistory.append((.user, trimmedFinalText))
 
                 do {
-                    var fullResponse = ""
-                    let stream = try await aiProvider.streamChat(
-                        messages: conversationHistory.map {
-                            ChatMessage(role: $0.role, content: $0.content)
-                        }
-                    )
-
-                    try? AudioSessionManager.shared.configureForSpeaking(ttsEngine.audioRequirement)
-                    updateState(.speaking)
-
-                    // Collect response and speak in sentence chunks
-                    var sentenceBuffer = ""
-                    for try await chunk in stream {
-                        if Task.isCancelled { break }
-                        fullResponse += chunk
-                        sentenceBuffer += chunk
-                        transcriptContinuation?.yield(
-                            VoiceTranscript(
-                                text: fullResponse,
-                                isFinal: false,
-                                role: .assistant
-                            )
-                        )
-
-                        // Speak when we hit sentence boundaries
-                        if let range = sentenceBuffer.range(
-                            of: "[.!?] ",
-                            options: .regularExpression
-                        ) {
-                            let sentence = String(
-                                sentenceBuffer[..<range.upperBound]
-                            )
-                            sentenceBuffer = String(
-                                sentenceBuffer[range.upperBound...]
-                            )
-                            await ttsEngine.speak(sentence)
-                            if Task.isCancelled { break }
-                        }
-                    }
-
-                    // Speak remaining text
-                    if !sentenceBuffer.isEmpty, !Task.isCancelled {
-                        await ttsEngine.speak(sentenceBuffer)
-                    }
-
+                    let fullResponse = try await streamAssistantResponse()
                     conversationHistory.append((.assistant, fullResponse))
                     trimHistoryIfNeeded()
                     transcriptContinuation?.yield(
@@ -269,6 +194,8 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                             role: .assistant
                         )
                     )
+                } catch is CancellationError {
+                    break
                 } catch {
                     updateState(.error(error.localizedDescription))
                 }
@@ -291,6 +218,52 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
     private func updateState(_ newState: VoiceSessionState) {
         state = newState
         stateContinuation?.yield(newState)
+    }
+
+    private func streamAssistantResponse() async throws -> String {
+        let stream = try await aiProvider.streamChat(
+            messages: conversationHistory.map {
+                ChatMessage(role: $0.role, content: $0.content)
+            }
+        )
+
+        try? AudioSessionManager.shared.configureForSpeaking(ttsEngine.audioRequirement)
+        updateState(.speaking)
+
+        var fullResponse = ""
+        var sentenceBuffer = ""
+
+        for try await chunk in stream {
+            try Task.checkCancellation()
+            fullResponse += chunk
+            sentenceBuffer += chunk
+            transcriptContinuation?.yield(
+                VoiceTranscript(
+                    text: fullResponse,
+                    isFinal: false,
+                    role: .assistant
+                )
+            )
+
+            if let range = sentenceBuffer.range(
+                of: "[.!?] ",
+                options: .regularExpression
+            ) {
+                let sentence = String(sentenceBuffer[..<range.upperBound])
+                sentenceBuffer = String(sentenceBuffer[range.upperBound...])
+                await ttsEngine.speak(sentence)
+                try Task.checkCancellation()
+            }
+        }
+
+        try Task.checkCancellation()
+
+        if !sentenceBuffer.isEmpty {
+            await ttsEngine.speak(sentenceBuffer)
+        }
+
+        try Task.checkCancellation()
+        return fullResponse
     }
 
     private func setUpAudioObservers() {

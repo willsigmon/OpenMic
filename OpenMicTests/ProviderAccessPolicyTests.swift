@@ -215,9 +215,7 @@ struct ProviderAccessPolicyTests {
 
     @Test("Managed tiers do not require cloud API keys")
     func managedTierDoesNotRequireCloudKey() async {
-        let keychainManager = KeychainManager(
-            service: "com.willsigmon.openmic.tests.managed.\(UUID().uuidString)"
-        )
+        let keychainManager = KeychainManager(inMemorySeed: [:])
 
         let result = await ProviderAccessPolicy.canUseAtRuntime(
             provider: .openAI,
@@ -231,9 +229,7 @@ struct ProviderAccessPolicyTests {
 
     @Test("BYOK tier still requires cloud API keys")
     func byokTierStillRequiresCloudKey() async {
-        let keychainManager = KeychainManager(
-            service: "com.willsigmon.openmic.tests.byok.\(UUID().uuidString)"
-        )
+        let keychainManager = KeychainManager(inMemorySeed: [:])
 
         let result = await ProviderAccessPolicy.canUseAtRuntime(
             provider: .openAI,

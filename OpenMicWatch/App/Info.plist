@@ -4,6 +4,8 @@
 <dict>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>OpenMic</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -18,11 +20,43 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
-    <key>CFBundleDisplayName</key>
-    <string>OpenMic</string>
-    <key>WKWatchKitApp</key>
-    <true/>
+    <key>CFBundleIconFiles</key>
+    <array>
+        <string>AppIcon24x24@2x</string>
+        <string>AppIcon27.5x27.5@2x</string>
+        <string>AppIcon29x29@2x</string>
+        <string>AppIcon29x29@3x</string>
+        <string>AppIcon40x40@2x</string>
+        <string>AppIcon44x44@2x</string>
+        <string>AppIcon50x50@2x</string>
+        <string>AppIcon86x86@2x</string>
+        <string>AppIcon98x98@2x</string>
+        <string>AppIcon108x108@2x</string>
+    </array>
+    <key>CFBundleIcons</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>AppIcon24x24@2x</string>
+                <string>AppIcon27.5x27.5@2x</string>
+                <string>AppIcon29x29@2x</string>
+                <string>AppIcon29x29@3x</string>
+                <string>AppIcon40x40@2x</string>
+                <string>AppIcon44x44@2x</string>
+                <string>AppIcon50x50@2x</string>
+                <string>AppIcon86x86@2x</string>
+                <string>AppIcon98x98@2x</string>
+                <string>AppIcon108x108@2x</string>
+            </array>
+        </dict>
+    </dict>
     <key>WKCompanionAppBundleIdentifier</key>
     <string>com.willsigmon.openmic</string>
+    <key>WKWatchKitApp</key>
+    <true/>
 </dict>
 </plist>

@@ -31,8 +31,6 @@
         </dict>
         <key>NSExtensionPointIdentifier</key>
         <string>com.apple.watchkit</string>
-        <key>NSExtensionPrincipalClass</key>
-        <string>$(PRODUCT_MODULE_NAME).ExtensionDelegate</string>
     </dict>
 </dict>
 </plist>

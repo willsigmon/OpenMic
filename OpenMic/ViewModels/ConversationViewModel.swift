@@ -77,7 +77,6 @@ final class ConversationViewModel {
         startTask = Task { [weak self] in
             guard let self else { return }
             defer { startTask = nil }
-            var didStartUsage = false
 
             do {
                 let session = try await buildSession()
@@ -114,19 +113,10 @@ final class ConversationViewModel {
                 let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
                 try await session.start(systemPrompt: systemPrompt)
                 appServices.usageTracker.startSession()
-                didStartUsage = true
                 ProviderAccessPolicy.markProviderAsWorking(activeProvider)
             } catch {
                 if Task.isCancelled { return }
                 await voiceSession?.stop()
-                if didStartUsage {
-                    await appServices.usageTracker.endSession(
-                        provider: activeProvider.rawValue,
-                        tier: appServices.effectiveTier,
-                        deviceID: appServices.authManager.effectiveDeviceID,
-                        userID: appServices.authManager.currentUserID
-                    )
-                }
                 voiceState = .idle
                 errorMessage = error.localizedDescription
                 tearDownObservers()

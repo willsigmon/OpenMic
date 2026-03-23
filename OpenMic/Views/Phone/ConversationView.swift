@@ -265,6 +265,20 @@ struct ConversationView: View {
 
             Spacer()
 
+            if let conversation = vm.conversation, !conversation.messages.isEmpty {
+                ShareLink(
+                    item: ConversationExporter.plainText(from: conversation),
+                    subject: Text(conversation.displayTitle)
+                ) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                        .padding(8)
+                        .glassBackground(cornerRadius: OpenMicTheme.Radius.pill)
+                }
+                .accessibilityLabel("Share conversation")
+            }
+
             Button {
                 Task {
                     availableProviders = await vm.availableProviders()

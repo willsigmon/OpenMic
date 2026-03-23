@@ -114,6 +114,31 @@ struct ConversationListView: View {
                             Haptics.tap()
                             onResumeConversation(conversation)
                         }
+                        .contextMenu {
+                            ShareLink(
+                                item: ConversationExporter.plainText(from: conversation),
+                                subject: Text(conversation.displayTitle),
+                                message: Text("Conversation from OpenMic")
+                            ) {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                            }
+
+                            Button {
+                                let text = ConversationExporter.plainText(from: conversation)
+                                UIPasteboard.general.string = text
+                                Haptics.tap()
+                            } label: {
+                                Label("Copy Transcript", systemImage: "doc.on.doc")
+                            }
+
+                            Divider()
+
+                            Button(role: .destructive) {
+                                conversationToDelete = conversation
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) {
                                 conversationToDelete = conversation

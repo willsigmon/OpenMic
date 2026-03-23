@@ -32,14 +32,34 @@ struct SystemVoiceSettingsSection: View {
             } else {
                 // Default option
                 voiceRow(
-                    name: "Default",
-                    detail: "System default English voice",
-                    quality: nil,
+                    name: "Auto (Best Available)",
+                    detail: bestVoiceDescription,
+                    quality: bestAvailableQuality,
                     isSelected: selectedSystemVoiceID == nil
                 ) {
                     withAnimation(OpenMicTheme.Animation.fast) {
                         selectedSystemVoiceID = nil
                         saveSystemVoice(nil)
+                    }
+                }
+
+                if !hasPremiumVoice {
+                    GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
+                        HStack(spacing: OpenMicTheme.Spacing.sm) {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Premium voices available")
+                                    .font(OpenMicTheme.Typography.headline)
+                                    .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+                                Text("Settings \u{2192} Accessibility \u{2192} Spoken Content \u{2192} Voices to download neural voices")
+                                    .font(OpenMicTheme.Typography.caption)
+                                    .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                            }
+                            Spacer()
+                        }
                     }
                 }
 
@@ -222,18 +242,25 @@ struct SystemVoiceSettingsSection: View {
         }
     }
 
+    private var hasPremiumVoice: Bool {
+        availableVoices.contains { $0.quality == .premium }
+    }
+
+    private var bestAvailableQuality: AVSpeechSynthesisVoiceQuality? {
+        availableVoices.first?.quality
+    }
+
+    private var bestVoiceDescription: String {
+        if let best = SystemTTS.bestAvailableVoice() {
+            return "\(best.name) (\(voiceQualityLabel(best.quality)))"
+        }
+        return "System default English voice"
+    }
+
     // MARK: - Actions
 
     private func loadState() async {
-        let allVoices = AVSpeechSynthesisVoice.speechVoices()
-        availableVoices = allVoices
-            .filter { $0.language.hasPrefix("en") }
-            .sorted { lhs, rhs in
-                if lhs.quality != rhs.quality {
-                    return lhs.quality.rawValue > rhs.quality.rawValue
-                }
-                return lhs.name < rhs.name
-            }
+        availableVoices = SystemTTS.availableVoices(language: "en")
 
         if let persona = fetchActivePersona(from: appServices) {
             selectedSystemVoiceID = persona.systemTTSVoice

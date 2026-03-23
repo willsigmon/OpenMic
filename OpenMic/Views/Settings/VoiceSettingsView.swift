@@ -425,7 +425,7 @@ private struct TTSEngineCard: View {
 
     private var engineSubtitle: String {
         switch engine {
-        case .system: "Built-in iOS voice synthesis \u{2014} free, no setup"
+        case .system: "On-device neural voices \u{2014} free, no setup"
         case .openAI: "Natural AI voices \u{2014} uses your OpenAI key"
         case .elevenLabs: "Ultra-realistic AI voices \u{2014} requires API key"
         case .humeAI: "Emotionally expressive voices \u{2014} requires API key"

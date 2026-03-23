@@ -50,7 +50,7 @@ enum TTSEngineType: String, Codable, Sendable, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .system: "System (AVSpeechSynthesizer)"
+        case .system: "System (Neural)"
         case .openAI: "OpenAI"
         case .elevenLabs: "ElevenLabs"
         case .humeAI: "Hume AI (Expressive)"

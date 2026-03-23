@@ -40,7 +40,7 @@ final class SystemTTS: NSObject, TTSEngineProtocol {
            let voice = AVSpeechSynthesisVoice(identifier: voiceIdentifier) {
             utterance.voice = voice
         } else {
-            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            utterance.voice = Self.bestAvailableVoice(language: "en-US")
         }
 
         isSpeaking = true
@@ -84,6 +84,38 @@ final class SystemTTS: NSObject, TTSEngineProtocol {
         continuation.resume()
     }
 }
+
+// MARK: - Premium Voice Selection
+
+extension SystemTTS {
+    /// Returns the highest-quality available voice for the given language.
+    /// Prefers premium > enhanced > default quality tiers.
+    static func bestAvailableVoice(language: String = "en-US") -> AVSpeechSynthesisVoice? {
+        let candidates = AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.language.hasPrefix(language.prefix(2).description) }
+            .sorted { $0.quality.rawValue > $1.quality.rawValue }
+
+        // Prefer exact language match (en-US over en-GB) at the highest quality
+        if let exact = candidates.first(where: { $0.language == language }) {
+            return exact
+        }
+        return candidates.first ?? AVSpeechSynthesisVoice(language: language)
+    }
+
+    /// Lists all available voices for a language, grouped and sorted by quality tier.
+    static func availableVoices(language prefix: String = "en") -> [AVSpeechSynthesisVoice] {
+        AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.language.hasPrefix(prefix) }
+            .sorted { lhs, rhs in
+                if lhs.quality != rhs.quality {
+                    return lhs.quality.rawValue > rhs.quality.rawValue
+                }
+                return lhs.name < rhs.name
+            }
+    }
+}
+
+// MARK: - AVSpeechSynthesizerDelegate
 
 extension SystemTTS: AVSpeechSynthesizerDelegate {
     nonisolated func speechSynthesizer(

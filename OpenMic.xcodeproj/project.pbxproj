@@ -63,6 +63,7 @@
 		26961A12AAC2F4E2ED739682 /* OpenAIRealtimeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043924DED82C85205DF76FED /* OpenAIRealtimeSession.swift */; };
 		26EC09171DA879E594A24003 /* CustomIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED3DFB899CFEF317C6FFF9BA /* CustomIcons.swift */; };
 		27BC72E0B61583B0A174B95E /* AIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC312C99FE58404FAE4E8CCF /* AIProvider.swift */; };
+		27CBACD94A492A1126398EC4 /* ProviderPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */; };
 		287026DC4DF95AD9ACD76BC7 /* ManagedSessionTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE57FA93D9D056B01608EB8 /* ManagedSessionTokenProvider.swift */; };
 		2A55AEFC524A3F5B83DF9ACE /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8E2990FC07BB80168613D /* OpenAIProvider.swift */; };
 		2AB9F8F5E7D48501807680F6 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDADC81DE93AA145E2877 /* OnboardingViewModel.swift */; };
@@ -125,6 +126,7 @@
 		5DD4B1318CBB55675651F601 /* ProviderBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC49460E8929B94FF794E3D /* ProviderBadge.swift */; };
 		5E258BC405F64113B6667BBA /* UsageDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57B3F30BDB2B376BA334D6C /* UsageDashboardView.swift */; };
 		63BD150D126BC19F72289F05 /* APIKeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A8A8A370FDB725A4A7575E /* APIKeySettingsView.swift */; };
+		64A22EF957A406322A7C3A05 /* ProviderPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */; };
 		65F82479F9F05747EEA86AE3 /* Microcopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9ECE00DEE0C06EE83A981 /* Microcopy.swift */; };
 		665BDCB0CE4796FB8607C969 /* TopicCategoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4D021F2DC5C52EDE587591 /* TopicCategoryDetailView.swift */; };
 		67ED6F689E3F5C3728E3F88D /* AppIcon29x29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60D7545B138D44B7AAA74E3A /* AppIcon29x29@2x.png */; };
@@ -408,6 +410,7 @@
 		5D338D5D08B07E9A0FBBC087 /* OpenMicLaunchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMicLaunchUITests.swift; sourceTree = "<group>"; };
 		5E57DD5022CABF9800EDAC13 /* TopicCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCatalog.swift; sourceTree = "<group>"; };
 		5F4498A8CE5261D8B96A3779 /* AudioOutputMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioOutputMode.swift; sourceTree = "<group>"; };
+		60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderPickerSheet.swift; sourceTree = "<group>"; };
 		60D7545B138D44B7AAA74E3A /* AppIcon29x29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@2x.png"; sourceTree = "<group>"; };
 		61A4F9915F0BA607E7668FFF /* AppIcon24x24@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon24x24@2x.png"; sourceTree = "<group>"; };
 		627F4620B2AE29A8B3F8B604 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -775,6 +778,7 @@
 				487EFD2EF33C51B4E55E60C5 /* ConversationBubbleRow.swift */,
 				AB4C24F14766FD420DF56399 /* MicButton.swift */,
 				CFC49460E8929B94FF794E3D /* ProviderBadge.swift */,
+				60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */,
 				58B6D56CD2D95113AE8AD7A1 /* SuggestionChipsView.swift */,
 				C5C8B42737453D23389D38B2 /* TopicCategoryCard.swift */,
 				6EB37C0C3659233E0FFEC832 /* VoiceWaveformView.swift */,
@@ -1321,6 +1325,7 @@
 				F1E894D15DFE7BB733393BFF /* ProviderAccessPolicy.swift in Sources */,
 				5DD4B1318CBB55675651F601 /* ProviderBadge.swift in Sources */,
 				22C7FBFA0710FE553013B07F /* ProviderCard.swift in Sources */,
+				27CBACD94A492A1126398EC4 /* ProviderPickerSheet.swift in Sources */,
 				A015D66259935C2E49A7FC25 /* RealtimeAudioIO.swift in Sources */,
 				96B3FBDEE977476EACB562B4 /* RealtimeVoiceSession.swift in Sources */,
 				9D6535E648776987582A0B54 /* SFSpeechSTT.swift in Sources */,
@@ -1443,6 +1448,7 @@
 				CE6ED9C7AFEAC77634A3492F /* ProviderAccessPolicy.swift in Sources */,
 				E6D4E3962EA1A4C13ECB8844 /* ProviderBadge.swift in Sources */,
 				4C802825A9424C14BA2D3EEA /* ProviderCard.swift in Sources */,
+				64A22EF957A406322A7C3A05 /* ProviderPickerSheet.swift in Sources */,
 				820B5379BD646B7231DE7A83 /* RealtimeAudioIO.swift in Sources */,
 				AD515A1CEEDAA9E57594F4A0 /* RealtimeVoiceSession.swift in Sources */,
 				BB99EDB88E1968BB13934A58 /* SFSpeechSTT.swift in Sources */,

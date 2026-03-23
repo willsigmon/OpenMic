@@ -13,6 +13,8 @@ struct ConversationView: View {
     @State private var suggestions: [PromptSuggestions.Suggestion] = []
     @State private var statusLabel = Microcopy.Status.label(for: .idle)
     @State private var showSettings = false
+    @State private var showProviderPicker = false
+    @State private var availableProviders: [(provider: AIProviderType, ready: Bool)] = []
     @State private var bubbleReactions: [UUID: String] = [:]
     @State private var micOffset: CGSize = .zero
     @State private var micRestPosition: CGSize = .zero
@@ -183,6 +185,15 @@ struct ConversationView: View {
                     }
             }
         }
+        .sheet(isPresented: $showProviderPicker) {
+            ProviderPickerSheet(
+                currentProvider: vm.activeProvider,
+                providers: availableProviders,
+                onSelect: { provider in
+                    vm.switchProvider(to: provider)
+                }
+            )
+        }
         .onChange(of: vm.voiceState) { oldState, newState in
             // Haptic per state transition with sound companions
             Haptics.voiceStateChanged(to: newState)
@@ -254,7 +265,16 @@ struct ConversationView: View {
 
             Spacer()
 
-            ProviderBadge(provider: vm.activeProvider)
+            Button {
+                Task {
+                    availableProviders = await vm.availableProviders()
+                    showProviderPicker = true
+                }
+            } label: {
+                ProviderBadge(provider: vm.activeProvider)
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Tap to switch AI provider")
 
             Menu {
                 ForEach(AudioOutputMode.allCases) { mode in

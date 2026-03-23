@@ -236,6 +236,49 @@ final class ConversationViewModel {
         }
     }
 
+    // MARK: - Provider Switching
+
+    /// Available providers the user can switch to, with key readiness.
+    func availableProviders() async -> [(provider: AIProviderType, ready: Bool)] {
+        var results: [(provider: AIProviderType, ready: Bool)] = []
+        for provider in AIProviderType.allCases where provider.isAvailable && provider.isRuntimeAvailable {
+            if provider.requiresAPIKey {
+                let hasKey = (try? await appServices.keychainManager.hasAPIKey(for: provider)) ?? false
+                results.append((provider, hasKey))
+            } else {
+                results.append((provider, true))
+            }
+        }
+        return results
+    }
+
+    /// Switch provider mid-conversation: tear down session, swap, insert marker, restart.
+    func switchProvider(to newProvider: AIProviderType) {
+        guard newProvider != activeProvider else { return }
+
+        let wasActive = isActive
+        stopListening()
+
+        activeProvider = newProvider
+        UserDefaults.standard.set(newProvider.rawValue, forKey: "selectedProvider")
+
+        // Insert a system-style marker bubble
+        let marker = ConversationBubble(
+            role: .system,
+            text: "Switched to \(newProvider.displayName)",
+            isFinal: true
+        )
+        bubbles.append(marker)
+
+        providerFallbackMessage = nil
+        errorMessage = nil
+
+        // Restart voice session if one was active
+        if wasActive {
+            startListening()
+        }
+    }
+
     // MARK: - Conversation Resume
 
     func loadConversation(_ conversation: Conversation) {

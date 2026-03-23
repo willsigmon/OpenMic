@@ -53,6 +53,23 @@ struct ConversationBubbleDescriptorTests {
         #expect(descriptor.isUser)
     }
 
+    @Test("System bubbles map to System label with swap icon")
+    func systemBubbleDescriptor() {
+        let bubble = ConversationBubble(
+            role: .system,
+            text: "Switched to Anthropic",
+            isFinal: true
+        )
+
+        let descriptor = ConversationBubbleDescriptorFactory.make(from: bubble)
+
+        #expect(descriptor.assistantHeader == nil)
+        #expect(descriptor.carPlayTitle == "System")
+        #expect(descriptor.carPlayDetail == "Switched to Anthropic")
+        #expect(descriptor.carPlaySystemImage == "arrow.triangle.2.circlepath")
+        #expect(!descriptor.isUser)
+    }
+
     @Test("Descriptor collapses whitespace and truncates long text")
     func descriptorNormalizesDetailText() {
         let bubble = ConversationBubble(

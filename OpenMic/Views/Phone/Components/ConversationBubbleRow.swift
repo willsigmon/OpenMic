@@ -7,11 +7,42 @@ struct ConversationBubbleRow: View {
     let onCopy: () -> Void
 
     private var isUser: Bool { bubble.role == .user }
+    private var isSystem: Bool { bubble.role == .system }
     private var descriptor: ConversationBubbleDescriptor {
         ConversationBubbleDescriptorFactory.make(from: bubble)
     }
 
     var body: some View {
+        if isSystem {
+            systemMarker
+        } else {
+            chatBubble
+        }
+    }
+
+    // MARK: - System Marker (provider switch, etc.)
+
+    private var systemMarker: some View {
+        HStack(spacing: OpenMicTheme.Spacing.xs) {
+            Rectangle()
+                .fill(OpenMicTheme.Colors.borderMedium.opacity(0.4))
+                .frame(height: 0.5)
+            Text(bubble.text)
+                .font(OpenMicTheme.Typography.micro)
+                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                .lineLimit(1)
+            Rectangle()
+                .fill(OpenMicTheme.Colors.borderMedium.opacity(0.4))
+                .frame(height: 0.5)
+        }
+        .padding(.horizontal, OpenMicTheme.Spacing.xl)
+        .padding(.vertical, OpenMicTheme.Spacing.xs)
+        .accessibilityLabel(bubble.text)
+    }
+
+    // MARK: - Chat Bubble
+
+    private var chatBubble: some View {
         HStack {
             if isUser { Spacer(minLength: 42) }
 
@@ -74,6 +105,8 @@ struct ConversationBubbleRow: View {
         }
         .padding(.vertical, 2)
     }
+
+    // MARK: - Background
 
     @ViewBuilder
     private var bubbleBackground: some View {

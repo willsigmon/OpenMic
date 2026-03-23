@@ -12,7 +12,8 @@ enum ConversationBubbleDescriptorFactory {
     static func make(from bubble: ConversationBubble) -> ConversationBubbleDescriptor {
         let detail = normalizedDetailText(from: bubble.text)
 
-        if bubble.role == .user {
+        switch bubble.role {
+        case .user:
             return ConversationBubbleDescriptor(
                 assistantHeader: nil,
                 carPlayTitle: "You",
@@ -20,18 +21,28 @@ enum ConversationBubbleDescriptorFactory {
                 carPlaySystemImage: "person.fill",
                 isUser: true
             )
+
+        case .system:
+            return ConversationBubbleDescriptor(
+                assistantHeader: nil,
+                carPlayTitle: "System",
+                carPlayDetail: detail,
+                carPlaySystemImage: "arrow.triangle.2.circlepath",
+                isUser: false
+            )
+
+        case .assistant:
+            let assistantHeader = bubble.isFinal ? "OpenMic" : "OpenMic • Live"
+            let icon = bubble.isFinal ? "bubble.left.fill" : "waveform"
+
+            return ConversationBubbleDescriptor(
+                assistantHeader: assistantHeader,
+                carPlayTitle: assistantHeader,
+                carPlayDetail: detail,
+                carPlaySystemImage: icon,
+                isUser: false
+            )
         }
-
-        let assistantHeader = bubble.isFinal ? "OpenMic" : "OpenMic • Live"
-        let icon = bubble.isFinal ? "bubble.left.fill" : "waveform"
-
-        return ConversationBubbleDescriptor(
-            assistantHeader: assistantHeader,
-            carPlayTitle: assistantHeader,
-            carPlayDetail: detail,
-            carPlaySystemImage: icon,
-            isUser: false
-        )
     }
 
     private static func normalizedDetailText(from text: String, limit: Int = 140) -> String {

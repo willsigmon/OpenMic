@@ -37,6 +37,7 @@
 		0F7A84F58DA92D077D0E80DA /* AppIcon40x40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A68B7AFD250B4A7AEC3EAFD7 /* AppIcon40x40@2x.png */; };
 		0FA9B2C8CED19F42AA5178D8 /* voice_sample_premium.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 80255EA85D7726E54425E2D2 /* voice_sample_premium.m4a */; };
 		0FFF6C6BE92AA375397FE1E3 /* PromptSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DBB7CBAB1771F5686D47E9 /* PromptSuggestions.swift */; };
+		115C978E29D678658D7BCDC8 /* OpenMicWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5A6DEA69DF1DF99A75EF5E /* OpenMicWatchWidget.swift */; };
 		12C8C3D56963E9A258122F3D /* SelfHostedProviderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDDBD91632215B468E2E9EF /* SelfHostedProviderCard.swift */; };
 		1435949BA22F8DF36904D392 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 1E13A3C1CD286A1A9574A271 /* KeychainAccess */; };
 		14EFFB16182D5980151A4105 /* AppIcon29x29@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C80B19A8842749680861D9D /* AppIcon29x29@3x.png */; };
@@ -146,6 +147,7 @@
 		75604518FE6B73C968FE483B /* AppleFoundationModelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819727AB527F71838EF98649 /* AppleFoundationModelsProvider.swift */; };
 		768FD6056A2B12FA7082E633 /* PersonaSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03F6FCFDDEF49CDC0BFBAED /* PersonaSettingsView.swift */; };
 		794F7A18AF5E91F7D87E2CA1 /* PromptSuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F995A7A4B6F30B8299F5154 /* PromptSuggestionsTests.swift */; };
+		79B64D2E164CE86B9E2BBF94 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51B9E9F05DFFE238F2389A63 /* SwiftUI.framework */; };
 		7BF117B9B1E21A8B70E83E29 /* TopicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DA9F26348B91590BC801E3 /* TopicsView.swift */; };
 		7C555840CE4F347F2627008B /* GeminiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2DB34FA8BB97320EAF8687 /* GeminiProvider.swift */; };
 		7D72CB7C0E15EF66C9C116B1 /* AmazonPollyVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC3EDEF147DFA30FFB8BA0D /* AmazonPollyVoiceSettingsSection.swift */; };
@@ -176,6 +178,7 @@
 		96B3FBDEE977476EACB562B4 /* RealtimeVoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A99DBA5DB29F3B81F5A1F1 /* RealtimeVoiceSession.swift */; };
 		97DFAFF542F9BD27A9369CF2 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BCE1E81158FA8622EEB628 /* WatchConnectivityManager.swift */; };
 		97F30C0C8B8B06E2CDAE5543 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E334C81DAB5D4EF2C8082C8 /* PaywallView.swift */; };
+		98973A31566E04B5937DB689 /* OpenMicWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 61190E45A9982B26C17C0D44 /* OpenMicWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9966BFFC36D501937631449D /* WatchPhoneBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5400C74139D51E6D4AA70282 /* WatchPhoneBridge.swift */; };
 		99900BEFC6E96FECD436075D /* AmazonPollyTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB0854BA2C73F2E819CBE47 /* AmazonPollyTTS.swift */; };
 		99F0F32EE37D8C902A4CB116 /* GrokProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ECF0FC17FE71D783D560AF /* GrokProvider.swift */; };
@@ -297,6 +300,7 @@
 		FA60639F2A58BA4E4DCE1B51 /* OpenMicWatchExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6C0D66AAA3894A9D37DBF677 /* OpenMicWatchExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FCA21FF7E9AD6B2AB77D54E4 /* PipelineVoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFC55F6DE4D0482001D4458 /* PipelineVoiceSession.swift */; };
 		FCB95A94B824885241828715 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 68BBA258CF26158B1D6D8744 /* Supabase */; };
+		FD0F97AEA351AB8D9F1ACA50 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CD13387AACB78C730A206C0 /* WidgetKit.framework */; };
 		FD2A263592ED469629E817BC /* WatchConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24EABE430E7BCC224C318C5D /* WatchConversationViewModel.swift */; };
 		FE51539AD507F2A6C9542780 /* CarPlayTemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4D430D63507C5D6515C56B /* CarPlayTemplateManager.swift */; };
 /* End PBXBuildFile section */
@@ -322,6 +326,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = DBBFB1CC5F3308201F032E12;
 			remoteInfo = OpenMic;
+		};
+		C99296A6F360640FAD3DFB12 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EB21ACBFF3EC526E69D4DC7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F0AC2DDBB4AEEDD569DBC85;
+			remoteInfo = OpenMicWatchWidget;
 		};
 		D2D0616DF512D35E8A0343A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -351,6 +362,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				FA60639F2A58BA4E4DCE1B51 /* OpenMicWatchExtension.appex in Embed Foundation Extensions */,
+				98973A31566E04B5937DB689 /* OpenMicWatchWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -368,6 +380,7 @@
 		0C4D430D63507C5D6515C56B /* CarPlayTemplateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayTemplateManager.swift; sourceTree = "<group>"; };
 		0C80B19A8842749680861D9D /* AppIcon29x29@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@3x.png"; sourceTree = "<group>"; };
 		0E334C81DAB5D4EF2C8082C8 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		0E5A6DEA69DF1DF99A75EF5E /* OpenMicWatchWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMicWatchWidget.swift; sourceTree = "<group>"; };
 		0E9926CEDBBD4DFAA3A698A4 /* WatchDictation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDictation.swift; sourceTree = "<group>"; };
 		0F92499440A15A4A84B6CE74 /* VoiceSettingsShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSettingsShared.swift; sourceTree = "<group>"; };
 		1DB7F1210BC24B08B5F5CC74 /* OpenAIVoiceSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIVoiceSettingsSection.swift; sourceTree = "<group>"; };
@@ -400,6 +413,7 @@
 		4B35EE4F3862F5BA9B14BC54 /* SubscriptionTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTier.swift; sourceTree = "<group>"; };
 		4E486EF3FBCC9BE143E25A12 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBubbleDescriptorTests.swift; sourceTree = "<group>"; };
+		51B9E9F05DFFE238F2389A63 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		5276423ABE3D95B6FA9475B9 /* OpenMicUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenMicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5400C74139D51E6D4AA70282 /* WatchPhoneBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPhoneBridge.swift; sourceTree = "<group>"; };
 		544C55B90914FD8748841462 /* ConversationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationStore.swift; sourceTree = "<group>"; };
@@ -416,6 +430,7 @@
 		5F4498A8CE5261D8B96A3779 /* AudioOutputMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioOutputMode.swift; sourceTree = "<group>"; };
 		60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderPickerSheet.swift; sourceTree = "<group>"; };
 		60D7545B138D44B7AAA74E3A /* AppIcon29x29@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon29x29@2x.png"; sourceTree = "<group>"; };
+		61190E45A9982B26C17C0D44 /* OpenMicWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenMicWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		61A4F9915F0BA607E7668FFF /* AppIcon24x24@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon24x24@2x.png"; sourceTree = "<group>"; };
 		627F4620B2AE29A8B3F8B604 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		647D399E111AC023A0F564DB /* SigmonPersona.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = SigmonPersona.json; sourceTree = "<group>"; };
@@ -447,6 +462,7 @@
 		891B8C8B5C4C82D11AA739C2 /* ConversationExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationExporter.swift; sourceTree = "<group>"; };
 		89ECF0FC17FE71D783D560AF /* GrokProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrokProvider.swift; sourceTree = "<group>"; };
 		8B80FAC176052607316FEBCC /* OpenMicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMicTests.swift; sourceTree = "<group>"; };
+		8CD13387AACB78C730A206C0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8EFC55F6DE4D0482001D4458 /* PipelineVoiceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineVoiceSession.swift; sourceTree = "<group>"; };
 		9008D10D42F4256ACD3460B3 /* TopicCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCategory.swift; sourceTree = "<group>"; };
 		90193CFD9C662337299FFEC6 /* VoiceEndpointDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceEndpointDetector.swift; sourceTree = "<group>"; };
@@ -512,6 +528,7 @@
 		F19CDB66782EC7305C1FFC9E /* VoicePreviewStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePreviewStepView.swift; sourceTree = "<group>"; };
 		F2AF702CE109BCB300E51B94 /* CartesiaVoiceSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartesiaVoiceSettingsSection.swift; sourceTree = "<group>"; };
 		F485E3A3BF8D51CF8AE2C483 /* STTEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = STTEngine.swift; sourceTree = "<group>"; };
+		F4889682F5370D650FCA2F8C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F59B3222746225BECC8BB542 /* AIProviderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIProviderFactory.swift; sourceTree = "<group>"; };
 		F5AAFCB1B642B5AA6FB02A95 /* WelcomeStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeStepView.swift; sourceTree = "<group>"; };
 		F5DD0B7DA72F6418880495F7 /* DeepgramTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepgramTTS.swift; sourceTree = "<group>"; };
@@ -525,6 +542,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		36BE7519EB391260F4880205 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD0F97AEA351AB8D9F1ACA50 /* WidgetKit.framework in Frameworks */,
+				79B64D2E164CE86B9E2BBF94 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		76A8AE280CFEBC79A9BF6893 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -775,6 +801,7 @@
 				5276423ABE3D95B6FA9475B9 /* OpenMicUITests.xctest */,
 				D0A0B05FC95E82C91AEA80DC /* OpenMicWatch.app */,
 				6C0D66AAA3894A9D37DBF677 /* OpenMicWatchExtension.appex */,
+				61190E45A9982B26C17C0D44 /* OpenMicWatchWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -826,6 +853,15 @@
 				E9BCE1E81158FA8622EEB628 /* WatchConnectivityManager.swift */,
 			);
 			path = Watch;
+			sourceTree = "<group>";
+		};
+		AD9C13B95B7A90312DB961EB /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				F4889682F5370D650FCA2F8C /* Info.plist */,
+				0E5A6DEA69DF1DF99A75EF5E /* OpenMicWatchWidget.swift */,
+			);
+			path = Widget;
 			sourceTree = "<group>";
 		};
 		B6E75CD585BDAC190858CD20 /* TTS */ = {
@@ -981,6 +1017,7 @@
 			children = (
 				649631E0E14596466560BB48 /* App */,
 				C09E247C335ED033501B8ECB /* Extension */,
+				AD9C13B95B7A90312DB961EB /* Widget */,
 			);
 			path = OpenMicWatch;
 			sourceTree = "<group>";
@@ -991,7 +1028,9 @@
 				F7C94650D117340A993BD570 /* AuthenticationServices.framework */,
 				09087E5A7F3C72C3B2BA793F /* CarPlay.framework */,
 				96CB962EAFDF5433E3ACF961 /* StoreKit.framework */,
+				51B9E9F05DFFE238F2389A63 /* SwiftUI.framework */,
 				5C5C6B63628856F6E354F957 /* UserNotifications.framework */,
+				8CD13387AACB78C730A206C0 /* WidgetKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1066,6 +1105,7 @@
 			);
 			dependencies = (
 				5699DAC79E0B07A6BBFC4836 /* PBXTargetDependency */,
+				33910F08B92436725EFAF509 /* PBXTargetDependency */,
 			);
 			name = OpenMicWatch;
 			packageProductDependencies = (
@@ -1073,6 +1113,24 @@
 			productName = OpenMicWatch;
 			productReference = D0A0B05FC95E82C91AEA80DC /* OpenMicWatch.app */;
 			productType = "com.apple.product-type.application.watchapp2";
+		};
+		9F0AC2DDBB4AEEDD569DBC85 /* OpenMicWatchWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9202C3160D5DD157D971EADE /* Build configuration list for PBXNativeTarget "OpenMicWatchWidget" */;
+			buildPhases = (
+				4F36E30E87960CE0CCA3C7E4 /* Sources */,
+				36BE7519EB391260F4880205 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenMicWatchWidget;
+			packageProductDependencies = (
+			);
+			productName = OpenMicWatchWidget;
+			productReference = 61190E45A9982B26C17C0D44 /* OpenMicWatchWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		D47B2C0D0F345249856F0C75 /* OpenMiciOSBuildOnly */ = {
 			isa = PBXNativeTarget;
@@ -1155,6 +1213,10 @@
 						DevelopmentTeam = 49HAGQE8FB;
 						ProvisioningStyle = Automatic;
 					};
+					9F0AC2DDBB4AEEDD569DBC85 = {
+						DevelopmentTeam = 49HAGQE8FB;
+						ProvisioningStyle = Automatic;
+					};
 					D47B2C0D0F345249856F0C75 = {
 						DevelopmentTeam = 49HAGQE8FB;
 						ProvisioningStyle = Automatic;
@@ -1194,6 +1256,7 @@
 				3961A7510E056E6E137B8D85 /* OpenMicUITests */,
 				6DABD196B37DBFDAF3AE4E04 /* OpenMicWatch */,
 				F034C2F4DB3430C871A27FFA /* OpenMicWatchExtension */,
+				9F0AC2DDBB4AEEDD569DBC85 /* OpenMicWatchWidget */,
 				D47B2C0D0F345249856F0C75 /* OpenMiciOSBuildOnly */,
 			);
 		};
@@ -1374,6 +1437,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4F36E30E87960CE0CCA3C7E4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				115C978E29D678658D7BCDC8 /* OpenMicWatchWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A157E7B748E4CB6092C4515B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1536,6 +1607,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		33910F08B92436725EFAF509 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F0AC2DDBB4AEEDD569DBC85 /* OpenMicWatchWidget */;
+			targetProxy = C99296A6F360640FAD3DFB12 /* PBXContainerItemProxy */;
+		};
 		5699DAC79E0B07A6BBFC4836 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F034C2F4DB3430C871A27FFA /* OpenMicWatchExtension */;
@@ -1742,6 +1818,29 @@
 			};
 			name = Debug;
 		};
+		A8F22248B207C7AFE789EFD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = 49HAGQE8FB;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenMicWatch/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.watchkitapp.widget;
+				PRODUCT_NAME = "OpenMic Watch Widget";
+				SDKROOT = watchos;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
 		AEBD3D4E322A73E3F65FC132 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1795,6 +1894,29 @@
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
+		};
+		D8EFBA4A5DAC714733BF7535 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = 49HAGQE8FB;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OpenMicWatch/Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.watchkitapp.widget;
+				PRODUCT_NAME = "OpenMic Watch Widget";
+				SDKROOT = watchos;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
 		};
 		D9FE53A9FC3837815AEE5E79 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1854,6 +1976,15 @@
 			buildConfigurations = (
 				A3897047896C7F910FC84CB0 /* Debug */,
 				2EDD0C3C88871B85EACEC856 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9202C3160D5DD157D971EADE /* Build configuration list for PBXNativeTarget "OpenMicWatchWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8F22248B207C7AFE789EFD4 /* Debug */,
+				D8EFBA4A5DAC714733BF7535 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -168,6 +168,8 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - target: OpenMicWatchExtension
+      - target: OpenMicWatchWidget
+        embed: true
 
   OpenMicWatchExtension:
     type: watchkit2-extension
@@ -190,6 +192,35 @@ targets:
         CURRENT_PROJECT_VERSION: "7"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: OpenMicWatch/Extension/Info.plist
+
+  OpenMicWatchWidget:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: OpenMicWatch/Widget
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        WATCHOS_DEPLOYMENT_TARGET: "10.0"
+        SDKROOT: watchos
+        SUPPORTED_PLATFORMS: "watchos watchsimulator"
+        TARGETED_DEVICE_FAMILY: "4"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 49HAGQE8FB
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.watchkitapp.widget
+        PRODUCT_NAME: OpenMic Watch Widget
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "7"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: OpenMicWatch/Widget/Info.plist
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+          - "@executable_path/../../Frameworks"
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
 
   OpenMicTests:
     type: bundle.unit-test

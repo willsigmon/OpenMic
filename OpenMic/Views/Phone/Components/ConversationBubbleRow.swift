@@ -7,14 +7,17 @@ struct ConversationBubbleRow: View {
     let onCopy: () -> Void
 
     private var isUser: Bool { bubble.role == .user }
+    private var descriptor: ConversationBubbleDescriptor {
+        ConversationBubbleDescriptorFactory.make(from: bubble)
+    }
 
     var body: some View {
         HStack {
             if isUser { Spacer(minLength: 42) }
 
             VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xxs) {
-                if !isUser {
-                    Text(bubble.isFinal ? "OpenMic" : "OpenMic \u{2022} Live")
+                if let assistantHeader = descriptor.assistantHeader {
+                    Text(assistantHeader)
                         .font(OpenMicTheme.Typography.micro)
                         .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                 }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,7 @@
 		033C9CC9A4C3228995B59402 /* SignInStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683D536050CAC80FFA0D5C50 /* SignInStepView.swift */; };
 		0366E5450030B890312932E3 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDADC81DE93AA145E2877 /* OnboardingViewModel.swift */; };
 		03B120EA8FED2370D05C3806 /* ManagedSessionTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE57FA93D9D056B01608EB8 /* ManagedSessionTokenProvider.swift */; };
+		03B4D6034FDF0D901F7AEF8C /* ConversationBubbleDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */; };
 		046B1F2BF22EB8FA67DD0D87 /* voice_sample_standard.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FDC3A6F85C537D4123A744DD /* voice_sample_standard.m4a */; };
 		04A33BABD4D925BDE315A5BD /* CartesiaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42900D84E1DEBF1A91BE0DDE /* CartesiaModels.swift */; };
 		05031878EEA5138204A5FF8D /* OpenAITTSModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF96236C5138C2D2C030C73 /* OpenAITTSModels.swift */; };
@@ -179,6 +180,7 @@
 		9D6535E648776987582A0B54 /* SFSpeechSTT.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96E814F9F5978C03D43F47E /* SFSpeechSTT.swift */; };
 		A0025E6C7D450A2C140D922C /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA3789367CDFB1983656F51 /* AppServices.swift */; };
 		A015D66259935C2E49A7FC25 /* RealtimeAudioIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D009F8BBA3A7403369C35222 /* RealtimeAudioIO.swift */; };
+		A09C5B525601AE6892BA2FEA /* ConversationBubbleDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */; };
 		A0B8642B84F4AE2EC07E2DB0 /* OpenMic.storekit in Resources */ = {isa = PBXBuildFile; fileRef = B84533527A11720F58180B02 /* OpenMic.storekit */; };
 		A0CDDE992027BA460390D7B5 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F125C835ACA6BDBD9A0360 /* MainTabView.swift */; };
 		A247E5EA1476BB75462F3668 /* OpenMic.storekit in Resources */ = {isa = PBXBuildFile; fileRef = B84533527A11720F58180B02 /* OpenMic.storekit */; };
@@ -209,6 +211,7 @@
 		B54E38D61DAD333C89565CE4 /* TopicCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E57DD5022CABF9800EDAC13 /* TopicCatalog.swift */; };
 		B57BDE4211F2636693A008B3 /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662ED47DDB99327B15542BC2 /* HapticEngine.swift */; };
 		B584C0048606102789396CCE /* PipelineVoiceSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A4BC4DBAD19047B1952E4 /* PipelineVoiceSessionTests.swift */; };
+		B726C1A2F2831FE7F1BD3611 /* ConversationBubbleDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */; };
 		B85C9B148A91E02B1D9263E7 /* GoogleCloudVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E91ED0695BBA21FB2C9BB2 /* GoogleCloudVoiceSettingsSection.swift */; };
 		BB47676658556BBAF7D40439 /* VoiceWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB37C0C3659233E0FFEC832 /* VoiceWaveformView.swift */; };
 		BB99EDB88E1968BB13934A58 /* SFSpeechSTT.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96E814F9F5978C03D43F47E /* SFSpeechSTT.swift */; };
@@ -372,6 +375,7 @@
 		2E32FC36A9A4311C22C3CB8C /* OpenMicDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenMicDemo.entitlements; sourceTree = "<group>"; };
 		2F1AF9074F3F2DEBCC9D2FFB /* ElevenLabsTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsTTS.swift; sourceTree = "<group>"; };
 		2F98BC8101239E5B08CAC182 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBubbleDescriptor.swift; sourceTree = "<group>"; };
 		3426AEE136383CB1DA06D255 /* AppIcon27.5x27.5@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon27.5x27.5@2x.png"; sourceTree = "<group>"; };
 		361FCDA6F4396083324DDD83 /* OpenMicTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenMicTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3629DC6B885949D7F7DC0FB8 /* HumeAIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumeAIModels.swift; sourceTree = "<group>"; };
@@ -386,6 +390,7 @@
 		49DBB7CBAB1771F5686D47E9 /* PromptSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSuggestions.swift; sourceTree = "<group>"; };
 		4B35EE4F3862F5BA9B14BC54 /* SubscriptionTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionTier.swift; sourceTree = "<group>"; };
 		4E486EF3FBCC9BE143E25A12 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBubbleDescriptorTests.swift; sourceTree = "<group>"; };
 		5276423ABE3D95B6FA9475B9 /* OpenMicUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenMicUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5400C74139D51E6D4AA70282 /* WatchPhoneBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPhoneBridge.swift; sourceTree = "<group>"; };
 		544C55B90914FD8748841462 /* ConversationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationStore.swift; sourceTree = "<group>"; };
@@ -628,10 +633,19 @@
 				3773BB9BF17DD5B858EF5C7A /* Models */,
 				D8652BE43D4F4DE7368B75CA /* Resources */,
 				D228EFF96D5494262F4E3D77 /* Services */,
+				6160B4B50406C08FA806DF12 /* Shared */,
 				64BF35AD0E1E42E8A239F10B /* ViewModels */,
 				C56FE6A35C561D03DE826841 /* Views */,
 			);
 			path = OpenMic;
+			sourceTree = "<group>";
+		};
+		6160B4B50406C08FA806DF12 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		61BFAE56D9EFB8B4F5723ABA /* Phone */ = {
@@ -719,6 +733,7 @@
 		7D2F7AB185E18C5BD62AF6C0 /* OpenMicTests */ = {
 			isa = PBXGroup;
 			children = (
+				51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */,
 				8B80FAC176052607316FEBCC /* OpenMicTests.swift */,
 				441A4BC4DBAD19047B1952E4 /* PipelineVoiceSessionTests.swift */,
 				9F995A7A4B6F30B8299F5154 /* PromptSuggestionsTests.swift */,
@@ -1154,7 +1169,7 @@
 				1C799BEF1BA78C78F3127C51 /* XCRemoteSwiftPackageReference "SwiftAnthropic" */,
 				481232E2801167B0ADE894BD /* XCRemoteSwiftPackageReference "SwiftOpenAI" */,
 			);
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 54;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -1248,6 +1263,7 @@
 				8B6F6642DD49C1B264FC0984 /* CloudTTSBase.swift in Sources */,
 				353CA5C3B23F0A8A5647E6C3 /* ContentView.swift in Sources */,
 				A91CCE239A0D1C7507ED6158 /* Conversation.swift in Sources */,
+				B726C1A2F2831FE7F1BD3611 /* ConversationBubbleDescriptor.swift in Sources */,
 				16449DF51C6D260D7521CA36 /* ConversationBubbleRow.swift in Sources */,
 				529771EA661C917188BBC75D /* ConversationListView.swift in Sources */,
 				8030AA50CCAE1F1FD7DA67BE /* ConversationStore.swift in Sources */,
@@ -1368,6 +1384,7 @@
 				C061C0C94E2ECD20006C9947 /* CloudTTSBase.swift in Sources */,
 				BDEE5FCAA55A3F5ED9FAB4BB /* ContentView.swift in Sources */,
 				C83FA05561A1F5FCC9CF77DB /* Conversation.swift in Sources */,
+				03B4D6034FDF0D901F7AEF8C /* ConversationBubbleDescriptor.swift in Sources */,
 				6B7853BDB4E5FBAC2C0E3929 /* ConversationBubbleRow.swift in Sources */,
 				F92EBE8C7B76282B0C60111A /* ConversationListView.swift in Sources */,
 				360AF262413A02CE86010241 /* ConversationStore.swift in Sources */,
@@ -1462,6 +1479,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A09C5B525601AE6892BA2FEA /* ConversationBubbleDescriptorTests.swift in Sources */,
 				3F992F8518A12DB9553B0FE3 /* OpenMicTests.swift in Sources */,
 				B584C0048606102789396CCE /* PipelineVoiceSessionTests.swift in Sources */,
 				794F7A18AF5E91F7D87E2CA1 /* PromptSuggestionsTests.swift in Sources */,
@@ -1521,60 +1539,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -1596,11 +1561,8 @@
 				PRODUCT_NAME = OpenMicTests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenMic.app/OpenMic";
 			};
 			name = Release;
@@ -1610,25 +1572,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild;
 				PRODUCT_NAME = "OpenMic iOS Build";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -1637,24 +1591,15 @@
 		390B72C9EAA762B2EB968A30 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.uitests;
 				PRODUCT_NAME = OpenMicUITests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "";
 				TEST_TARGET_NAME = OpenMic;
 			};
 			name = Debug;
@@ -1664,7 +1609,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/App/Info.plist;
@@ -1683,53 +1628,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
@@ -1751,11 +1650,8 @@
 				PRODUCT_NAME = OpenMicTests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenMic.app/OpenMic";
 			};
 			name = Debug;
@@ -1765,25 +1661,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic;
 				PRODUCT_NAME = OpenMic;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -1792,22 +1680,15 @@
 		A04F0B8E641BDF3A8A4DD104 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/Extension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "OpenMic Watch Extension";
 				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1819,26 +1700,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMic.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild;
 				PRODUCT_NAME = "OpenMic iOS Build";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1848,24 +1721,15 @@
 		AEBD3D4E322A73E3F65FC132 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.uitests;
 				PRODUCT_NAME = OpenMicUITests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "";
 				TEST_TARGET_NAME = OpenMic;
 			};
 			name = Release;
@@ -1873,22 +1737,15 @@
 		B8AFB216F961DB7599504071 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/Extension/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "OpenMic Watch Extension";
 				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -1900,7 +1757,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = OpenMicWatch/App/Info.plist;
@@ -1920,26 +1777,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = OpenMic/Resources/OpenMicDemo.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 49HAGQE8FB;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				INFOPLIST_FILE = OpenMic/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic;
 				PRODUCT_NAME = OpenMic;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				TARGETED_DEVICE_FAMILY = 1;

@@ -22,10 +22,16 @@ final class CarPlayVoiceController {
 
     private let interfaceController: CPInterfaceController
     private let voiceTemplate: CPVoiceControlTemplate
+    private let transcriptTemplate: CPListTemplate
+    private let rootTemplate: CPTabBarTemplate
 
     private var session: PipelineVoiceSession?
     private var stateTask: Task<Void, Never>?
+    private var transcriptTask: Task<Void, Never>?
     private var buildTask: Task<Void, Never>?
+    private var bubbles: [ConversationBubble] = []
+    private var activeUserBubbleID: UUID?
+    private var activeAssistantBubbleID: UUID?
 
     // Standalone dependencies (no AppServices access in CarPlay scene)
     private let keychainManager = KeychainManager()
@@ -33,6 +39,11 @@ final class CarPlayVoiceController {
     init(interfaceController: CPInterfaceController) {
         self.interfaceController = interfaceController
         self.voiceTemplate = Self.buildTemplate()
+        self.transcriptTemplate = Self.buildTranscriptTemplate()
+        self.rootTemplate = Self.buildRootTemplate(
+            voiceTemplate: voiceTemplate,
+            transcriptTemplate: transcriptTemplate
+        )
 
         pushTemplateAndStart()
     }
@@ -52,6 +63,34 @@ final class CarPlayVoiceController {
         return CPVoiceControlTemplate(voiceControlStates: states)
     }
 
+    private static func buildTranscriptTemplate() -> CPListTemplate {
+        let template = CPListTemplate(
+            title: "Conversation",
+            sections: [placeholderTranscriptSection()]
+        )
+        template.tabTitle = "Chat"
+        template.tabImage = UIImage(systemName: "bubble.left.and.bubble.right.fill")
+        return template
+    }
+
+    private static func buildRootTemplate(
+        voiceTemplate: CPVoiceControlTemplate,
+        transcriptTemplate: CPListTemplate
+    ) -> CPTabBarTemplate {
+        voiceTemplate.tabTitle = "Talk"
+        voiceTemplate.tabImage = UIImage(systemName: "mic.fill")
+        return CPTabBarTemplate(templates: [voiceTemplate, transcriptTemplate])
+    }
+
+    private static func placeholderTranscriptSection() -> CPListSection {
+        let item = CPListItem(
+            text: "Conversation appears here",
+            detailText: "Recent turns stay visible while the voice session runs.",
+            image: UIImage(systemName: "text.bubble")
+        )
+        return CPListSection(items: [item])
+    }
+
     private static func buildState(
         id: String,
         title: String,
@@ -69,7 +108,7 @@ final class CarPlayVoiceController {
     // MARK: - Lifecycle
 
     private func pushTemplateAndStart() {
-        interfaceController.pushTemplate(voiceTemplate, animated: true) { [weak self] _, _ in
+        interfaceController.setRootTemplate(rootTemplate, animated: true) { [weak self] _, _ in
             Task { @MainActor [weak self] in
                 self?.beginSession()
             }
@@ -170,6 +209,8 @@ final class CarPlayVoiceController {
         self.session = pipeline
 
         observeState(pipeline)
+        observeTranscripts(pipeline)
+        refreshTranscriptTemplate()
 
         guard !Task.isCancelled else { return }
 
@@ -200,6 +241,17 @@ final class CarPlayVoiceController {
                 case .error:
                     self.voiceTemplate.activateVoiceControlState(withIdentifier: StateID.error)
                 }
+            }
+        }
+    }
+
+    private func observeTranscripts(_ session: PipelineVoiceSession) {
+        transcriptTask?.cancel()
+        transcriptTask = Task { [weak self] in
+            for await transcript in session.transcriptStream {
+                guard let self, !Task.isCancelled else { break }
+                self.upsertBubble(transcript)
+                self.refreshTranscriptTemplate()
             }
         }
     }
@@ -324,6 +376,8 @@ final class CarPlayVoiceController {
     func cleanup() async {
         stateTask?.cancel()
         stateTask = nil
+        transcriptTask?.cancel()
+        transcriptTask = nil
         buildTask?.cancel()
         buildTask = nil
 
@@ -333,5 +387,81 @@ final class CarPlayVoiceController {
         }
 
         try? AudioSessionManager.shared.deactivateCarPlay()
+    }
+
+    private func refreshTranscriptTemplate() {
+        guard !bubbles.isEmpty else {
+            transcriptTemplate.updateSections([Self.placeholderTranscriptSection()])
+            return
+        }
+
+        let items = bubbles
+            .suffix(8)
+            .map { bubble -> CPListItem in
+                let descriptor = ConversationBubbleDescriptorFactory.make(from: bubble)
+                return CPListItem(
+                    text: descriptor.carPlayTitle,
+                    detailText: descriptor.carPlayDetail,
+                    image: UIImage(systemName: descriptor.carPlaySystemImage)
+                )
+            }
+
+        transcriptTemplate.updateSections([CPListSection(items: items)])
+    }
+
+    private func upsertBubble(_ transcript: VoiceTranscript) {
+        let trimmed = transcript.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let existingID: UUID?
+        switch transcript.role {
+        case .user:
+            existingID = activeUserBubbleID
+        case .assistant:
+            existingID = activeAssistantBubbleID
+        case .system:
+            existingID = nil
+        }
+
+        if let existingID,
+           let index = bubbles.firstIndex(where: { $0.id == existingID }) {
+            bubbles[index] = ConversationBubble(
+                id: existingID,
+                role: transcript.role,
+                text: trimmed,
+                isFinal: transcript.isFinal,
+                createdAt: bubbles[index].createdAt
+            )
+        } else {
+            let bubble = ConversationBubble(
+                role: transcript.role,
+                text: trimmed,
+                isFinal: transcript.isFinal
+            )
+            bubbles.append(bubble)
+            switch transcript.role {
+            case .user:
+                activeUserBubbleID = bubble.id
+            case .assistant:
+                activeAssistantBubbleID = bubble.id
+            case .system:
+                break
+            }
+        }
+
+        if transcript.isFinal {
+            switch transcript.role {
+            case .user:
+                activeUserBubbleID = nil
+            case .assistant:
+                activeAssistantBubbleID = nil
+            case .system:
+                break
+            }
+        }
+
+        if bubbles.count > 24 {
+            bubbles.removeFirst(bubbles.count - 24)
+        }
     }
 }

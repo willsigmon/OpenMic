@@ -93,6 +93,7 @@ extension SystemTTS {
     static func bestAvailableVoice(language: String = "en-US") -> AVSpeechSynthesisVoice? {
         let candidates = AVSpeechSynthesisVoice.speechVoices()
             .filter { $0.language.hasPrefix(language.prefix(2).description) }
+            .filter { !$0.voiceTraits.contains(.isNoveltyVoice) && !$0.voiceTraits.contains(.isPersonalVoice) }
             .sorted { $0.quality.rawValue > $1.quality.rawValue }
 
         // Prefer exact language match (en-US over en-GB) at the highest quality
@@ -106,6 +107,7 @@ extension SystemTTS {
     static func availableVoices(language prefix: String = "en") -> [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices()
             .filter { $0.language.hasPrefix(prefix) }
+            .filter { !$0.voiceTraits.contains(.isNoveltyVoice) }
             .sorted { lhs, rhs in
                 if lhs.quality != rhs.quality {
                     return lhs.quality.rawValue > rhs.quality.rawValue

@@ -20,7 +20,7 @@ struct LocalNeuralVoiceSettingsSection: View {
                                 .font(OpenMicTheme.Typography.headline)
                                 .foregroundStyle(OpenMicTheme.Colors.textPrimary)
 
-                            Text("82M parameter model running on Apple Neural Engine via MLX. Natural speech in ~45ms. No cloud, no API key, fully offline.")
+                            Text("82M parameter CoreML model on Apple Neural Engine. Natural speech, auto-downloads on first use. No cloud API key, fully offline.")
                                 .font(OpenMicTheme.Typography.caption)
                                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                         }
@@ -46,7 +46,7 @@ struct LocalNeuralVoiceSettingsSection: View {
                         Text("Kokoro v1 \u{2022} 82M params \u{2022} 24kHz \u{2022} 9 languages")
                             .font(OpenMicTheme.Typography.caption)
                             .foregroundStyle(OpenMicTheme.Colors.textTertiary)
-                        Text("50 voices \u{2022} Non-autoregressive \u{2022} ~500MB memory")
+                        Text("60 voices \u{2022} CoreML Neural Engine \u{2022} Auto-downloads ~200MB")
                             .font(OpenMicTheme.Typography.micro)
                             .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                     }

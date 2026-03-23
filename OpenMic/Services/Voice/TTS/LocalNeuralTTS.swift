@@ -1,18 +1,17 @@
 import AVFoundation
 import os.log
 
-#if canImport(KokoroSwift)
-import KokoroSwift
-import MLX
+#if canImport(FluidAudio)
+@preconcurrency import FluidAudio
 #endif
 
 private let log = Logger(subsystem: "com.willsigmon.openmic", category: "LocalNeuralTTS")
 
-/// On-device neural TTS using Kokoro (82M) via MLX Swift.
+/// On-device neural TTS using Kokoro 82M via FluidAudio (CoreML).
 ///
-/// Runs entirely on-device with no network dependency.
-/// Uses Apple's MLX framework for Neural Engine / GPU acceleration.
-/// Output is PCM audio played via AVAudioPlayer.
+/// Runs entirely on-device with no network dependency after initial model download.
+/// Uses Apple's CoreML framework for Neural Engine / GPU acceleration.
+/// Models auto-download from HuggingFace on first use (~200MB).
 @MainActor
 final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     private var audioPlayer: AVAudioPlayer?
@@ -23,9 +22,8 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     private(set) var isSpeaking = false
     let audioRequirement: TTSAudioRequirement = .audioPlayer
 
-    #if canImport(KokoroSwift)
-    private var tts: KokoroTTS?
-    private var voiceEmbedding: MLXArray?
+    #if canImport(FluidAudio)
+    private var ttsManager: KokoroTtsManager?
     #endif
 
     override init() {
@@ -72,63 +70,23 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     // MARK: - Synthesis
 
     private func synthesize(text: String) async throws -> Data {
-        #if canImport(KokoroSwift)
-        return try synthesizeWithKokoro(text: text)
+        #if canImport(FluidAudio)
+        return try await synthesizeWithFluidAudio(text: text)
         #else
-        throw LocalNeuralTTSError.kokoroNotAvailable
+        throw LocalNeuralTTSError.fluidAudioNotAvailable
         #endif
     }
 
-    #if canImport(KokoroSwift)
-    private func synthesizeWithKokoro(text: String) throws -> Data {
-        let engine = try getOrCreateEngine()
-        let voice = try getOrLoadVoice()
-
-        let (samples, _) = try engine.generateAudio(
-            voice: voice,
-            language: .enUS,
-            text: text,
-            speed: 1.0
-        )
-        return wavData(from: samples, sampleRate: 24000)
-    }
-
-    private func getOrCreateEngine() throws -> KokoroTTS {
-        if let existing = tts { return existing }
-
-        guard let modelURL = Bundle.main.url(
-            forResource: "kokoro-v1",
-            withExtension: nil,
-            subdirectory: "KokoroModel"
-        ) else {
-            throw LocalNeuralTTSError.modelNotFound
+    #if canImport(FluidAudio)
+    private func synthesizeWithFluidAudio(text: String) async throws -> Data {
+        if ttsManager == nil || ttsManager?.isAvailable != true {
+            let manager = KokoroTtsManager(defaultVoice: "af_heart")
+            try await manager.initialize()
+            ttsManager = manager
+            log.info("FluidAudio Kokoro TTS initialized (CoreML, 24kHz)")
         }
-
-        let engine = KokoroTTS(modelPath: modelURL, g2p: .misaki)
-        tts = engine
-        log.info("Kokoro TTS engine initialized")
-        return engine
-    }
-
-    private func getOrLoadVoice() throws -> MLXArray {
-        if let existing = voiceEmbedding { return existing }
-
-        guard let voicesURL = Bundle.main.url(
-            forResource: "voices",
-            withExtension: "bin",
-            subdirectory: "KokoroModel"
-        ) else {
-            throw LocalNeuralTTSError.voiceNotFound
-        }
-
-        // Load voice pack and extract first voice (af_heart — warm female)
-        let data = try Data(contentsOf: voicesURL)
-        let voice = try MLX.loadArrays(url: voicesURL).first?.value
-            ?? { throw LocalNeuralTTSError.voiceNotFound }()
-
-        voiceEmbedding = voice
-        log.info("Loaded Kokoro voice embedding")
-        return voice
+        guard let tts = ttsManager else { throw LocalNeuralTTSError.initFailed }
+        return try await tts.synthesize(text: text)
     }
     #endif
 
@@ -147,43 +105,6 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
                 continuation.resume()
             }
         }
-    }
-
-    // MARK: - WAV Encoding
-
-    private func wavData(from samples: [Float], sampleRate: Int32) -> Data {
-        let numSamples = samples.count
-        let dataSize = numSamples * 2
-        let fileSize = 44 + dataSize
-
-        var data = Data(capacity: fileSize)
-
-        // RIFF header
-        data.append(contentsOf: [0x52, 0x49, 0x46, 0x46]) // "RIFF"
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(fileSize - 8).littleEndian) { Array($0) })
-        data.append(contentsOf: [0x57, 0x41, 0x56, 0x45]) // "WAVE"
-
-        // fmt chunk
-        data.append(contentsOf: [0x66, 0x6D, 0x74, 0x20]) // "fmt "
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(16).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // PCM
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // mono
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(2).littleEndian) { Array($0) }) // block align
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(16).littleEndian) { Array($0) }) // bits/sample
-
-        // data chunk
-        data.append(contentsOf: [0x64, 0x61, 0x74, 0x61]) // "data"
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(dataSize).littleEndian) { Array($0) })
-
-        for sample in samples {
-            let clamped = max(-1.0, min(1.0, sample))
-            let int16 = Int16(clamped * 32767.0)
-            data.append(contentsOf: withUnsafeBytes(of: int16.littleEndian) { Array($0) })
-        }
-
-        return data
     }
 }
 
@@ -214,21 +135,15 @@ extension LocalNeuralTTS: AVAudioPlayerDelegate {
 // MARK: - Errors
 
 enum LocalNeuralTTSError: LocalizedError {
-    case modelNotFound
-    case voiceNotFound
     case initFailed
-    case kokoroNotAvailable
+    case fluidAudioNotAvailable
 
     var errorDescription: String? {
         switch self {
-        case .modelNotFound:
-            "Kokoro model not found in app bundle. Add KokoroModel/ directory with model weights."
-        case .voiceNotFound:
-            "Kokoro voice embedding not found. Add voices.bin to KokoroModel/ directory."
         case .initFailed:
             "Failed to initialize on-device Kokoro TTS engine"
-        case .kokoroNotAvailable:
-            "On-device neural TTS requires the KokoroSwift package"
+        case .fluidAudioNotAvailable:
+            "On-device neural TTS requires the FluidAudio package"
         }
     }
 }

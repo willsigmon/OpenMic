@@ -50,10 +50,9 @@ packages:
   Supabase:
     url: https://github.com/supabase/supabase-swift
     from: "2.41.0"
-  # KokoroSwift — uncomment when upstream bundle signing issue is fixed
-  # KokoroSwift:
-  #   url: https://github.com/mlalma/kokoro-ios
-  #   branch: main
+  FluidAudio:
+    url: https://github.com/FluidInference/FluidAudio.git
+    from: "0.12.4"
 
 settings:
   base:
@@ -96,8 +95,7 @@ targets:
       - package: SwiftAnthropic
       - package: KeychainAccess
       - package: Supabase
-      # KokoroSwift: uncomment when upstream bundle signing issue is fixed
-      # - package: KokoroSwift
+      - package: FluidAudio
       - target: OpenMicWatch
         embed: true
       - sdk: AuthenticationServices.framework

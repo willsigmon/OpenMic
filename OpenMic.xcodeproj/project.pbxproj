@@ -89,6 +89,7 @@
 		3AC740FC65653696520D3E48 /* CarPlay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09087E5A7F3C72C3B2BA793F /* CarPlay.framework */; };
 		3AF6F41CCA8541CC766B875F /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E486EF3FBCC9BE143E25A12 /* AuthManager.swift */; };
 		3BF5AA88958CF970DBF1AE77 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 49578A64BF250E8181AD1470 /* KeychainAccess */; };
+		3EE929EC02C4138FD87A9B65 /* ConversationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1A764E47A0A5363CB43880 /* ConversationBubble.swift */; };
 		3F992F8518A12DB9553B0FE3 /* OpenMicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B80FAC176052607316FEBCC /* OpenMicTests.swift */; };
 		3FAA570F54312198FF369D34 /* AppIcon86x86@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 23A95D10ACB0353C34097E4A /* AppIcon86x86@2x.png */; };
 		407A815892C38A45A8BCB909 /* WatchAsyncBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2925105F3DE26014336A57CD /* WatchAsyncBridge.swift */; };
@@ -181,6 +182,7 @@
 		A0025E6C7D450A2C140D922C /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA3789367CDFB1983656F51 /* AppServices.swift */; };
 		A015D66259935C2E49A7FC25 /* RealtimeAudioIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D009F8BBA3A7403369C35222 /* RealtimeAudioIO.swift */; };
 		A09C5B525601AE6892BA2FEA /* ConversationBubbleDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */; };
+		A0A9E2687E22F3942E824DAF /* ConversationBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1A764E47A0A5363CB43880 /* ConversationBubble.swift */; };
 		A0B8642B84F4AE2EC07E2DB0 /* OpenMic.storekit in Resources */ = {isa = PBXBuildFile; fileRef = B84533527A11720F58180B02 /* OpenMic.storekit */; };
 		A0CDDE992027BA460390D7B5 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F125C835ACA6BDBD9A0360 /* MainTabView.swift */; };
 		A247E5EA1476BB75462F3668 /* OpenMic.storekit in Resources */ = {isa = PBXBuildFile; fileRef = B84533527A11720F58180B02 /* OpenMic.storekit */; };
@@ -371,6 +373,7 @@
 		28996869586F327155C134CF /* AppIcon108x108@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon108x108@2x.png"; sourceTree = "<group>"; };
 		2925105F3DE26014336A57CD /* WatchAsyncBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAsyncBridge.swift; sourceTree = "<group>"; };
 		2B2685392F1184688134B244 /* SpeechEndpointingConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechEndpointingConfig.swift; sourceTree = "<group>"; };
+		2C1A764E47A0A5363CB43880 /* ConversationBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBubble.swift; sourceTree = "<group>"; };
 		2DE13B1109B90D53BC1CDA8C /* AmazonPollyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmazonPollyModels.swift; sourceTree = "<group>"; };
 		2E32FC36A9A4311C22C3CB8C /* OpenMicDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenMicDemo.entitlements; sourceTree = "<group>"; };
 		2F1AF9074F3F2DEBCC9D2FFB /* ElevenLabsTTS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsTTS.swift; sourceTree = "<group>"; };
@@ -643,6 +646,7 @@
 		6160B4B50406C08FA806DF12 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				2C1A764E47A0A5363CB43880 /* ConversationBubble.swift */,
 				32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */,
 			);
 			path = Shared;
@@ -1263,6 +1267,7 @@
 				8B6F6642DD49C1B264FC0984 /* CloudTTSBase.swift in Sources */,
 				353CA5C3B23F0A8A5647E6C3 /* ContentView.swift in Sources */,
 				A91CCE239A0D1C7507ED6158 /* Conversation.swift in Sources */,
+				A0A9E2687E22F3942E824DAF /* ConversationBubble.swift in Sources */,
 				B726C1A2F2831FE7F1BD3611 /* ConversationBubbleDescriptor.swift in Sources */,
 				16449DF51C6D260D7521CA36 /* ConversationBubbleRow.swift in Sources */,
 				529771EA661C917188BBC75D /* ConversationListView.swift in Sources */,
@@ -1384,6 +1389,7 @@
 				C061C0C94E2ECD20006C9947 /* CloudTTSBase.swift in Sources */,
 				BDEE5FCAA55A3F5ED9FAB4BB /* ContentView.swift in Sources */,
 				C83FA05561A1F5FCC9CF77DB /* Conversation.swift in Sources */,
+				3EE929EC02C4138FD87A9B65 /* ConversationBubble.swift in Sources */,
 				03B4D6034FDF0D901F7AEF8C /* ConversationBubbleDescriptor.swift in Sources */,
 				6B7853BDB4E5FBAC2C0E3929 /* ConversationBubbleRow.swift in Sources */,
 				F92EBE8C7B76282B0C60111A /* ConversationListView.swift in Sources */,

@@ -50,6 +50,9 @@ packages:
   Supabase:
     url: https://github.com/supabase/supabase-swift
     from: "2.41.0"
+  KokoroSwift:
+    url: https://github.com/mlalma/kokoro-ios
+    branch: main
 
 settings:
   base:
@@ -92,6 +95,7 @@ targets:
       - package: SwiftAnthropic
       - package: KeychainAccess
       - package: Supabase
+      - package: KokoroSwift
       - target: OpenMicWatch
         embed: true
       - sdk: AuthenticationServices.framework

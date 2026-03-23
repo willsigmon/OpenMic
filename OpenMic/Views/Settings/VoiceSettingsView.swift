@@ -433,7 +433,7 @@ private struct TTSEngineCard: View {
     private var engineSubtitle: String {
         switch engine {
         case .system: "On-device neural voices \u{2014} free, no setup"
-        case .localNeural: "Piper neural model \u{2014} offline, high quality"
+        case .localNeural: "Kokoro 82M neural voice \u{2014} offline, high quality"
         case .openAI: "Natural AI voices \u{2014} uses your OpenAI key"
         case .elevenLabs: "Ultra-realistic AI voices \u{2014} requires API key"
         case .humeAI: "Emotionally expressive voices \u{2014} requires API key"

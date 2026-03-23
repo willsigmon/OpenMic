@@ -3,7 +3,7 @@ import SwiftUI
 struct LocalNeuralVoiceSettingsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xs) {
-            Text("LOCAL NEURAL VOICE")
+            Text("KOKORO ON-DEVICE VOICE")
                 .font(OpenMicTheme.Typography.micro)
                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                 .padding(.horizontal, OpenMicTheme.Spacing.xs)
@@ -16,11 +16,11 @@ struct LocalNeuralVoiceSettingsSection: View {
                             .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Piper Neural TTS")
+                            Text("Kokoro Neural TTS")
                                 .font(OpenMicTheme.Typography.headline)
                                 .foregroundStyle(OpenMicTheme.Colors.textPrimary)
 
-                            Text("High-quality on-device voice synthesis using neural networks. No cloud, no API key, works offline.")
+                            Text("82M parameter model running on Apple Neural Engine via MLX. Natural speech in ~45ms. No cloud, no API key, fully offline.")
                                 .font(OpenMicTheme.Typography.caption)
                                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
                         }
@@ -42,9 +42,14 @@ struct LocalNeuralVoiceSettingsSection: View {
                         .font(.system(size: 14))
                         .foregroundStyle(OpenMicTheme.Colors.textTertiary)
 
-                    Text("Model: en_US-amy-medium (Piper VITS) \u{2022} ~20MB \u{2022} 22kHz")
-                        .font(OpenMicTheme.Typography.caption)
-                        .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Kokoro v1 \u{2022} 82M params \u{2022} 24kHz \u{2022} 9 languages")
+                            .font(OpenMicTheme.Typography.caption)
+                            .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                        Text("50 voices \u{2022} Non-autoregressive \u{2022} ~500MB memory")
+                            .font(OpenMicTheme.Typography.micro)
+                            .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    }
 
                     Spacer()
                 }

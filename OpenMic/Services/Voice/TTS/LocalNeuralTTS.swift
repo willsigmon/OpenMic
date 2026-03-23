@@ -1,13 +1,18 @@
 import AVFoundation
 import os.log
 
+#if canImport(KokoroSwift)
+import KokoroSwift
+import MLX
+#endif
+
 private let log = Logger(subsystem: "com.willsigmon.openmic", category: "LocalNeuralTTS")
 
-/// On-device neural TTS using Piper VITS models via sherpa-onnx.
+/// On-device neural TTS using Kokoro (82M) via MLX Swift.
 ///
 /// Runs entirely on-device with no network dependency.
-/// Models are bundled in the app (or downloaded on first use).
-/// Output is 16-bit PCM at the model's sample rate, played via AVAudioPlayer.
+/// Uses Apple's MLX framework for Neural Engine / GPU acceleration.
+/// Output is PCM audio played via AVAudioPlayer.
 @MainActor
 final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     private var audioPlayer: AVAudioPlayer?
@@ -18,11 +23,12 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     private(set) var isSpeaking = false
     let audioRequirement: TTSAudioRequirement = .audioPlayer
 
-    private let modelName: String
-    private var synthesizer: PiperSynthesizer?
+    #if canImport(KokoroSwift)
+    private var tts: KokoroTTS?
+    private var voiceEmbedding: MLXArray?
+    #endif
 
-    init(modelName: String = "en_US-amy-medium") {
-        self.modelName = modelName
+    override init() {
         super.init()
     }
 
@@ -37,8 +43,7 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
 
         currentTask = Task {
             do {
-                let synth = try getOrCreateSynthesizer()
-                let audioData = try synth.synthesize(text: text)
+                let audioData = try await synthesize(text: text)
                 guard !Task.isCancelled, isSpeaking else { return }
                 try await playAudio(data: audioData)
             } catch {
@@ -64,14 +69,68 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
         isSpeaking = false
     }
 
-    // MARK: - Synthesizer
+    // MARK: - Synthesis
 
-    private func getOrCreateSynthesizer() throws -> PiperSynthesizer {
-        if let existing = synthesizer { return existing }
-        let synth = try PiperSynthesizer(modelName: modelName)
-        synthesizer = synth
-        return synth
+    private func synthesize(text: String) async throws -> Data {
+        #if canImport(KokoroSwift)
+        return try synthesizeWithKokoro(text: text)
+        #else
+        throw LocalNeuralTTSError.kokoroNotAvailable
+        #endif
     }
+
+    #if canImport(KokoroSwift)
+    private func synthesizeWithKokoro(text: String) throws -> Data {
+        let engine = try getOrCreateEngine()
+        let voice = try getOrLoadVoice()
+
+        let (samples, _) = try engine.generateAudio(
+            voice: voice,
+            language: .enUS,
+            text: text,
+            speed: 1.0
+        )
+        return wavData(from: samples, sampleRate: 24000)
+    }
+
+    private func getOrCreateEngine() throws -> KokoroTTS {
+        if let existing = tts { return existing }
+
+        guard let modelURL = Bundle.main.url(
+            forResource: "kokoro-v1",
+            withExtension: nil,
+            subdirectory: "KokoroModel"
+        ) else {
+            throw LocalNeuralTTSError.modelNotFound
+        }
+
+        let engine = KokoroTTS(modelPath: modelURL, g2p: .misaki)
+        tts = engine
+        log.info("Kokoro TTS engine initialized")
+        return engine
+    }
+
+    private func getOrLoadVoice() throws -> MLXArray {
+        if let existing = voiceEmbedding { return existing }
+
+        guard let voicesURL = Bundle.main.url(
+            forResource: "voices",
+            withExtension: "bin",
+            subdirectory: "KokoroModel"
+        ) else {
+            throw LocalNeuralTTSError.voiceNotFound
+        }
+
+        // Load voice pack and extract first voice (af_heart — warm female)
+        let data = try Data(contentsOf: voicesURL)
+        let voice = try MLX.loadArrays(url: voicesURL).first?.value
+            ?? { throw LocalNeuralTTSError.voiceNotFound }()
+
+        voiceEmbedding = voice
+        log.info("Loaded Kokoro voice embedding")
+        return voice
+    }
+    #endif
 
     // MARK: - Playback
 
@@ -88,6 +147,43 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
                 continuation.resume()
             }
         }
+    }
+
+    // MARK: - WAV Encoding
+
+    private func wavData(from samples: [Float], sampleRate: Int32) -> Data {
+        let numSamples = samples.count
+        let dataSize = numSamples * 2
+        let fileSize = 44 + dataSize
+
+        var data = Data(capacity: fileSize)
+
+        // RIFF header
+        data.append(contentsOf: [0x52, 0x49, 0x46, 0x46]) // "RIFF"
+        data.append(contentsOf: withUnsafeBytes(of: UInt32(fileSize - 8).littleEndian) { Array($0) })
+        data.append(contentsOf: [0x57, 0x41, 0x56, 0x45]) // "WAVE"
+
+        // fmt chunk
+        data.append(contentsOf: [0x66, 0x6D, 0x74, 0x20]) // "fmt "
+        data.append(contentsOf: withUnsafeBytes(of: UInt32(16).littleEndian) { Array($0) })
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // PCM
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // mono
+        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate).littleEndian) { Array($0) })
+        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) })
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(2).littleEndian) { Array($0) }) // block align
+        data.append(contentsOf: withUnsafeBytes(of: UInt16(16).littleEndian) { Array($0) }) // bits/sample
+
+        // data chunk
+        data.append(contentsOf: [0x64, 0x61, 0x74, 0x61]) // "data"
+        data.append(contentsOf: withUnsafeBytes(of: UInt32(dataSize).littleEndian) { Array($0) })
+
+        for sample in samples {
+            let clamped = max(-1.0, min(1.0, sample))
+            let int16 = Int16(clamped * 32767.0)
+            data.append(contentsOf: withUnsafeBytes(of: int16.littleEndian) { Array($0) })
+        }
+
+        return data
     }
 }
 
@@ -115,130 +211,24 @@ extension LocalNeuralTTS: AVAudioPlayerDelegate {
     }
 }
 
-// MARK: - Piper Synthesizer Wrapper
-
-/// Wraps a Piper VITS model for on-device speech synthesis.
-/// This is a bridge to sherpa-onnx's offline TTS API.
-///
-/// When sherpa-onnx SPM package is added, this calls the C API directly.
-/// Until then, this uses a bundled model with ONNX Runtime.
-final class PiperSynthesizer: @unchecked Sendable {
-    private let modelPath: String
-    private let tokensPath: String
-    private let dataDir: String?
-    private let sampleRate: Int
-
-    init(modelName: String) throws {
-        guard let modelURL = Bundle.main.url(
-            forResource: modelName,
-            withExtension: "onnx",
-            subdirectory: "PiperModels"
-        ) else {
-            throw LocalNeuralTTSError.modelNotFound(modelName)
-        }
-
-        guard let tokensURL = Bundle.main.url(
-            forResource: "tokens",
-            withExtension: "txt",
-            subdirectory: "PiperModels"
-        ) else {
-            throw LocalNeuralTTSError.tokensNotFound
-        }
-
-        self.modelPath = modelURL.path
-        self.tokensPath = tokensURL.path
-        self.dataDir = Bundle.main.url(
-            forResource: "espeak-ng-data",
-            withExtension: nil,
-            subdirectory: "PiperModels"
-        )?.path
-        self.sampleRate = 22050 // Piper models typically use 22050 Hz
-
-        log.info("Loaded Piper model: \(modelName, privacy: .public)")
-    }
-
-    /// Synthesize text to WAV audio data.
-    func synthesize(text: String) throws -> Data {
-        #if canImport(SherpaOnnx)
-        return try synthesizeWithSherpa(text: text)
-        #else
-        throw LocalNeuralTTSError.sherpaOnnxNotAvailable
-        #endif
-    }
-
-    #if canImport(SherpaOnnx)
-    private func synthesizeWithSherpa(text: String) throws -> Data {
-        // sherpa-onnx offline TTS integration point
-        // This will be implemented when the SPM package is added
-        let config = sherpaOnnxOfflineTtsConfig(
-            model: modelPath,
-            tokens: tokensPath,
-            dataDir: dataDir ?? ""
-        )
-        guard let tts = SherpaOnnxOfflineTts(config: config) else {
-            throw LocalNeuralTTSError.initFailed
-        }
-        let audio = tts.generate(text: text)
-        return wavData(from: audio.samples, sampleRate: Int32(audio.sampleRate))
-    }
-    #endif
-
-    /// Convert raw PCM float samples to WAV data for AVAudioPlayer.
-    private func wavData(from samples: [Float], sampleRate: Int32) -> Data {
-        let numSamples = samples.count
-        let dataSize = numSamples * 2 // 16-bit PCM
-        let fileSize = 44 + dataSize
-
-        var data = Data(capacity: fileSize)
-
-        // RIFF header
-        data.append(contentsOf: [0x52, 0x49, 0x46, 0x46]) // "RIFF"
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(fileSize - 8).littleEndian) { Array($0) })
-        data.append(contentsOf: [0x57, 0x41, 0x56, 0x45]) // "WAVE"
-
-        // fmt chunk
-        data.append(contentsOf: [0x66, 0x6D, 0x74, 0x20]) // "fmt "
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(16).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // PCM
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(1).littleEndian) { Array($0) }) // mono
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate).littleEndian) { Array($0) })
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(sampleRate * 2).littleEndian) { Array($0) }) // byte rate
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(2).littleEndian) { Array($0) }) // block align
-        data.append(contentsOf: withUnsafeBytes(of: UInt16(16).littleEndian) { Array($0) }) // bits per sample
-
-        // data chunk
-        data.append(contentsOf: [0x64, 0x61, 0x74, 0x61]) // "data"
-        data.append(contentsOf: withUnsafeBytes(of: UInt32(dataSize).littleEndian) { Array($0) })
-
-        // Convert float samples to int16
-        for sample in samples {
-            let clamped = max(-1.0, min(1.0, sample))
-            let int16 = Int16(clamped * 32767.0)
-            data.append(contentsOf: withUnsafeBytes(of: int16.littleEndian) { Array($0) })
-        }
-
-        return data
-    }
-}
-
 // MARK: - Errors
 
 enum LocalNeuralTTSError: LocalizedError {
-    case modelNotFound(String)
-    case tokensNotFound
+    case modelNotFound
+    case voiceNotFound
     case initFailed
-    case sherpaOnnxNotAvailable
+    case kokoroNotAvailable
 
     var errorDescription: String? {
         switch self {
-        case .modelNotFound(let name):
-            "Piper model '\(name)' not found in app bundle"
-        case .tokensNotFound:
-            "Piper tokens file not found in app bundle"
+        case .modelNotFound:
+            "Kokoro model not found in app bundle. Add KokoroModel/ directory with model weights."
+        case .voiceNotFound:
+            "Kokoro voice embedding not found. Add voices.bin to KokoroModel/ directory."
         case .initFailed:
-            "Failed to initialize on-device TTS engine"
-        case .sherpaOnnxNotAvailable:
-            "On-device neural TTS requires the sherpa-onnx package (not yet integrated)"
+            "Failed to initialize on-device Kokoro TTS engine"
+        case .kokoroNotAvailable:
+            "On-device neural TTS requires the KokoroSwift package"
         }
     }
 }

@@ -430,6 +430,9 @@ final class ConversationViewModel {
             }
             return tts
 
+        case .localNeural:
+            return LocalNeuralTTS()
+
         case .openAI:
             guard let key = try? await appServices.keychainManager.getAPIKey(for: .openAI),
                   !key.isEmpty else {

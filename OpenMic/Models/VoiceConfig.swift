@@ -16,6 +16,7 @@ struct VoiceConfig: Codable, Sendable {
 
 enum TTSEngineType: String, Codable, Sendable, CaseIterable, Identifiable {
     case system
+    case localNeural
     case openAI
     case elevenLabs
     case humeAI
@@ -30,6 +31,7 @@ enum TTSEngineType: String, Codable, Sendable, CaseIterable, Identifiable {
     var keychainKey: String {
         switch self {
         case .system: "openmic.tts.system"
+        case .localNeural: "openmic.tts.localneural"
         case .openAI: "openmic.apikey.openai"
         case .elevenLabs: "openmic.apikey.elevenlabs"
         case .humeAI: "openmic.apikey.humeai"
@@ -51,6 +53,7 @@ enum TTSEngineType: String, Codable, Sendable, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .system: "System (Neural)"
+        case .localNeural: "Local Neural (Piper)"
         case .openAI: "OpenAI"
         case .elevenLabs: "ElevenLabs"
         case .humeAI: "Hume AI (Expressive)"
@@ -58,6 +61,14 @@ enum TTSEngineType: String, Codable, Sendable, CaseIterable, Identifiable {
         case .cartesia: "Cartesia (Ultra-Fast)"
         case .amazonPolly: "Amazon Polly"
         case .deepgram: "Deepgram Aura"
+        }
+    }
+
+    /// Whether this engine requires a network connection
+    var isOfflineCapable: Bool {
+        switch self {
+        case .system, .localNeural: true
+        default: false
         }
     }
 }

@@ -29,6 +29,8 @@ struct VoiceSettingsView: View {
                     switch selectedEngine {
                     case .system:
                         SystemVoiceSettingsSection()
+                    case .localNeural:
+                        LocalNeuralVoiceSettingsSection()
                     case .openAI:
                         OpenAIVoiceSettingsSection()
                     case .elevenLabs:
@@ -244,6 +246,10 @@ struct VoiceSettingsView: View {
                 }
                 engine = tts
 
+            case .localNeural:
+                testDiagnostic = "Testing Local Neural voice..."
+                engine = LocalNeuralTTS()
+
             case .openAI:
                 testDiagnostic = "Testing OpenAI voice..."
                 if let key = try? await appServices.keychainManager.getAPIKey(for: .openAI),
@@ -413,6 +419,7 @@ private struct TTSEngineCard: View {
     private var engineIcon: String {
         switch engine {
         case .system: "speaker.wave.2.fill"
+        case .localNeural: "cpu.fill"
         case .openAI: "brain.head.profile.fill"
         case .elevenLabs: "waveform.circle.fill"
         case .humeAI: "heart.text.clipboard.fill"
@@ -426,6 +433,7 @@ private struct TTSEngineCard: View {
     private var engineSubtitle: String {
         switch engine {
         case .system: "On-device neural voices \u{2014} free, no setup"
+        case .localNeural: "Piper neural model \u{2014} offline, high quality"
         case .openAI: "Natural AI voices \u{2014} uses your OpenAI key"
         case .elevenLabs: "Ultra-realistic AI voices \u{2014} requires API key"
         case .humeAI: "Emotionally expressive voices \u{2014} requires API key"

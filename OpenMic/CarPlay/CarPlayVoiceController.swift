@@ -315,6 +315,9 @@ final class CarPlayVoiceController {
         case .system:
             return SystemTTS()
 
+        case .localNeural:
+            return LocalNeuralTTS()
+
         case .openAI:
             guard let key = try? await keychainManager.getAPIKey(for: .openAI),
                   !key.isEmpty else {

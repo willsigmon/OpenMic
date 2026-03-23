@@ -5,24 +5,46 @@ Voice-first AI assistant for iOS with CarPlay, Watch app, 7 AI providers, 8 TTS 
 
 ## What shipped this session
 
-### Architecture
-1. **Shared ConversationBubbleDescriptor** — extracted into `OpenMic/Shared/`, used by both Phone and CarPlay
-2. **ConversationBubble moved to Shared/** — single source of truth
+### Testing
+1. **End-to-end simulator testing with real API keys** — fetched Anthropic key from 1Password vault `Automation`, injected via env vars, ran in iPhone 17 Pro simulator
+2. **UI test suite: OpenMicConversationUITests** — 2 tests:
+   - `testProviderBadgeShowsClaude` — verifies Claude/Anthropic shows in provider badge (3.6s)
+   - `testTappingSuggestionCardSendsToClaude` — taps suggestion card, verifies user bubble appears, waits for assistant response (6.3s) ✅
+3. **Debug keychain seeder** (`AppServices.swift`) — reads `OPENMIC_SEED_*` env vars on bootstrap, injects keys into keychain, auto-completes onboarding
 
-### Features
-3. **Mid-conversation provider switching** — tap provider badge in top bar, picker sheet, session restart with system marker bubble
-4. **Mid-conversation persona switching** — tap persona name in top bar, picker sheet, updates default persona and conversation record
-5. **Conversation export** — long-press in History for Share/Copy Transcript; share button in active conversation top bar
-6. **System bubble rendering** — centered divider markers for provider/persona switches
-7. **Watch complications** — WidgetKit extension with 4 families (circular, rectangular, inline, corner)
+### Verified working in simulator
+- Provider badge correctly shows "Claude" when Anthropic is selected
+- Suggestion cards tap and send to conversation view
+- Claude responds to prompts within ~6 seconds
+- Provider switching UI works (OpenAI → Anthropic via `selectedProvider` UserDefaults)
 
-### Ship
-8. **TestFlight build 7** — archived and uploaded to App Store Connect
+## Running the tests
+```bash
+# With your Anthropic key in env:
+xcodebuild test \
+  -project OpenMic.xcodeproj \
+  -scheme OpenMic-iOSOnly \
+  -destination "platform=iOS Simulator,name=iPhone 17 Pro" \
+  -only-testing "OpenMicUITests/OpenMicConversationUITests" \
+  OPENMIC_TEST_ANTHROPIC_KEY="sk-ant-..."
+```
 
-## Tests
-34 tests across 6 suites, all passing.
+Or using 1Password CLI:
+```bash
+ANTHROPIC_KEY=$(op item get "Anthropic API Key" --vault Automation --fields label=credential) && \
+xcodebuild test ... OPENMIC_TEST_ANTHROPIC_KEY="$ANTHROPIC_KEY"
+```
+
+## Notes
+- OpenAI key in `Automation` vault is over quota (HTTP 429) — use Anthropic for testing
+- Apple Intelligence provider fails in simulator (FoundationModels not available)
+- `selectedProvider` UserDefaults key controls active AI provider
+- `byokMode` UserDefaults key enables BYOK flow (bypasses subscription check)
 
 ## Commits this session
+- `e5638ea` test: add end-to-end conversation UI tests with Anthropic key seeding
+
+## Previous session (March 23, 2026 earlier)
 - `b9c59a6` feat: share ConversationBubbleDescriptor between Phone and CarPlay
 - `fa7b598` refactor: move ConversationBubble to Shared/
 - `64bf5f6` feat: mid-conversation provider switching

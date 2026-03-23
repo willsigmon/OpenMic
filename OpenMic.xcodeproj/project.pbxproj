@@ -144,7 +144,6 @@
 		7075A2124CEA5052DA514476 /* HumeAITTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B558D54BC35416CBAA8BA930 /* HumeAITTS.swift */; };
 		7219FBEB4E431B6200451A9C /* AmazonPollyVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC3EDEF147DFA30FFB8BA0D /* AmazonPollyVoiceSettingsSection.swift */; };
 		7450F77FCF49558845748D73 /* VoiceConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8583DCBCFF41628E3F61B741 /* VoiceConfig.swift */; };
-		74665C4C4024F218FC74F5EA /* KokoroSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7451EB7EF80826F4C27D2855 /* KokoroSwift */; };
 		74894E3EE2F3124FF5A018CE /* CartesiaTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5856F60028602D9EEEFBBFA8 /* CartesiaTTS.swift */; };
 		753BEDB9D0A8A0A686274493 /* SystemTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27F2944645C230352A86943 /* SystemTTS.swift */; };
 		75604518FE6B73C968FE483B /* AppleFoundationModelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819727AB527F71838EF98649 /* AppleFoundationModelsProvider.swift */; };
@@ -583,7 +582,6 @@
 				DE2D14C59F5F87E0FAF92B67 /* SwiftAnthropic in Frameworks */,
 				3BF5AA88958CF970DBF1AE77 /* KeychainAccess in Frameworks */,
 				FCB95A94B824885241828715 /* Supabase in Frameworks */,
-				74665C4C4024F218FC74F5EA /* KokoroSwift in Frameworks */,
 				229C4222E0B5FB81D707C0B7 /* AuthenticationServices.framework in Frameworks */,
 				CFA46E42B406A0B95E28C420 /* StoreKit.framework in Frameworks */,
 				003D8B1617D63D1AFFE2EA87 /* UserNotifications.framework in Frameworks */,
@@ -1188,7 +1186,6 @@
 				EBBB1DD570A6CD4E3C6E4FA5 /* SwiftAnthropic */,
 				49578A64BF250E8181AD1470 /* KeychainAccess */,
 				68BBA258CF26158B1D6D8744 /* Supabase */,
-				7451EB7EF80826F4C27D2855 /* KokoroSwift */,
 			);
 			productName = OpenMic;
 			productReference = B0A68469B0230396F57F76C6 /* OpenMic.app */;
@@ -1257,7 +1254,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				508A0C629C1D6EA22166022A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				40EA8540800D0DD2388F5753 /* XCRemoteSwiftPackageReference "kokoro-ios" */,
 				F241C31660E58CD81C1A3367 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				1C799BEF1BA78C78F3127C51 /* XCRemoteSwiftPackageReference "SwiftAnthropic" */,
 				481232E2801167B0ADE894BD /* XCRemoteSwiftPackageReference "SwiftOpenAI" */,
@@ -2047,14 +2043,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		40EA8540800D0DD2388F5753 /* XCRemoteSwiftPackageReference "kokoro-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mlalma/kokoro-ios";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		481232E2801167B0ADE894BD /* XCRemoteSwiftPackageReference "SwiftOpenAI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jamesrochabrun/SwiftOpenAI";
@@ -2111,11 +2099,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F241C31660E58CD81C1A3367 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
-		};
-		7451EB7EF80826F4C27D2855 /* KokoroSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 40EA8540800D0DD2388F5753 /* XCRemoteSwiftPackageReference "kokoro-ios" */;
-			productName = KokoroSwift;
 		};
 		EA7A6B63D6E95AF16C0D0B06 /* SwiftOpenAI */ = {
 			isa = XCSwiftPackageProductDependency;

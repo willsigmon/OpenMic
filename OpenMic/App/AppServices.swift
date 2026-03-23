@@ -120,6 +120,10 @@ final class AppServices {
 
     /// Called on app launch to restore auth session and load products
     func bootstrap() async {
+        #if DEBUG
+        await seedKeysFromEnvironmentIfNeeded()
+        #endif
+
         await authManager.restoreSession()
         await storeManager.loadProducts()
         await usageTracker.refreshQuota(tier: effectiveTier)
@@ -127,6 +131,35 @@ final class AppServices {
         notificationManager.registerCategories()
         syncTierToWatch()
     }
+
+    #if DEBUG
+    /// Seeds API keys from environment variables for automated testing.
+    /// Set OPENMIC_SEED_OPENAI, OPENMIC_SEED_ANTHROPIC, etc. to inject keys.
+    private func seedKeysFromEnvironmentIfNeeded() async {
+        let envMap: [(env: String, provider: AIProviderType)] = [
+            ("OPENMIC_SEED_OPENAI", .openAI),
+            ("OPENMIC_SEED_ANTHROPIC", .anthropic),
+            ("OPENMIC_SEED_GEMINI", .gemini),
+            ("OPENMIC_SEED_GROK", .grok),
+        ]
+
+        for (envKey, provider) in envMap {
+            if let value = ProcessInfo.processInfo.environment[envKey],
+               !value.isEmpty {
+                try? await keychainManager.saveAPIKey(for: provider, key: value)
+            }
+        }
+
+        // Auto-complete onboarding + set BYOK mode when keys are seeded
+        if ProcessInfo.processInfo.environment["OPENMIC_SEED_OPENAI"] != nil
+            || ProcessInfo.processInfo.environment["OPENMIC_SEED_ANTHROPIC"] != nil {
+            if !isOnboardingComplete {
+                completeOnboarding()
+            }
+            UserDefaults.standard.set(true, forKey: "byokMode")
+        }
+    }
+    #endif
 
     func handleAccountDeletionCleanup() async {
         conversationStore.deleteAllConversations()

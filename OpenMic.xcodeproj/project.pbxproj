@@ -249,6 +249,7 @@
 		CFA46E42B406A0B95E28C420 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB962EAFDF5433E3ACF961 /* StoreKit.framework */; };
 		D11F080E6C723E980FCB899D /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2950B782F3FF4E881A94441 /* ConversationView.swift */; };
 		D21DBFE07CD916E58239D264 /* VoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0685E9AE19187DE32DDA9EEC /* VoiceSession.swift */; };
+		D5C620C63D2B2DA1E9911907 /* OpenMicConversationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD04EC69E1AEBA42A95D811 /* OpenMicConversationUITests.swift */; };
 		D6C59E474BF492DAE5819887 /* OpenMicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5827A2BE9AD14DAF371B3134 /* OpenMicApp.swift */; };
 		D73E0EA66E4EF947873C139A /* HapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662ED47DDB99327B15542BC2 /* HapticEngine.swift */; };
 		D7A2C9BAB61B83CEDEEFF6A3 /* VoicePreviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19CDB66782EC7305C1FFC9E /* VoicePreviewStepView.swift */; };
@@ -536,6 +537,7 @@
 		F7C94650D117340A993BD570 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		F9B45E6D49AB95E17FA8A501 /* ElevenLabsVoiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsVoiceManager.swift; sourceTree = "<group>"; };
 		FA9E9603E2BBA0E1515E12D7 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		FAD04EC69E1AEBA42A95D811 /* OpenMicConversationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMicConversationUITests.swift; sourceTree = "<group>"; };
 		FDC3A6F85C537D4123A744DD /* voice_sample_standard.m4a */ = {isa = PBXFileReference; path = voice_sample_standard.m4a; sourceTree = "<group>"; };
 		FE08A376471E78D5F78F044F /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicProvider.swift; sourceTree = "<group>"; };
 		FEEEAADADC9776C8E1013637 /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
@@ -646,6 +648,7 @@
 		42808C175F648A3180D89AA1 /* OpenMicUITests */ = {
 			isa = PBXGroup;
 			children = (
+				FAD04EC69E1AEBA42A95D811 /* OpenMicConversationUITests.swift */,
 				5D338D5D08B07E9A0FBBC087 /* OpenMicLaunchUITests.swift */,
 			);
 			path = OpenMicUITests;
@@ -1587,6 +1590,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5C620C63D2B2DA1E9911907 /* OpenMicConversationUITests.swift in Sources */,
 				8B08DC3D4C0F97A50F0C21B2 /* OpenMicLaunchUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

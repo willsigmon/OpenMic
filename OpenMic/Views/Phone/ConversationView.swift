@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -14,6 +15,7 @@ struct ConversationView: View {
     @State private var statusLabel = Microcopy.Status.label(for: .idle)
     @State private var showSettings = false
     @State private var showProviderPicker = false
+    @State private var showPersonaPicker = false
     @State private var availableProviders: [(provider: AIProviderType, ready: Bool)] = []
     @State private var bubbleReactions: [UUID: String] = [:]
     @State private var micOffset: CGSize = .zero
@@ -194,6 +196,16 @@ struct ConversationView: View {
                 }
             )
         }
+        .sheet(isPresented: $showPersonaPicker) {
+            PersonaPickerSheet(
+                currentPersonaID: vm.conversation?.personaName == nil
+                    ? nil
+                    : fetchCurrentPersonaID(vm),
+                onSelect: { persona in
+                    vm.switchPersona(to: persona)
+                }
+            )
+        }
         .onChange(of: vm.voiceState) { oldState, newState in
             // Haptic per state transition with sound companions
             Haptics.voiceStateChanged(to: newState)
@@ -262,6 +274,20 @@ struct ConversationView: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("OpenMic")
+
+            if let conversation = vm.conversation {
+                Button { showPersonaPicker = true } label: {
+                    Text(conversation.personaName)
+                        .font(OpenMicTheme.Typography.caption.weight(.medium))
+                        .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
+                        .padding(.horizontal, OpenMicTheme.Spacing.xs)
+                        .padding(.vertical, 5)
+                        .glassBackground(cornerRadius: OpenMicTheme.Radius.pill)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Persona: \(conversation.personaName)")
+                .accessibilityHint("Tap to switch persona")
+            }
 
             Spacer()
 
@@ -568,6 +594,14 @@ struct ConversationView: View {
         UIPasteboard.general.string = text
 #endif
         Haptics.tap()
+    }
+
+    private func fetchCurrentPersonaID(_ vm: ConversationViewModel) -> UUID? {
+        let context = appServices.modelContainer.mainContext
+        let descriptor = FetchDescriptor<Persona>(
+            predicate: #Predicate { $0.isDefault == true }
+        )
+        return (try? context.fetch(descriptor))?.first?.id
     }
 }
 

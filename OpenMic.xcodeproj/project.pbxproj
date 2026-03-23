@@ -46,6 +46,7 @@
 		172868D07F38C4FDF02F89C6 /* SwiftOpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 1813B76FEFC06206E682A9EB /* SwiftOpenAI */; };
 		17787CDE89B1D32990489EA2 /* OpenClawProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AADCD83E63B1898AA3A4AD1 /* OpenClawProvider.swift */; };
 		194F77452EEF4197FCA073C2 /* HumeAIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3629DC6B885949D7F7DC0FB8 /* HumeAIModels.swift */; };
+		19D7C96BEFE45EF69B13CAE0 /* PersonaPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE1CC47655A6773893D4B3F /* PersonaPickerSheet.swift */; };
 		1A9F1E8C2B63D9E22B09A197 /* APIKeyStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3AC330ED0C93FC1D7A3C648 /* APIKeyStepView.swift */; };
 		1AAFD3FCA956801D27DD4870 /* OllamaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571A13E10043328249FC3555 /* OllamaProvider.swift */; };
 		1D6A54F8008EC81DBA24EBE1 /* TTSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCA661407AB86C06F2EBCFC /* TTSEngine.swift */; };
@@ -160,6 +161,7 @@
 		8596167CA70C0E8C63E12968 /* VoiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBEEFA36A815519552ED2CC /* VoiceSettingsView.swift */; };
 		8638046B086FCAF748C2A77D /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB62EC578DB529100DBB2EE /* KeychainManager.swift */; };
 		8742EC3881CE235B5B1526D7 /* AmazonPollyTTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB0854BA2C73F2E819CBE47 /* AmazonPollyTTS.swift */; };
+		89952F2B850EB1D76CB8E16E /* PersonaPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE1CC47655A6773893D4B3F /* PersonaPickerSheet.swift */; };
 		89C2B7EB757BBE422A349A86 /* SpeechEndpointingConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2685392F1184688134B244 /* SpeechEndpointingConfig.swift */; };
 		8B08DC3D4C0F97A50F0C21B2 /* OpenMicLaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D338D5D08B07E9A0FBBC087 /* OpenMicLaunchUITests.swift */; };
 		8B6F6642DD49C1B264FC0984 /* CloudTTSBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272F4F2CABD35356D6BA4813 /* CloudTTSBase.swift */; };
@@ -424,6 +426,7 @@
 		6C0D66AAA3894A9D37DBF677 /* OpenMicWatchExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenMicWatchExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D99F9AC46D27EDD8702B5E8 /* DeepgramVoiceSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepgramVoiceSettingsSection.swift; sourceTree = "<group>"; };
 		6EB37C0C3659233E0FFEC832 /* VoiceWaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceWaveformView.swift; sourceTree = "<group>"; };
+		6EE1CC47655A6773893D4B3F /* PersonaPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaPickerSheet.swift; sourceTree = "<group>"; };
 		6EE4184833F0D190F8CBE2DA /* ButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyles.swift; sourceTree = "<group>"; };
 		6F4D021F2DC5C52EDE587591 /* TopicCategoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCategoryDetailView.swift; sourceTree = "<group>"; };
 		70CC55131C967BDA63D994B0 /* AmbientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientBackground.swift; sourceTree = "<group>"; };
@@ -781,6 +784,7 @@
 			children = (
 				487EFD2EF33C51B4E55E60C5 /* ConversationBubbleRow.swift */,
 				AB4C24F14766FD420DF56399 /* MicButton.swift */,
+				6EE1CC47655A6773893D4B3F /* PersonaPickerSheet.swift */,
 				CFC49460E8929B94FF794E3D /* ProviderBadge.swift */,
 				60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */,
 				58B6D56CD2D95113AE8AD7A1 /* SuggestionChipsView.swift */,
@@ -1323,6 +1327,7 @@
 				C692D7E4A8B94A80EEA6C77A /* PaywallView.swift in Sources */,
 				05E7A363551DCEA5492E785E /* PermissionsStepView.swift in Sources */,
 				A4A592F43ADA7EFCCA8C44DF /* Persona.swift in Sources */,
+				89952F2B850EB1D76CB8E16E /* PersonaPickerSheet.swift in Sources */,
 				768FD6056A2B12FA7082E633 /* PersonaSettingsView.swift in Sources */,
 				2593EA29D938DE7878FCF462 /* PipelineVoiceSession.swift in Sources */,
 				0FFF6C6BE92AA375397FE1E3 /* PromptSuggestions.swift in Sources */,
@@ -1447,6 +1452,7 @@
 				97F30C0C8B8B06E2CDAE5543 /* PaywallView.swift in Sources */,
 				C9791E0981EF8E69BA1A26CE /* PermissionsStepView.swift in Sources */,
 				E867EA00BCDF8E85E6BAEFDA /* Persona.swift in Sources */,
+				19D7C96BEFE45EF69B13CAE0 /* PersonaPickerSheet.swift in Sources */,
 				9BD033AD388D2116C7736D41 /* PersonaSettingsView.swift in Sources */,
 				FCA21FF7E9AD6B2AB77D54E4 /* PipelineVoiceSession.swift in Sources */,
 				389266322858C079298B33B2 /* PromptSuggestions.swift in Sources */,

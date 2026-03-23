@@ -279,6 +279,46 @@ final class ConversationViewModel {
         }
     }
 
+    // MARK: - Persona Switching
+
+    /// Switch persona mid-conversation: tear down session, update default, insert marker, restart.
+    func switchPersona(to persona: Persona) {
+        let currentPersona = fetchActivePersona()
+        guard persona.id != currentPersona?.id else { return }
+
+        let wasActive = isActive
+        stopListening()
+
+        // Update default persona
+        let context = appServices.modelContainer.mainContext
+        if let current = currentPersona {
+            current.isDefault = false
+        }
+        persona.isDefault = true
+        try? context.save()
+
+        // Update conversation record
+        if let conversation {
+            conversation.personaName = persona.name
+            conversation.updatedAt = Date()
+            try? context.save()
+        }
+
+        // Insert marker
+        let marker = ConversationBubble(
+            role: .system,
+            text: "Switched to \(persona.name)",
+            isFinal: true
+        )
+        bubbles.append(marker)
+
+        errorMessage = nil
+
+        if wasActive {
+            startListening()
+        }
+    }
+
     // MARK: - Conversation Resume
 
     func loadConversation(_ conversation: Conversation) {

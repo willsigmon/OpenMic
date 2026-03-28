@@ -23,7 +23,7 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
     let audioRequirement: TTSAudioRequirement = .audioPlayer
 
     #if canImport(FluidAudio)
-    private var ttsManager: KokoroTtsManager?
+    private let synthesizer = LocalNeuralSynthesizer()
     #endif
 
     override init() {
@@ -79,14 +79,7 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
 
     #if canImport(FluidAudio)
     private func synthesizeWithFluidAudio(text: String) async throws -> Data {
-        if ttsManager == nil || ttsManager?.isAvailable != true {
-            let manager = KokoroTtsManager(defaultVoice: "af_heart")
-            try await manager.initialize()
-            ttsManager = manager
-            log.info("FluidAudio Kokoro TTS initialized (CoreML, 24kHz)")
-        }
-        guard let tts = ttsManager else { throw LocalNeuralTTSError.initFailed }
-        return try await tts.synthesize(text: text)
+        try await synthesizer.synthesize(text: text)
     }
     #endif
 
@@ -107,6 +100,24 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
         }
     }
 }
+
+#if canImport(FluidAudio)
+private actor LocalNeuralSynthesizer {
+    private var ttsManager: KokoroTtsManager?
+
+    func synthesize(text: String) async throws -> Data {
+        if ttsManager == nil || ttsManager?.isAvailable != true {
+            let manager = KokoroTtsManager(defaultVoice: "af_heart")
+            try await manager.initialize()
+            ttsManager = manager
+            log.info("FluidAudio Kokoro TTS initialized (CoreML, 24kHz)")
+        }
+
+        guard let ttsManager else { throw LocalNeuralTTSError.initFailed }
+        return try await ttsManager.synthesize(text: text)
+    }
+}
+#endif
 
 // MARK: - AVAudioPlayerDelegate
 

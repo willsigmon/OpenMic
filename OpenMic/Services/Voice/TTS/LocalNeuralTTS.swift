@@ -104,8 +104,13 @@ final class LocalNeuralTTS: NSObject, TTSEngineProtocol {
 #if canImport(FluidAudio)
 private actor LocalNeuralSynthesizer {
     private var ttsManager: KokoroTtsManager?
+    private var isSynthesizing = false
+    private var synthesisWaiters: [CheckedContinuation<Void, Never>] = []
 
     func synthesize(text: String) async throws -> Data {
+        await acquireSynthesisLock()
+        defer { releaseSynthesisLock() }
+
         if ttsManager == nil || ttsManager?.isAvailable != true {
             let manager = KokoroTtsManager(defaultVoice: "af_heart")
             try await manager.initialize()
@@ -114,7 +119,29 @@ private actor LocalNeuralSynthesizer {
         }
 
         guard let ttsManager else { throw LocalNeuralTTSError.initFailed }
-        return try await ttsManager.synthesize(text: text)
+        nonisolated(unsafe) let unsafeManager = ttsManager
+        return try await unsafeManager.synthesize(text: text)
+    }
+
+    private func acquireSynthesisLock() async {
+        guard isSynthesizing else {
+            isSynthesizing = true
+            return
+        }
+
+        await withCheckedContinuation { continuation in
+            synthesisWaiters.append(continuation)
+        }
+    }
+
+    private func releaseSynthesisLock() {
+        guard let nextWaiter = synthesisWaiters.first else {
+            isSynthesizing = false
+            return
+        }
+
+        synthesisWaiters.removeFirst()
+        nextWaiter.resume()
     }
 }
 #endif

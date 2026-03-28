@@ -39,7 +39,29 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F5A06EB15B42297574E62BEA"
+               BuildableName = "OpenMicTestsiOS.xctest"
+               BlueprintName = "OpenMicTestsiOS"
+               ReferencedContainer = "container:OpenMic.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "07EC715E2A2635DA1986D3A6"
+               BuildableName = "OpenMicUITestsiOS.xctest"
+               BlueprintName = "OpenMicUITestsiOS"
+               ReferencedContainer = "container:OpenMic.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

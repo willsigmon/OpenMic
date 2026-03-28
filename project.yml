@@ -17,6 +17,10 @@ schemes:
     build:
       targets:
         OpenMiciOSBuildOnly: all
+    test:
+      targets:
+        - OpenMicTestsiOS
+        - OpenMicUITestsiOS
 
 packages:
   SwiftOpenAI:
@@ -106,6 +110,7 @@ targets:
         DEVELOPMENT_TEAM: 49HAGQE8FB
         PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild
         PRODUCT_NAME: OpenMic iOS Build
+        PRODUCT_MODULE_NAME: OpenMic
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "9"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -233,6 +238,31 @@ targets:
           - "@loader_path/Frameworks"
           - "@executable_path/Frameworks"
 
+  OpenMicTestsiOS:
+    type: bundle.unit-test
+    platform: iOS
+    supportedDestinations: [iOS]
+    sources:
+      - path: OpenMicTests
+    dependencies:
+      - target: OpenMiciOSBuildOnly
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.6"
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_NAME: OpenMicTestsiOS
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild.tests
+        SDKROOT: iphoneos
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OpenMic iOS Build.app/OpenMic iOS Build"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@loader_path/Frameworks"
+          - "@executable_path/Frameworks"
+
   OpenMicUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -252,3 +282,23 @@ targets:
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
         TEST_TARGET_NAME: OpenMic
+
+  OpenMicUITestsiOS:
+    type: bundle.ui-testing
+    platform: iOS
+    supportedDestinations: [iOS]
+    sources:
+      - path: OpenMicUITests
+    dependencies:
+      - target: OpenMiciOSBuildOnly
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.6"
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_NAME: OpenMicUITestsiOS
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild.uitests
+        SDKROOT: iphoneos
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
+        TEST_TARGET_NAME: OpenMiciOSBuildOnly

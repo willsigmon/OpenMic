@@ -94,12 +94,15 @@ enum AIProviderFactory {
     static func createManaged(
         type: AIProviderType,
         model: String? = nil,
-        endpointURL: URL = SupabaseConfig.managedChatFunctionURL,
+        endpointURL: URL? = SupabaseConfig.managedChatFunctionURL,
         authTokenProvider: @escaping @Sendable () async throws -> String = {
             try await ManagedSessionTokenProvider.accessToken()
         }
-    ) -> AIProvider {
-        ManagedProxyProvider(
+    ) throws -> AIProvider {
+        guard let endpointURL else {
+            throw AIProviderError.configurationMissing("Supabase managed chat URL not configured")
+        }
+        return ManagedProxyProvider(
             providerType: type,
             endpointURL: endpointURL,
             model: model ?? type.defaultModel,

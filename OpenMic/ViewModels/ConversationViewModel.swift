@@ -379,6 +379,10 @@ final class ConversationViewModel {
            providerType.requiresAPIKey,
            appServices.authManager.currentUserID != nil
         {
+            guard let proxyURL = SupabaseConfig.realtimeProxyURL else {
+                throw AIProviderError.configurationMissing("Supabase realtime proxy URL not configured")
+            }
+
             let authToken: String
             do {
                 authToken = try await ManagedSessionTokenProvider.accessToken()
@@ -388,7 +392,7 @@ final class ConversationViewModel {
 
             let session = try RealtimeVoiceSession(
                 provider: providerType,
-                proxyBaseURL: SupabaseConfig.realtimeProxyURL,
+                proxyBaseURL: proxyURL,
                 authToken: authToken,
                 deviceID: appServices.authManager.effectiveDeviceID,
                 voice: fetchActivePersona()?.openAIRealtimeVoice ?? "alloy"

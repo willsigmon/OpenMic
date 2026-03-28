@@ -31,7 +31,7 @@ enum AIProviderResolver {
         }
 
         if providerType.requiresAPIKey {
-            return AIProviderFactory.createManaged(type: providerType)
+            return try AIProviderFactory.createManaged(type: providerType)
         }
 
         return try AIProviderFactory.create(type: providerType, apiKey: nil)

@@ -40,6 +40,7 @@
 		115C978E29D678658D7BCDC8 /* OpenMicWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5A6DEA69DF1DF99A75EF5E /* OpenMicWatchWidget.swift */; };
 		12C8C3D56963E9A258122F3D /* SelfHostedProviderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDDBD91632215B468E2E9EF /* SelfHostedProviderCard.swift */; };
 		133DAC045C0B5E2FC8308210 /* LocalNeuralVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C68AF639AA71CF82D1F36818 /* LocalNeuralVoiceSettingsSection.swift */; };
+		13A4AB2C7F3EB05F1FB5CAC2 /* OpenMicLaunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D338D5D08B07E9A0FBBC087 /* OpenMicLaunchUITests.swift */; };
 		1435949BA22F8DF36904D392 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 1E13A3C1CD286A1A9574A271 /* KeychainAccess */; };
 		14EFFB16182D5980151A4105 /* AppIcon29x29@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0C80B19A8842749680861D9D /* AppIcon29x29@3x.png */; };
 		15F36F870F47E2BC4F23F25C /* UsageDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57B3F30BDB2B376BA334D6C /* UsageDashboardView.swift */; };
@@ -64,6 +65,7 @@
 		229C4222E0B5FB81D707C0B7 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C94650D117340A993BD570 /* AuthenticationServices.framework */; };
 		22C7FBFA0710FE553013B07F /* ProviderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E77AAD529E593855CBD40D /* ProviderCard.swift */; };
 		24A36B7267FF92543295B3E0 /* AppIcon27.5x27.5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3426AEE136383CB1DA06D255 /* AppIcon27.5x27.5@2x.png */; };
+		25896BEEE9DD1E8EA137259B /* ConversationBubbleDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A6D177E73EFEC76264E680 /* ConversationBubbleDescriptorTests.swift */; };
 		2593EA29D938DE7878FCF462 /* PipelineVoiceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFC55F6DE4D0482001D4458 /* PipelineVoiceSession.swift */; };
 		26961A12AAC2F4E2ED739682 /* OpenAIRealtimeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043924DED82C85205DF76FED /* OpenAIRealtimeSession.swift */; };
 		26EC09171DA879E594A24003 /* CustomIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED3DFB899CFEF317C6FFF9BA /* CustomIcons.swift */; };
@@ -125,6 +127,7 @@
 		5626661954ABF894A788F760 /* VoicePreviewStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19CDB66782EC7305C1FFC9E /* VoicePreviewStepView.swift */; };
 		57766608DDB78D0F335683ED /* voice_sample_free.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 717700CFC3F451F71E93E3DA /* voice_sample_free.m4a */; };
 		579CFEFE8ECDB511FD26ECBA /* SelfHostedProviderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDDBD91632215B468E2E9EF /* SelfHostedProviderCard.swift */; };
+		58F93B679D3A06A46D81AE2A /* ProviderAccessPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3ED7798226CF892DD884E2E /* ProviderAccessPolicyTests.swift */; };
 		59AA7007B7016CDA35376B98 /* AIProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59B3222746225BECC8BB542 /* AIProviderFactory.swift */; };
 		5A174201C9210F6321804375 /* APIKeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A8A8A370FDB725A4A7575E /* APIKeySettingsView.swift */; };
 		5A19FFDEAF1620613E0294C7 /* Microcopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9ECE00DEE0C06EE83A981 /* Microcopy.swift */; };
@@ -134,12 +137,16 @@
 		5D915787A4B973D564B7CE47 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BCE1E81158FA8622EEB628 /* WatchConnectivityManager.swift */; };
 		5DD4B1318CBB55675651F601 /* ProviderBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC49460E8929B94FF794E3D /* ProviderBadge.swift */; };
 		5E258BC405F64113B6667BBA /* UsageDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57B3F30BDB2B376BA334D6C /* UsageDashboardView.swift */; };
+		6190358FFDC74ABCB1A0DE05 /* OpenMicConversationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD04EC69E1AEBA42A95D811 /* OpenMicConversationUITests.swift */; };
 		63BD150D126BC19F72289F05 /* APIKeySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A8A8A370FDB725A4A7575E /* APIKeySettingsView.swift */; };
 		64A22EF957A406322A7C3A05 /* ProviderPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BA6918CA59301273A70622 /* ProviderPickerSheet.swift */; };
+		64A95AF9248879FEC6AD4E25 /* PipelineVoiceSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A4BC4DBAD19047B1952E4 /* PipelineVoiceSessionTests.swift */; };
 		65F82479F9F05747EEA86AE3 /* Microcopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9ECE00DEE0C06EE83A981 /* Microcopy.swift */; };
 		665BDCB0CE4796FB8607C969 /* TopicCategoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4D021F2DC5C52EDE587591 /* TopicCategoryDetailView.swift */; };
+		67A22B3B93631DD7A3D630A2 /* VoiceEndpointDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA2512324AC155134EB3784 /* VoiceEndpointDetectorTests.swift */; };
 		67ED6F689E3F5C3728E3F88D /* AppIcon29x29@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60D7545B138D44B7AAA74E3A /* AppIcon29x29@2x.png */; };
 		68F319D6384C45FD7372A6BA /* GrokProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ECF0FC17FE71D783D560AF /* GrokProvider.swift */; };
+		6A93409D006C46A3843A8DAB /* OpenMicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B80FAC176052607316FEBCC /* OpenMicTests.swift */; };
 		6B7853BDB4E5FBAC2C0E3929 /* ConversationBubbleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 487EFD2EF33C51B4E55E60C5 /* ConversationBubbleRow.swift */; };
 		6C45BE6C7A50826AC979AA06 /* TTSEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DCA661407AB86C06F2EBCFC /* TTSEngine.swift */; };
 		6D7636CAEA3E16815B7970B3 /* voice_sample_premium.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 80255EA85D7726E54425E2D2 /* voice_sample_premium.m4a */; };
@@ -234,6 +241,7 @@
 		B584C0048606102789396CCE /* PipelineVoiceSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441A4BC4DBAD19047B1952E4 /* PipelineVoiceSessionTests.swift */; };
 		B726C1A2F2831FE7F1BD3611 /* ConversationBubbleDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CD4E24007559721FFA14BD /* ConversationBubbleDescriptor.swift */; };
 		B85C9B148A91E02B1D9263E7 /* GoogleCloudVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E91ED0695BBA21FB2C9BB2 /* GoogleCloudVoiceSettingsSection.swift */; };
+		B9C1F6622EA634F4AD87B9E3 /* PromptSuggestionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F995A7A4B6F30B8299F5154 /* PromptSuggestionsTests.swift */; };
 		BB47676658556BBAF7D40439 /* VoiceWaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB37C0C3659233E0FFEC832 /* VoiceWaveformView.swift */; };
 		BB99EDB88E1968BB13934A58 /* SFSpeechSTT.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96E814F9F5978C03D43F47E /* SFSpeechSTT.swift */; };
 		BBBC383D2F782ACFC5CDB9FC /* WelcomeStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AAFCB1B642B5AA6FB02A95 /* WelcomeStepView.swift */; };
@@ -256,6 +264,7 @@
 		C9791E0981EF8E69BA1A26CE /* PermissionsStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950C3F0D0749795BE1ED7F44 /* PermissionsStepView.swift */; };
 		CACC80A07E1BD2659A83ACE9 /* APIKeyStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3AC330ED0C93FC1D7A3C648 /* APIKeyStepView.swift */; };
 		CE6ED9C7AFEAC77634A3492F /* ProviderAccessPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62322C93221B18F3982133 /* ProviderAccessPolicy.swift */; };
+		CF2720B3939DFCA7A30D36C1 /* ConversationViewModelLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFA1EAC664716D95A3903EA /* ConversationViewModelLifecycleTests.swift */; };
 		CF4362F01FE6D81AB6179414 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEF887E90E2BA61371C2903 /* SupabaseClient.swift */; };
 		CFA46E42B406A0B95E28C420 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96CB962EAFDF5433E3ACF961 /* StoreKit.framework */; };
 		D11F080E6C723E980FCB899D /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2950B782F3FF4E881A94441 /* ConversationView.swift */; };
@@ -322,6 +331,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0E43464F5DA7CD1BF10F5DF0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EB21ACBFF3EC526E69D4DC7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D47B2C0D0F345249856F0C75;
+			remoteInfo = OpenMiciOSBuildOnly;
+		};
 		1B5D3804BEAE894AEB71989C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3EB21ACBFF3EC526E69D4DC7 /* Project object */;
@@ -342,6 +358,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = DBBFB1CC5F3308201F032E12;
 			remoteInfo = OpenMic;
+		};
+		AA1D749F8E7EABCCAA59C5DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EB21ACBFF3EC526E69D4DC7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D47B2C0D0F345249856F0C75;
+			remoteInfo = OpenMiciOSBuildOnly;
 		};
 		C99296A6F360640FAD3DFB12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -408,6 +431,7 @@
 		2757FA731D110449D26754FF /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		28996869586F327155C134CF /* AppIcon108x108@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon108x108@2x.png"; sourceTree = "<group>"; };
 		2925105F3DE26014336A57CD /* WatchAsyncBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAsyncBridge.swift; sourceTree = "<group>"; };
+		298B79814151E34ACD0463D8 /* OpenMicTestsiOS.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenMicTestsiOS.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B2685392F1184688134B244 /* SpeechEndpointingConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechEndpointingConfig.swift; sourceTree = "<group>"; };
 		2C1A764E47A0A5363CB43880 /* ConversationBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBubble.swift; sourceTree = "<group>"; };
 		2DE13B1109B90D53BC1CDA8C /* AmazonPollyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmazonPollyModels.swift; sourceTree = "<group>"; };
@@ -562,6 +586,7 @@
 		FAD04EC69E1AEBA42A95D811 /* OpenMicConversationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMicConversationUITests.swift; sourceTree = "<group>"; };
 		FDC3A6F85C537D4123A744DD /* voice_sample_standard.m4a */ = {isa = PBXFileReference; path = voice_sample_standard.m4a; sourceTree = "<group>"; };
 		FE08A376471E78D5F78F044F /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicProvider.swift; sourceTree = "<group>"; };
+		FEC7045DB61CA96EDB7F709B /* OpenMicUITestsiOS.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenMicUITestsiOS.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEEEAADADC9776C8E1013637 /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -837,7 +862,9 @@
 				B0A68469B0230396F57F76C6 /* OpenMic.app */,
 				43B107BC9CA24EE39A14A55A /* OpenMiciOSBuildOnly.app */,
 				361FCDA6F4396083324DDD83 /* OpenMicTests.xctest */,
+				298B79814151E34ACD0463D8 /* OpenMicTestsiOS.xctest */,
 				5276423ABE3D95B6FA9475B9 /* OpenMicUITests.xctest */,
+				FEC7045DB61CA96EDB7F709B /* OpenMicUITestsiOS.xctest */,
 				D0A0B05FC95E82C91AEA80DC /* OpenMicWatch.app */,
 				6C0D66AAA3894A9D37DBF677 /* OpenMicWatchExtension.appex */,
 				61190E45A9982B26C17C0D44 /* OpenMicWatchWidget.appex */,
@@ -1100,6 +1127,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		07EC715E2A2635DA1986D3A6 /* OpenMicUITestsiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 59437F013F360FF89FB871E1 /* Build configuration list for PBXNativeTarget "OpenMicUITestsiOS" */;
+			buildPhases = (
+				0E5AA0CC96DF292D0DEEB2AA /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F64815C998A861FA7707E8F4 /* PBXTargetDependency */,
+			);
+			name = OpenMicUITestsiOS;
+			packageProductDependencies = (
+			);
+			productName = OpenMicUITestsiOS;
+			productReference = FEC7045DB61CA96EDB7F709B /* OpenMicUITestsiOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		0A33FDD0A9B8264C17E3F8F0 /* OpenMicTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C7FCF16B811B9A9844FFF7F9 /* Build configuration list for PBXNativeTarget "OpenMicTests" */;
@@ -1241,6 +1286,24 @@
 			productReference = 6C0D66AAA3894A9D37DBF677 /* OpenMicWatchExtension.appex */;
 			productType = "com.apple.product-type.watchkit2-extension";
 		};
+		F5A06EB15B42297574E62BEA /* OpenMicTestsiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4120BFBF3F1E6111401D5841 /* Build configuration list for PBXNativeTarget "OpenMicTestsiOS" */;
+			buildPhases = (
+				940839609F4F24C4F5694133 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				78BC10114BF105D98C84A871 /* PBXTargetDependency */,
+			);
+			name = OpenMicTestsiOS;
+			packageProductDependencies = (
+			);
+			productName = OpenMicTestsiOS;
+			productReference = 298B79814151E34ACD0463D8 /* OpenMicTestsiOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1250,6 +1313,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					07EC715E2A2635DA1986D3A6 = {
+						TestTargetID = D47B2C0D0F345249856F0C75;
+					};
 					3961A7510E056E6E137B8D85 = {
 						TestTargetID = DBBFB1CC5F3308201F032E12;
 					};
@@ -1298,7 +1364,9 @@
 			targets = (
 				DBBFB1CC5F3308201F032E12 /* OpenMic */,
 				0A33FDD0A9B8264C17E3F8F0 /* OpenMicTests */,
+				F5A06EB15B42297574E62BEA /* OpenMicTestsiOS */,
 				3961A7510E056E6E137B8D85 /* OpenMicUITests */,
+				07EC715E2A2635DA1986D3A6 /* OpenMicUITestsiOS */,
 				6DABD196B37DBFDAF3AE4E04 /* OpenMicWatch */,
 				F034C2F4DB3430C871A27FFA /* OpenMicWatchExtension */,
 				9F0AC2DDBB4AEEDD569DBC85 /* OpenMicWatchWidget */,
@@ -1357,6 +1425,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0E5AA0CC96DF292D0DEEB2AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6190358FFDC74ABCB1A0DE05 /* OpenMicConversationUITests.swift in Sources */,
+				13A4AB2C7F3EB05F1FB5CAC2 /* OpenMicLaunchUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2B36A188FED23BB274E4EA33 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1493,6 +1570,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				115C978E29D678658D7BCDC8 /* OpenMicWatchWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		940839609F4F24C4F5694133 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				25896BEEE9DD1E8EA137259B /* ConversationBubbleDescriptorTests.swift in Sources */,
+				CF2720B3939DFCA7A30D36C1 /* ConversationViewModelLifecycleTests.swift in Sources */,
+				6A93409D006C46A3843A8DAB /* OpenMicTests.swift in Sources */,
+				64A95AF9248879FEC6AD4E25 /* PipelineVoiceSessionTests.swift in Sources */,
+				B9C1F6622EA634F4AD87B9E3 /* PromptSuggestionsTests.swift in Sources */,
+				58F93B679D3A06A46D81AE2A /* ProviderAccessPolicyTests.swift in Sources */,
+				67A22B3B93631DD7A3D630A2 /* VoiceEndpointDetectorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1676,6 +1767,11 @@
 			target = F034C2F4DB3430C871A27FFA /* OpenMicWatchExtension */;
 			targetProxy = 54330FBA7B2C92AE22B13D61 /* PBXContainerItemProxy */;
 		};
+		78BC10114BF105D98C84A871 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D47B2C0D0F345249856F0C75 /* OpenMiciOSBuildOnly */;
+			targetProxy = 0E43464F5DA7CD1BF10F5DF0 /* PBXContainerItemProxy */;
+		};
 		C4B5FFF9875DE9CE97F667A1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6DABD196B37DBFDAF3AE4E04 /* OpenMicWatch */;
@@ -1691,9 +1787,30 @@
 			target = DBBFB1CC5F3308201F032E12 /* OpenMic */;
 			targetProxy = 54852B9F3279DF52A1BACCB1 /* PBXContainerItemProxy */;
 		};
+		F64815C998A861FA7707E8F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D47B2C0D0F345249856F0C75 /* OpenMiciOSBuildOnly */;
+			targetProxy = AA1D749F8E7EABCCAA59C5DE /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0BD02C72B9E4EFBFF5E92846 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild.uitests;
+				PRODUCT_NAME = OpenMicUITestsiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "";
+				TEST_TARGET_NAME = OpenMiciOSBuildOnly;
+			};
+			name = Release;
+		};
 		13C5C300049CE4A48B94E63A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1739,6 +1856,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild;
+				PRODUCT_MODULE_NAME = OpenMic;
 				PRODUCT_NAME = "OpenMic iOS Build";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1780,6 +1898,28 @@
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		3EFDB7FCC75B76CECC7BBE81 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild.tests;
+				PRODUCT_NAME = OpenMicTestsiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenMic iOS Build.app/OpenMic iOS Build";
 			};
 			name = Release;
 		};
@@ -1868,6 +2008,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild;
+				PRODUCT_MODULE_NAME = OpenMic;
 				PRODUCT_NAME = "OpenMic iOS Build";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1933,6 +2074,22 @@
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
+		};
+		BBCD2F1BFBFAB0C4485BE53F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild.uitests;
+				PRODUCT_NAME = OpenMicUITestsiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "";
+				TEST_TARGET_NAME = OpenMiciOSBuildOnly;
+			};
+			name = Debug;
 		};
 		CA5B8D531FBFF12ADD88828E /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2000,6 +2157,28 @@
 			};
 			name = Debug;
 		};
+		DFAA3D3746E107B0D966D652 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.willsigmon.openmic.iosbuild.tests;
+				PRODUCT_NAME = OpenMicTestsiOS;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenMic iOS Build.app/OpenMic iOS Build";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2030,11 +2209,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		4120BFBF3F1E6111401D5841 /* Build configuration list for PBXNativeTarget "OpenMicTestsiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DFAA3D3746E107B0D966D652 /* Debug */,
+				3EFDB7FCC75B76CECC7BBE81 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		4CDD1E661A0180F55EA62DCD /* Build configuration list for PBXNativeTarget "OpenMiciOSBuildOnly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A3897047896C7F910FC84CB0 /* Debug */,
 				2EDD0C3C88871B85EACEC856 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		59437F013F360FF89FB871E1 /* Build configuration list for PBXNativeTarget "OpenMicUITestsiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBCD2F1BFBFAB0C4485BE53F /* Debug */,
+				0BD02C72B9E4EFBFF5E92846 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

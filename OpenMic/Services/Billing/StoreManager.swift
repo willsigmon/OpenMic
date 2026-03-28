@@ -157,6 +157,8 @@ final class StoreManager {
     // MARK: - Backend Sync
 
     private func syncSubscriptionToBackend(_ transaction: StoreKit.Transaction) async {
+        guard let supabase else { return }
+
         // Sync subscription state to Supabase user_subscriptions table
         do {
             try await supabase.from("user_subscriptions")

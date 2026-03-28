@@ -2,49 +2,59 @@ import Foundation
 import Supabase
 
 enum SupabaseConfig {
-    /// Load from Info.plist (set via xcconfig or build settings)
-    static let url: URL = {
-        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
-              !urlString.isEmpty else {
-            preconditionFailure("SUPABASE_URL missing from Info.plist — add it via xcconfig or build settings")
-        }
-        guard let url = URL(string: urlString) else {
-            preconditionFailure("SUPABASE_URL in Info.plist is not a valid URL: \(urlString)")
-        }
-        return url
+    /// Whether Supabase is configured (both URL and key present in Info.plist)
+    static let isConfigured: Bool = {
+        url != nil && anonKey != nil
     }()
 
-    static let anonKey: String = {
+    /// Load from Info.plist (set via xcconfig or build settings). Nil when unconfigured.
+    static let url: URL? = {
+        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
+              !urlString.isEmpty,
+              urlString != "$(SUPABASE_URL)" else {
+            return nil
+        }
+        return URL(string: urlString)
+    }()
+
+    static let anonKey: String? = {
         guard let key = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String,
-              !key.isEmpty else {
-            preconditionFailure("SUPABASE_ANON_KEY missing from Info.plist — add it via xcconfig or build settings")
+              !key.isEmpty,
+              key != "$(SUPABASE_ANON_KEY)" else {
+            return nil
         }
         return key
     }()
 
-    static var functionsBaseURL: URL {
-        url
+    static var functionsBaseURL: URL? {
+        url?
             .appendingPathComponent("functions")
             .appendingPathComponent("v1")
     }
 
-    static var realtimeProxyURL: URL {
-        functionsBaseURL.appendingPathComponent("realtime-proxy")
+    static var realtimeProxyURL: URL? {
+        functionsBaseURL?.appendingPathComponent("realtime-proxy")
     }
 
-    static var managedChatFunctionURL: URL {
-        functionsBaseURL.appendingPathComponent("managed-chat")
+    static var managedChatFunctionURL: URL? {
+        functionsBaseURL?.appendingPathComponent("managed-chat")
     }
 }
 
+/// Lazily initialized Supabase client. Nil when SUPABASE_URL / SUPABASE_ANON_KEY are missing.
 @MainActor
-let supabase = SupabaseClient(
-    supabaseURL: SupabaseConfig.url,
-    supabaseKey: SupabaseConfig.anonKey,
-    options: .init(
-        auth: .init(
-            redirectToURL: URL(string: "com.willsigmon.openmic://auth-callback"),
-            emitLocalSessionAsInitialSession: true
+let supabase: SupabaseClient? = {
+    guard let url = SupabaseConfig.url, let key = SupabaseConfig.anonKey else {
+        return nil
+    }
+    return SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        options: .init(
+            auth: .init(
+                redirectToURL: URL(string: "com.willsigmon.openmic://auth-callback"),
+                emitLocalSessionAsInitialSession: true
+            )
         )
     )
-)
+}()

@@ -66,6 +66,12 @@ final class AuthManager {
             return
         }
 
+        guard let supabase else {
+            authState = .anonymous
+            currentUserID = nil
+            return
+        }
+
         do {
             let session = try await supabase.auth.session
             currentUserID = session.user.id.uuidString
@@ -84,6 +90,9 @@ final class AuthManager {
         idToken: String,
         nonce: String
     ) async throws {
+        guard let supabase else {
+            throw AuthManagerError.notAuthenticated
+        }
         let session = try await supabase.auth.signInWithIdToken(
             credentials: .init(
                 provider: .apple,
@@ -105,6 +114,11 @@ final class AuthManager {
     func ensureAnonymousSession() async {
         guard authState == .anonymous, currentUserID == nil else { return }
 
+        guard let supabase else {
+            currentUserID = nil
+            return
+        }
+
         do {
             let session = try await supabase.auth.signInAnonymously()
             currentUserID = session.user.id.uuidString
@@ -119,7 +133,7 @@ final class AuthManager {
 
     func signOut() async {
         do {
-            try await supabase.auth.signOut()
+            try await supabase?.auth.signOut()
         } catch {
             // Best effort
         }
@@ -133,6 +147,10 @@ final class AuthManager {
     func deleteAccount() async throws {
         guard authState.isAuthenticated else {
             throw AuthManagerError.notAuthenticated
+        }
+
+        guard let supabase else {
+            throw AuthManagerError.deleteAccountFailed(reason: "Supabase not configured")
         }
 
         do {
@@ -197,7 +215,7 @@ final class AuthManager {
     private func mergeAnonymousUsage(userID: String) async {
         // Transfer any anonymous usage_events to the authenticated user
         do {
-            try await supabase.rpc(
+            try await supabase?.rpc(
                 "merge_anonymous_usage",
                 params: [
                     "p_device_id": deviceID,

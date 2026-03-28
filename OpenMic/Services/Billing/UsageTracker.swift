@@ -126,6 +126,11 @@ final class UsageTracker {
             return
         }
 
+        guard let supabase else {
+            remainingMinutes = tier.monthlyMinutes
+            return
+        }
+
         do {
             let response: [UserQuota] = try await supabase
                 .from("user_quotas")
@@ -164,6 +169,8 @@ final class UsageTracker {
         deviceID: String,
         userID: String?
     ) async {
+        guard let supabase else { return }
+
         do {
             var params: [String: String] = [
                 "device_id": deviceID,

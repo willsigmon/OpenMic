@@ -1,4 +1,4 @@
-# OpenMic — Handoff (March 23, 2026)
+# OpenMic — Handoff (March 28, 2026)
 
 ## What this is
 Voice-first AI assistant for iOS with CarPlay, Watch app, 7 AI providers, 8 TTS engines.
@@ -55,11 +55,18 @@ xcodebuild test ... OPENMIC_TEST_ANTHROPIC_KEY="$ANTHROPIC_KEY"
 - `daec415` feat: add watch complications via WidgetKit
 - `b46de2f` fix: add CFBundleDisplayName to watch widget plist
 
+## Shipped this session (March 28)
+
+1. **Provider-per-message display** — `Message` model stores `providerType`, each assistant bubble shows provider icon + short name (e.g., "Claude", "OpenAI") in the header
+2. **Conversation search** — `.searchable()` on History tab, filters by title, persona name, and message content with empty-results state
+3. **Watch complication deep links** — registered `openmic://` URL scheme in Info.plist, Watch widget complications use `widgetURL(openmic://voice)`, MainTabView routes `openmic://voice` to Talk tab with auto-start listening, also supports `openmic://history`, `openmic://settings`, `openmic://topics`
+4. **Persona editor improvements** — edit sheet now includes system prompt, collapsible voice settings section with pickers for OpenAI Realtime, OpenAI TTS, Gemini voices, and text fields for ElevenLabs Voice ID and System TTS voice
+
 ## What's next
-1. **Watch complication deep links** — URL scheme to launch directly into voice mode
-2. **Conversation search** — search across conversation history
-3. **Provider-per-message display** — show which provider answered each bubble
-4. **Persona editor improvements** — edit voice settings per-persona inline
+1. **iOS home screen widget** — WidgetKit widget for iPhone to quick-launch voice conversations
+2. **Conversation export formats** — Markdown and JSON export in addition to plain text
+3. **Persona creation flow** — create new personas from scratch (currently only edit default)
+4. **Audio input level visualization per-bubble** — show waveform thumbnails on user bubbles
 
 ## Build
 ```bash

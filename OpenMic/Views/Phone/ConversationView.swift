@@ -314,6 +314,7 @@ struct ConversationView: View {
                 ProviderBadge(provider: vm.activeProvider)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier(AppAccessibilityID.conversationProviderBadge)
             .accessibilityHint("Tap to switch AI provider")
 
             Menu {
@@ -629,4 +630,3 @@ private struct VoiceStateBadge: View {
         .glassBackground(cornerRadius: OpenMicTheme.Radius.pill)
     }
 }
-

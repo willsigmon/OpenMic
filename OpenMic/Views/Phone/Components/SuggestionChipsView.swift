@@ -53,9 +53,13 @@ struct SuggestionChipsView: View {
                         .frame(height: 44)
                 }
                 .buttonStyle(.openMicActionPill(tone: .accent))
+                .accessibilityIdentifier(
+                    AppAccessibilityID.conversationSuggestionsRefresh
+                )
                 .padding(.top, OpenMicTheme.Spacing.xxs)
             }
         }
+        .accessibilityIdentifier(AppAccessibilityID.conversationSuggestions)
         .onAppear {
             withAnimation {
                 appeared = true
@@ -118,6 +122,9 @@ private struct PromptCard: View {
             )
         }
         .buttonStyle(PromptCardButtonStyle(tint: tint))
+        .accessibilityIdentifier(
+            AppAccessibilityID.suggestionCard(suggestion.id)
+        )
         .accessibilityLabel(suggestion.text)
         .accessibilityHint("Sends this as a conversation starter")
     }

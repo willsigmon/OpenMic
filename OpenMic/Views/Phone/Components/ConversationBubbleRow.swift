@@ -37,6 +37,9 @@ struct ConversationBubbleRow: View {
         }
         .padding(.horizontal, OpenMicTheme.Spacing.xl)
         .padding(.vertical, OpenMicTheme.Spacing.xs)
+        .accessibilityIdentifier(
+            AppAccessibilityID.bubble(bubble.role, id: bubble.id)
+        )
         .accessibilityLabel(bubble.text)
     }
 
@@ -104,6 +107,9 @@ struct ConversationBubbleRow: View {
             if !isUser { Spacer(minLength: 42) }
         }
         .padding(.vertical, 2)
+        .accessibilityIdentifier(
+            AppAccessibilityID.bubble(bubble.role, id: bubble.id)
+        )
     }
 
     // MARK: - Background

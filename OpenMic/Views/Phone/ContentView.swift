@@ -9,7 +9,7 @@ struct ContentView: View {
                 .accessibilityIdentifier(AppAccessibilityID.rootContent)
         } else {
             OnboardingContainerView()
-                .accessibilityIdentifier(AppAccessibilityID.rootContent)
+                .accessibilityIdentifier(AppAccessibilityID.rootOnboarding)
         }
     }
 }

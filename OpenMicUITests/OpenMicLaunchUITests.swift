@@ -6,16 +6,17 @@ final class OpenMicLaunchUITests: XCTestCase {
     }
 
     @MainActor
-    func testAppLaunchesToReadyContent() throws {
+    func testAppLaunchesIntoPrimaryExperienceWithoutFailure() throws {
         let app = XCUIApplication()
         app.launch()
 
         let readyContent = app.otherElements[LaunchAccessibilityID.rootContent]
+        let onboardingContent = app.otherElements[LaunchAccessibilityID.rootOnboarding]
         let launchFailure = app.otherElements[LaunchAccessibilityID.rootFailure]
 
         let deadline = Date().addingTimeInterval(15)
         while Date() < deadline {
-            if readyContent.exists {
+            if readyContent.exists || onboardingContent.exists {
                 break
             }
 
@@ -28,17 +29,22 @@ final class OpenMicLaunchUITests: XCTestCase {
         }
 
         XCTAssertTrue(
-            readyContent.exists,
-            "Expected ready app content to appear within 15 seconds."
+            readyContent.exists || onboardingContent.exists,
+            "Expected onboarding or main app content to appear within 15 seconds."
         )
         XCTAssertFalse(
             launchFailure.exists,
             "App showed launch failure UI instead of ready content."
+        )
+        XCTAssertFalse(
+            readyContent.exists && onboardingContent.exists,
+            "App should not present onboarding and main content at the same time."
         )
     }
 }
 
 private enum LaunchAccessibilityID {
     static let rootContent = "app.root.content"
+    static let rootOnboarding = "app.root.onboarding"
     static let rootFailure = "app.root.failure"
 }

@@ -456,6 +456,7 @@ final class ConversationViewModel {
         transcriptTask = Task { [weak self] in
             for await transcript in session.transcriptStream {
                 guard let self, !Task.isCancelled else { break }
+                let provider = self.activeProvider
                 if transcript.role == .user {
                     self.currentTranscript = transcript.text
                     self.bubbleBuffer.upsert(transcript)
@@ -464,9 +465,9 @@ final class ConversationViewModel {
                     }
                 } else if transcript.role == .assistant {
                     self.assistantTranscript = transcript.text
-                    self.bubbleBuffer.upsert(transcript)
+                    self.bubbleBuffer.upsert(transcript, provider: provider)
                     if transcript.isFinal, !transcript.text.isEmpty {
-                        self.persistMessage(role: .assistant, content: transcript.text)
+                        self.persistMessage(role: .assistant, content: transcript.text, provider: provider)
                     }
                 }
             }
@@ -628,7 +629,8 @@ final class ConversationViewModel {
                 role: msg.messageRole,
                 text: msg.content,
                 isFinal: true,
-                createdAt: msg.createdAt
+                createdAt: msg.createdAt,
+                provider: msg.provider
             )
         })
     }
@@ -657,13 +659,14 @@ final class ConversationViewModel {
 
     // MARK: - Persistence
 
-    private func persistMessage(role: MessageRole, content: String) {
+    private func persistMessage(role: MessageRole, content: String, provider: AIProviderType? = nil) {
         guard let conversation else { return }
         do {
             _ = try appServices.conversationStore.addMessage(
                 to: conversation,
                 role: role,
-                content: content
+                content: content,
+                providerType: provider
             )
 
             if role == .user, conversation.title == AppConstants.Defaults.conversationTitle {

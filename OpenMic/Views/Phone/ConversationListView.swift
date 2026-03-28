@@ -12,6 +12,17 @@ struct ConversationListView: View {
 
     @State private var emptyStateVisible = false
     @State private var conversationToDelete: Conversation?
+    @State private var searchText = ""
+
+    private var filteredConversations: [Conversation] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return conversations }
+        return conversations.filter { conversation in
+            if conversation.displayTitle.lowercased().contains(query) { return true }
+            if conversation.personaName.lowercased().contains(query) { return true }
+            return conversation.messages.contains { $0.content.lowercased().contains(query) }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -21,12 +32,15 @@ struct ConversationListView: View {
                 Group {
                     if conversations.isEmpty {
                         emptyState
+                    } else if filteredConversations.isEmpty {
+                        noResultsState
                     } else {
                         conversationList
                     }
                 }
             }
             .navigationTitle("History")
+            .searchable(text: $searchText, prompt: "Search conversations")
             .confirmationDialog(
                 "Delete Conversation?",
                 isPresented: Binding(
@@ -105,10 +119,27 @@ struct ConversationListView: View {
     }
 
     @ViewBuilder
+    private var noResultsState: some View {
+        VStack(spacing: OpenMicTheme.Spacing.md) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 32, weight: .medium))
+                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                .accessibilityHidden(true)
+
+            Text("No results for \"\(searchText)\"")
+                .font(OpenMicTheme.Typography.body)
+                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
     private var conversationList: some View {
         ScrollView {
             LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
-                ForEach(Array(conversations.enumerated()), id: \.element.id) { index, conversation in
+                ForEach(Array(filteredConversations.enumerated()), id: \.element.id) { index, conversation in
                     ConversationRow(conversation: conversation)
                         .onTapGesture {
                             Haptics.tap()

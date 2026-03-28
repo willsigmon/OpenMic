@@ -47,12 +47,14 @@ final class ConversationStore {
         to conversation: Conversation,
         role: MessageRole,
         content: String,
-        durationSeconds: Double? = nil
+        durationSeconds: Double? = nil,
+        providerType: AIProviderType? = nil
     ) throws -> Message {
         let message = Message(
             role: role,
             content: content,
-            durationSeconds: durationSeconds
+            durationSeconds: durationSeconds,
+            providerType: providerType
         )
         message.conversation = conversation
         conversation.messages.append(message)

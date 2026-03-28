@@ -76,18 +76,25 @@ struct OpenMicWidgetEntryView: View {
     let entry: OpenMicEntry
     @Environment(\.widgetFamily) var family
 
+    private static let voiceURL = URL(string: "openmic://voice")!
+
     var body: some View {
         switch family {
         case .accessoryCircular:
             OpenMicCircularView()
+                .widgetURL(Self.voiceURL)
         case .accessoryRectangular:
             OpenMicRectangularView()
+                .widgetURL(Self.voiceURL)
         case .accessoryInline:
             OpenMicInlineView()
+                .widgetURL(Self.voiceURL)
         case .accessoryCorner:
             OpenMicCornerView()
+                .widgetURL(Self.voiceURL)
         default:
             OpenMicCircularView()
+                .widgetURL(Self.voiceURL)
         }
     }
 }

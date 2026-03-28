@@ -7,6 +7,7 @@ import UIKit
 struct ConversationView: View {
     @Binding var initialPrompt: String?
     @Binding var resumeConversation: Conversation?
+    @Binding var autoStartVoice: Bool
     @Environment(AppServices.self) private var appServices
     @AppStorage("audioOutputMode") private var audioOutputMode = AudioOutputMode.defaultMode.rawValue
     @State private var viewModel: ConversationViewModel?
@@ -252,6 +253,12 @@ struct ConversationView: View {
             if let conversation = resumeConversation {
                 resumeConversation = nil
                 vm.loadConversation(conversation)
+            }
+        }
+        .onChange(of: autoStartVoice) { _, shouldStart in
+            if shouldStart {
+                autoStartVoice = false
+                vm.startListening()
             }
         }
     }

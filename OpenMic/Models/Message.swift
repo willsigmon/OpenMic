@@ -8,6 +8,7 @@ final class Message {
     var content: String
     var createdAt: Date
     var durationSeconds: Double?
+    var providerType: String?
 
     var conversation: Conversation?
 
@@ -15,13 +16,20 @@ final class Message {
         id: UUID = UUID(),
         role: MessageRole = .user,
         content: String,
-        durationSeconds: Double? = nil
+        durationSeconds: Double? = nil,
+        providerType: AIProviderType? = nil
     ) {
         self.id = id
         self.role = role.rawValue
         self.content = content
         self.createdAt = Date()
         self.durationSeconds = durationSeconds
+        self.providerType = providerType?.rawValue
+    }
+
+    var provider: AIProviderType? {
+        guard let providerType else { return nil }
+        return AIProviderType(rawValue: providerType)
     }
 
     var messageRole: MessageRole {

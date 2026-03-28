@@ -18,6 +18,18 @@
 	<string>APPL</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- URL Schemes -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.willsigmon.openmic</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>openmic</string>
+			</array>
+		</dict>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

@@ -18,7 +18,7 @@ final class BubbleBuffer {
 
     // MARK: - Public API
 
-    func upsert(_ transcript: VoiceTranscript) {
+    func upsert(_ transcript: VoiceTranscript, provider: AIProviderType? = nil) {
         let trimmed = transcript.text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
@@ -39,13 +39,15 @@ final class BubbleBuffer {
                 role: transcript.role,
                 text: trimmed,
                 isFinal: transcript.isFinal,
-                createdAt: bubbles[index].createdAt
+                createdAt: bubbles[index].createdAt,
+                provider: provider ?? bubbles[index].provider
             )
         } else {
             let bubble = ConversationBubble(
                 role: transcript.role,
                 text: trimmed,
-                isFinal: transcript.isFinal
+                isFinal: transcript.isFinal,
+                provider: provider
             )
             bubbles.append(bubble)
             switch transcript.role {

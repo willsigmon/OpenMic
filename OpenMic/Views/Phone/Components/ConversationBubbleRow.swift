@@ -51,9 +51,14 @@ struct ConversationBubbleRow: View {
 
             VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xxs) {
                 if let assistantHeader = descriptor.assistantHeader {
-                    Text(assistantHeader)
-                        .font(OpenMicTheme.Typography.micro)
-                        .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    HStack(spacing: OpenMicTheme.Spacing.xxs) {
+                        if let provider = bubble.provider {
+                            BrandLogo(provider, size: 12)
+                        }
+                        Text(assistantHeader)
+                            .font(OpenMicTheme.Typography.micro)
+                            .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    }
                 }
 
                 Text(bubble.text)

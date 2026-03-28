@@ -4,6 +4,7 @@ struct MainTabView: View {
     @State private var selectedTab: Tab = .talk
     @State private var pendingPrompt: String?
     @State private var pendingConversation: Conversation?
+    @State private var launchVoice = false
 
     enum Tab: String {
         case talk, topics, history, settings
@@ -13,7 +14,8 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             ConversationView(
                 initialPrompt: $pendingPrompt,
-                resumeConversation: $pendingConversation
+                resumeConversation: $pendingConversation,
+                autoStartVoice: $launchVoice
             )
                 .tabItem {
                     Label("Talk", systemImage: "mic.fill")
@@ -55,5 +57,25 @@ struct MainTabView: View {
         .tint(OpenMicTheme.Colors.accentGradientStart)
         .toolbarBackground(.hidden, for: .tabBar)
         .sensoryFeedback(.selection, trigger: selectedTab)
+        .onOpenURL { url in
+            handleDeepLink(url)
+        }
+    }
+
+    private func handleDeepLink(_ url: URL) {
+        guard url.scheme == "openmic" else { return }
+        switch url.host {
+        case "voice", "talk":
+            selectedTab = .talk
+            launchVoice = true
+        case "history":
+            selectedTab = .history
+        case "settings":
+            selectedTab = .settings
+        case "topics":
+            selectedTab = .topics
+        default:
+            selectedTab = .talk
+        }
     }
 }

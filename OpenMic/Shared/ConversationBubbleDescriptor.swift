@@ -32,7 +32,8 @@ enum ConversationBubbleDescriptorFactory {
             )
 
         case .assistant:
-            let assistantHeader = bubble.isFinal ? "OpenMic" : "OpenMic • Live"
+            let providerLabel = bubble.provider?.shortName ?? "OpenMic"
+            let assistantHeader = bubble.isFinal ? providerLabel : "\(providerLabel) • Live"
             let icon = bubble.isFinal ? "bubble.left.fill" : "waveform"
 
             return ConversationBubbleDescriptor(

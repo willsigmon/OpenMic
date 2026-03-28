@@ -153,6 +153,19 @@ private struct PersonaEditSheet: View {
 
     @State private var editedName: String = ""
     @State private var editedPersonality: String = ""
+    @State private var editedSystemPrompt: String = ""
+    @State private var showVoiceSettings = false
+
+    // Voice IDs
+    @State private var openAIRealtimeVoice: String = "alloy"
+    @State private var geminiVoice: String = "Kore"
+    @State private var openAITTSVoice: String = "nova"
+    @State private var elevenLabsVoiceID: String = ""
+    @State private var systemTTSVoice: String = ""
+
+    private static let openAIRealtimeVoices = ["alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse"]
+    private static let openAITTSVoices = ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
+    private static let geminiVoices = ["Aoede", "Charon", "Fenrir", "Kore", "Puck"]
 
     var body: some View {
         NavigationStack {
@@ -193,9 +206,55 @@ private struct PersonaEditSheet: View {
                                     .tint(OpenMicTheme.Colors.accentGradientStart)
                             }
                         }
+
+                        // System prompt field
+                        VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xs) {
+                            Text("SYSTEM PROMPT")
+                                .font(OpenMicTheme.Typography.micro)
+                                .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                                .padding(.horizontal, OpenMicTheme.Spacing.xs)
+                                .accessibilityAddTraits(.isHeader)
+
+                            GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
+                                TextField("Instructions for the AI...", text: $editedSystemPrompt, axis: .vertical)
+                                    .font(OpenMicTheme.Typography.body)
+                                    .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+                                    .lineLimit(3...12)
+                                    .tint(OpenMicTheme.Colors.accentGradientStart)
+                            }
+                        }
+
+                        // Voice settings toggle
+                        VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xs) {
+                            Button {
+                                withAnimation(OpenMicTheme.Animation.fast) {
+                                    showVoiceSettings.toggle()
+                                }
+                            } label: {
+                                HStack {
+                                    Text("VOICE SETTINGS")
+                                        .font(OpenMicTheme.Typography.micro)
+                                        .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                                    Spacer()
+                                    Image(systemName: showVoiceSettings ? "chevron.up" : "chevron.down")
+                                        .font(.system(size: 10, weight: .semibold))
+                                        .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                                }
+                                .padding(.horizontal, OpenMicTheme.Spacing.xs)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Voice settings")
+                            .accessibilityHint(showVoiceSettings ? "Collapse" : "Expand")
+
+                            if showVoiceSettings {
+                                voiceSettingsSection
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                        }
                     }
                     .padding(.horizontal, OpenMicTheme.Spacing.md)
                     .padding(.top, OpenMicTheme.Spacing.sm)
+                    .padding(.bottom, OpenMicTheme.Spacing.xxxl)
                 }
             }
             .navigationTitle("Edit Persona")
@@ -218,14 +277,102 @@ private struct PersonaEditSheet: View {
         .onAppear {
             editedName = persona.name
             editedPersonality = persona.personality
+            editedSystemPrompt = persona.systemPrompt
+            openAIRealtimeVoice = persona.openAIRealtimeVoice
+            geminiVoice = persona.geminiVoice
+            openAITTSVoice = persona.openAITTSVoice ?? "nova"
+            elevenLabsVoiceID = persona.elevenLabsVoiceID ?? ""
+            systemTTSVoice = persona.systemTTSVoice ?? ""
         }
     }
+
+    // MARK: - Voice Settings
+
+    @ViewBuilder
+    private var voiceSettingsSection: some View {
+        VStack(spacing: OpenMicTheme.Spacing.sm) {
+            // OpenAI Realtime Voice
+            voicePicker(
+                label: "OpenAI Realtime",
+                selection: $openAIRealtimeVoice,
+                options: Self.openAIRealtimeVoices
+            )
+
+            // OpenAI TTS Voice
+            voicePicker(
+                label: "OpenAI TTS",
+                selection: $openAITTSVoice,
+                options: Self.openAITTSVoices
+            )
+
+            // Gemini Voice
+            voicePicker(
+                label: "Gemini",
+                selection: $geminiVoice,
+                options: Self.geminiVoices
+            )
+
+            // ElevenLabs Voice ID (free text)
+            voiceTextField(label: "ElevenLabs Voice ID", text: $elevenLabsVoiceID)
+
+            // System TTS Voice (free text)
+            voiceTextField(label: "System TTS Voice", text: $systemTTSVoice)
+        }
+    }
+
+    @ViewBuilder
+    private func voicePicker(label: String, selection: Binding<String>, options: [String]) -> some View {
+        GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
+            HStack {
+                Text(label)
+                    .font(OpenMicTheme.Typography.caption)
+                    .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                Spacer()
+                Picker(label, selection: selection) {
+                    ForEach(options, id: \.self) { option in
+                        Text(option).tag(option)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(OpenMicTheme.Colors.accentGradientStart)
+                .labelsHidden()
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private func voiceTextField(label: String, text: Binding<String>) -> some View {
+        GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
+            HStack {
+                Text(label)
+                    .font(OpenMicTheme.Typography.caption)
+                    .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                Spacer()
+                TextField("Optional", text: text)
+                    .font(OpenMicTheme.Typography.caption)
+                    .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: 160)
+                    .tint(OpenMicTheme.Colors.accentGradientStart)
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Save
 
     private func saveChanges() {
         let trimmedName = editedName.trimmingCharacters(in: .whitespaces)
         guard !trimmedName.isEmpty else { return }
         persona.name = trimmedName
         persona.personality = editedPersonality.trimmingCharacters(in: .whitespaces)
+        persona.systemPrompt = editedSystemPrompt.trimmingCharacters(in: .whitespaces)
+        persona.openAIRealtimeVoice = openAIRealtimeVoice
+        persona.geminiVoice = geminiVoice
+        persona.openAITTSVoice = openAITTSVoice
+        persona.elevenLabsVoiceID = elevenLabsVoiceID.isEmpty ? nil : elevenLabsVoiceID
+        persona.systemTTSVoice = systemTTSVoice.isEmpty ? nil : systemTTSVoice
         Haptics.success()
         try? modelContext.save()
     }

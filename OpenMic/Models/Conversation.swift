@@ -15,9 +15,9 @@ final class Conversation {
 
     init(
         id: UUID = UUID(),
-        title: String = "New Conversation",
+        title: String = AppConstants.Defaults.conversationTitle,
         providerType: AIProviderType = .openAI,
-        personaName: String = "Sigmon"
+        personaName: String = AppConstants.Defaults.personaName
     ) {
         self.id = id
         self.title = title
@@ -37,7 +37,7 @@ final class Conversation {
     }
 
     var displayTitle: String {
-        if title == "New Conversation", let first = messages.first {
+        if title == AppConstants.Defaults.conversationTitle, let first = messages.first {
             return String(first.content.prefix(50))
         }
         return title

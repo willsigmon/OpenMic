@@ -129,33 +129,11 @@ final class WatchConnectivityManager: NSObject {
             let providerType = resolution.effective
             log.debug("[ProviderAccess][\(ProviderSurface.watch.rawValue, privacy: .public)] requested=\(requestedProvider.rawValue, privacy: .public) effective=\(providerType.rawValue, privacy: .public) reason=\(resolution.fallbackReason?.rawValue ?? "none", privacy: .public)")
 
-            let provider: AIProvider
-            if tier == .byok {
-                let apiKey: String?
-                if providerType.requiresAPIKey {
-                    apiKey = try? await keychainManager.getAPIKey(for: providerType)
-                    guard let apiKey, !apiKey.isEmpty else {
-                        return WatchChatResponse(
-                            text: nil,
-                            error: AIProviderError.invalidAPIKey.localizedDescription
-                        )
-                    }
-                } else {
-                    apiKey = nil
-                }
-
-                provider = try AIProviderFactory.create(
-                    type: providerType,
-                    apiKey: apiKey
-                )
-            } else if providerType.requiresAPIKey {
-                provider = AIProviderFactory.createManaged(type: providerType)
-            } else {
-                provider = try AIProviderFactory.create(
-                    type: providerType,
-                    apiKey: nil
-                )
-            }
+            let provider = try await AIProviderResolver.resolve(
+                providerType: providerType,
+                tier: tier,
+                keychainManager: keychainManager
+            )
 
             var messages = request.history
             if messages.last?.content != request.prompt

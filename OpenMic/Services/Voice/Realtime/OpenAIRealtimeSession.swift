@@ -9,6 +9,7 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
     private let model: String
     private let authToken: String
 
+    private var urlSession: URLSession?
     private var webSocketTask: URLSessionWebSocketTask?
     private var audioIO: RealtimeAudioIO?
     private var receiveTask: Task<Void, Never>?
@@ -30,30 +31,39 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
         deviceID: String,
         voice: String = "alloy",
         model: String = "gpt-4o-realtime-preview"
-    ) {
+    ) throws {
         self.voice = voice
         self.model = model
         self.authToken = authToken
 
-        var components = URLComponents(url: proxyBaseURL, resolvingAgainstBaseURL: false)!
+        guard var components = URLComponents(url: proxyBaseURL, resolvingAgainstBaseURL: false) else {
+            throw URLError(.badURL, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to create URLComponents from proxy base URL: \(proxyBaseURL)"
+            ])
+        }
         components.queryItems = [
             URLQueryItem(name: "provider", value: "openai_realtime"),
             URLQueryItem(name: "model", value: model),
             URLQueryItem(name: "device_id", value: deviceID),
         ]
-        self.proxyURL = components.url!
+        guard let proxyURL = components.url else {
+            throw URLError(.badURL, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to construct proxy URL from components: \(components)"
+            ])
+        }
+        self.proxyURL = proxyURL
 
-        var stateCont: AsyncStream<VoiceSessionState>.Continuation!
-        self.stateStream = AsyncStream { stateCont = $0 }
-        self.stateContinuation = stateCont
+        let (stateStream, stateContinuation) = AsyncStream.makeStream(of: VoiceSessionState.self)
+        self.stateStream = stateStream
+        self.stateContinuation = stateContinuation
 
-        var transcriptCont: AsyncStream<VoiceTranscript>.Continuation!
-        self.transcriptStream = AsyncStream { transcriptCont = $0 }
-        self.transcriptContinuation = transcriptCont
+        let (transcriptStream, transcriptContinuation) = AsyncStream.makeStream(of: VoiceTranscript.self)
+        self.transcriptStream = transcriptStream
+        self.transcriptContinuation = transcriptContinuation
 
-        var audioLevelCont: AsyncStream<Float>.Continuation!
-        self.audioLevelStream = AsyncStream { audioLevelCont = $0 }
-        self.audioLevelContinuation = audioLevelCont
+        let (audioLevelStream, audioLevelContinuation) = AsyncStream.makeStream(of: Float.self)
+        self.audioLevelStream = audioLevelStream
+        self.audioLevelContinuation = audioLevelContinuation
     }
 
     deinit {
@@ -68,11 +78,15 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
         try AudioSessionManager.shared.configureForVoiceChat()
         updateState(.listening)
 
+        // Invalidate any existing session before creating a new one
+        urlSession?.invalidateAndCancel()
+
         // Connect WebSocket to proxy
         var request = URLRequest(url: proxyURL)
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
 
         let session = URLSession(configuration: .default)
+        self.urlSession = session
         let wsTask = session.webSocketTask(with: request)
         wsTask.resume()
         self.webSocketTask = wsTask
@@ -117,8 +131,9 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
         }
 
         try io.startCapture { [weak self] pcmData in
-            guard let self else { return }
-            self.sendAudioChunk(pcmData)
+            Task { @MainActor [weak self] in
+                await self?.sendAudioChunk(pcmData)
+            }
         }
 
         // Start receiving server messages
@@ -136,6 +151,9 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
 
         webSocketTask?.cancel(with: .normalClosure, reason: nil)
         webSocketTask = nil
+
+        urlSession?.invalidateAndCancel()
+        urlSession = nil
 
         updateState(.idle)
         stateContinuation?.finish()
@@ -161,7 +179,7 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
 
     // MARK: - Audio Sending
 
-    private func sendAudioChunk(_ data: Data) {
+    private func sendAudioChunk(_ data: Data) async {
         let base64 = data.base64EncodedString()
         let message: [String: Any] = [
             "type": "input_audio_buffer.append",
@@ -171,9 +189,7 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
         if let jsonData = try? JSONSerialization.data(withJSONObject: message),
            let jsonString = String(data: jsonData, encoding: .utf8)
         {
-            Task {
-                try? await webSocketTask?.send(.string(jsonString))
-            }
+            try? await webSocketTask?.send(.string(jsonString))
         }
     }
 

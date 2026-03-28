@@ -34,8 +34,7 @@ final class ConversationViewModel {
     private var stateTask: Task<Void, Never>?
     private var transcriptTask: Task<Void, Never>?
     private var audioLevelTask: Task<Void, Never>?
-    private var activeUserBubbleID: UUID?
-    private var activeAssistantBubbleID: UUID?
+    let bubbleBuffer = BubbleBuffer(maxBubbles: 64)
 
     private(set) var conversation: Conversation?
     private(set) var voiceState: VoiceSessionState = .idle
@@ -45,8 +44,9 @@ final class ConversationViewModel {
     private(set) var errorMessage: String?
     private(set) var providerFallbackMessage: String?
     private(set) var activeProvider: AIProviderType
-    private(set) var bubbles: [ConversationBubble] = []
     private(set) var isRealtimeSession = false
+
+    var bubbles: [ConversationBubble] { bubbleBuffer.bubbles }
 
     var showUpgradePrompt = false
     var showPaywall = false
@@ -119,10 +119,9 @@ final class ConversationViewModel {
                     let persona = fetchActivePersona()
                     conversation = try appServices.conversationStore.create(
                         providerType: build.provider,
-                        personaName: persona?.name ?? "Sigmon"
+                        personaName: persona?.name ?? AppConstants.Defaults.personaName
                     )
-                    resetBubbleDraftState()
-                    bubbles = []
+                    bubbleBuffer.removeAll()
                 }
 
                 observeStreams(build.voiceSession)
@@ -214,10 +213,9 @@ final class ConversationViewModel {
                     let persona = fetchActivePersona()
                     conversation = try appServices.conversationStore.create(
                         providerType: build.provider,
-                        personaName: persona?.name ?? "Sigmon"
+                        personaName: persona?.name ?? AppConstants.Defaults.personaName
                     )
-                    resetBubbleDraftState()
-                    bubbles = []
+                    bubbleBuffer.removeAll()
                 }
 
                 observeStreams(build.voiceSession)
@@ -405,23 +403,11 @@ final class ConversationViewModel {
         }
 
         // Fall back to pipeline session (BYOK or standard tier)
-        let aiProvider: AIProvider
-        if tier == .byok {
-            let apiKey = try? await appServices.keychainManager.getAPIKey(
-                for: providerType
-            )
-            aiProvider = try AIProviderFactory.create(
-                type: providerType,
-                apiKey: apiKey
-            )
-        } else if providerType.requiresAPIKey {
-            aiProvider = AIProviderFactory.createManaged(type: providerType)
-        } else {
-            aiProvider = try AIProviderFactory.create(
-                type: providerType,
-                apiKey: nil
-            )
-        }
+        let aiProvider = try await AIProviderResolver.resolve(
+            providerType: providerType,
+            tier: tier,
+            keychainManager: appServices.keychainManager
+        )
 
         let stt = SFSpeechSTT(paceProfile: .fast)
         let tts = try await buildTTSEngine()
@@ -445,125 +431,11 @@ final class ConversationViewModel {
             rawValue: UserDefaults.standard.string(forKey: "ttsEngine") ?? "system"
         ) ?? .system
 
-        switch engineType {
-        case .system:
-            let tts = SystemTTS()
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.systemTTSVoice {
-                tts.setVoice(identifier: voiceId)
-            }
-            return tts
-
-        case .localNeural:
-            return LocalNeuralTTS()
-
-        case .openAI:
-            guard let key = try? await appServices.keychainManager.getAPIKey(for: .openAI),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-
-            let modelRaw = UserDefaults.standard.string(forKey: "openAITTSModel") ?? OpenAITTSModel.tts1.rawValue
-            let model = OpenAITTSModel(rawValue: modelRaw) ?? .tts1
-
-            let tts = OpenAITTS(apiKey: key, model: model)
-            if let persona = fetchActivePersona(),
-               let voice = persona.openAITTSVoice {
-                tts.setVoice(voice)
-            }
-            return tts
-
-        case .elevenLabs:
-            guard let key = try? await appServices.keychainManager.getTTSKey(for: .elevenLabs),
-                  !key.isEmpty else {
-                let tts = SystemTTS()
-                if let persona = fetchActivePersona(),
-                   let voiceId = persona.systemTTSVoice {
-                    tts.setVoice(identifier: voiceId)
-                }
-                return tts
-            }
-
-            let modelRaw = UserDefaults.standard.string(forKey: "elevenLabsModel") ?? ElevenLabsModel.flash.rawValue
-            let model = ElevenLabsModel(rawValue: modelRaw) ?? .flash
-
-            let tts = ElevenLabsTTS(
-                apiKey: key,
-                model: model
-            )
-
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.elevenLabsVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-
-        case .humeAI:
-            guard let key = try? await appServices.keychainManager.getTTSKey(for: .humeAI),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-
-            let tts = HumeAITTS(apiKey: key)
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.humeAIVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-
-        case .googleCloud:
-            guard let key = try? await appServices.keychainManager.getTTSKey(for: .googleCloud),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-
-            let tts = GoogleCloudTTS(apiKey: key)
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.googleCloudVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-
-        case .cartesia:
-            guard let key = try? await appServices.keychainManager.getTTSKey(for: .cartesia),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-
-            let tts = CartesiaTTS(apiKey: key)
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.cartesiaVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-
-        case .amazonPolly:
-            guard let accessKey = try? await appServices.keychainManager.getTTSKey(for: .amazonPolly),
-                  let secretKey = try? await appServices.keychainManager.getTTSSecondaryKey(for: .amazonPolly),
-                  !accessKey.isEmpty, !secretKey.isEmpty else {
-                return SystemTTS()
-            }
-
-            let tts = AmazonPollyTTS(accessKey: accessKey, secretKey: secretKey)
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.amazonPollyVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-
-        case .deepgram:
-            guard let key = try? await appServices.keychainManager.getTTSKey(for: .deepgram),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-
-            let tts = DeepgramTTS(apiKey: key)
-            if let persona = fetchActivePersona(),
-               let voiceId = persona.deepgramVoiceID {
-                tts.setVoice(id: voiceId)
-            }
-            return tts
-        }
+        return await TTSEngineBuilder.build(
+            engine: engineType,
+            keychainManager: appServices.keychainManager,
+            persona: fetchActivePersona()
+        )
     }
 
     // MARK: - Stream Observers
@@ -586,13 +458,13 @@ final class ConversationViewModel {
                 guard let self, !Task.isCancelled else { break }
                 if transcript.role == .user {
                     self.currentTranscript = transcript.text
-                    self.upsertBubble(transcript)
+                    self.bubbleBuffer.upsert(transcript)
                     if transcript.isFinal, !transcript.text.isEmpty {
                         self.persistMessage(role: .user, content: transcript.text)
                     }
                 } else if transcript.role == .assistant {
                     self.assistantTranscript = transcript.text
-                    self.upsertBubble(transcript)
+                    self.bubbleBuffer.upsert(transcript)
                     if transcript.isFinal, !transcript.text.isEmpty {
                         self.persistMessage(role: .assistant, content: transcript.text)
                     }
@@ -699,7 +571,7 @@ final class ConversationViewModel {
             text: "Switched to \(newProvider.displayName)",
             isFinal: true
         )
-        bubbles.append(marker)
+        bubbleBuffer.append(marker)
 
         providerFallbackMessage = nil
         errorMessage = nil
@@ -734,7 +606,7 @@ final class ConversationViewModel {
             text: "Switched to \(persona.name)",
             isFinal: true
         )
-        bubbles.append(marker)
+        bubbleBuffer.append(marker)
 
         errorMessage = nil
 
@@ -751,15 +623,14 @@ final class ConversationViewModel {
         providerFallbackMessage = nil
 
         let sorted = conversation.messages.sorted { $0.createdAt < $1.createdAt }
-        bubbles = sorted.map { msg in
+        bubbleBuffer.replaceAll(sorted.map { msg in
             ConversationBubble(
                 role: msg.messageRole,
                 text: msg.content,
                 isFinal: true,
                 createdAt: msg.createdAt
             )
-        }
-        resetBubbleDraftState()
+        })
     }
 
     private func endCurrentSession() async {
@@ -795,7 +666,7 @@ final class ConversationViewModel {
                 content: content
             )
 
-            if role == .user, conversation.title == "New Conversation" {
+            if role == .user, conversation.title == AppConstants.Defaults.conversationTitle {
                 let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
                 let title = String(trimmed.prefix(60))
                 try appServices.conversationStore.updateTitle(conversation, title: title)
@@ -832,64 +703,4 @@ final class ConversationViewModel {
         return .openAI
     }
 
-    private func resetBubbleDraftState() {
-        activeUserBubbleID = nil
-        activeAssistantBubbleID = nil
-    }
-
-    private func upsertBubble(_ transcript: VoiceTranscript) {
-        let trimmed = transcript.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        let existingID: UUID?
-        switch transcript.role {
-        case .user:
-            existingID = activeUserBubbleID
-        case .assistant:
-            existingID = activeAssistantBubbleID
-        case .system:
-            existingID = nil
-        }
-
-        if let existingID,
-           let index = bubbles.firstIndex(where: { $0.id == existingID }) {
-            bubbles[index] = ConversationBubble(
-                id: existingID,
-                role: transcript.role,
-                text: trimmed,
-                isFinal: transcript.isFinal,
-                createdAt: bubbles[index].createdAt
-            )
-        } else {
-            let bubble = ConversationBubble(
-                role: transcript.role,
-                text: trimmed,
-                isFinal: transcript.isFinal
-            )
-            bubbles.append(bubble)
-            switch transcript.role {
-            case .user:
-                activeUserBubbleID = bubble.id
-            case .assistant:
-                activeAssistantBubbleID = bubble.id
-            case .system:
-                break
-            }
-        }
-
-        if transcript.isFinal {
-            switch transcript.role {
-            case .user:
-                activeUserBubbleID = nil
-            case .assistant:
-                activeAssistantBubbleID = nil
-            case .system:
-                break
-            }
-        }
-
-        if bubbles.count > 64 {
-            bubbles.removeFirst(bubbles.count - 64)
-        }
-    }
 }

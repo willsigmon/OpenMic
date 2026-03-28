@@ -47,6 +47,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Supabase Configuration (set via xcconfig or build settings) -->
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+
 	<key>OPENMIC_PRIVACY_POLICY_URL</key>
 	<string>https://openmic.ai/privacy</string>
 	<key>OPENMIC_TERMS_OF_USE_URL</key>

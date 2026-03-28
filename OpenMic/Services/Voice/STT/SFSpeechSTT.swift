@@ -29,13 +29,13 @@ final class SFSpeechSTT: STTEngine {
             ?? SFSpeechRecognizer()
         self.endpointingConfig = .forProfile(paceProfile)
 
-        var transcriptCont: AsyncStream<VoiceTranscript>.Continuation!
-        self.transcriptStream = AsyncStream { transcriptCont = $0 }
-        self.transcriptContinuation = transcriptCont
+        let (transcriptStream, transcriptContinuation) = AsyncStream.makeStream(of: VoiceTranscript.self)
+        self.transcriptStream = transcriptStream
+        self.transcriptContinuation = transcriptContinuation
 
-        var audioLevelCont: AsyncStream<Float>.Continuation!
-        self.audioLevelStream = AsyncStream { audioLevelCont = $0 }
-        self.audioLevelContinuation = audioLevelCont
+        let (audioLevelStream, audioLevelContinuation) = AsyncStream.makeStream(of: Float.self)
+        self.audioLevelStream = audioLevelStream
+        self.audioLevelContinuation = audioLevelContinuation
     }
 
     func startListening() async throws {

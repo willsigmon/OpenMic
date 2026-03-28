@@ -29,9 +29,7 @@ final class CarPlayVoiceController {
     private var stateTask: Task<Void, Never>?
     private var transcriptTask: Task<Void, Never>?
     private var buildTask: Task<Void, Never>?
-    private var bubbles: [ConversationBubble] = []
-    private var activeUserBubbleID: UUID?
-    private var activeAssistantBubbleID: UUID?
+    private let bubbleBuffer = BubbleBuffer(maxBubbles: 24)
 
     // Standalone dependencies (no AppServices access in CarPlay scene)
     private let keychainManager = KeychainManager()
@@ -155,30 +153,11 @@ final class CarPlayVoiceController {
         // Build AI provider
         let aiProvider: AIProvider
         do {
-            if tier == .byok {
-                let apiKey: String?
-                if providerType.requiresAPIKey {
-                    apiKey = try? await keychainManager.getAPIKey(for: providerType)
-                    guard let apiKey, !apiKey.isEmpty else {
-                        voiceTemplate.activateVoiceControlState(withIdentifier: StateID.noConfig)
-                        return
-                    }
-                } else {
-                    apiKey = nil
-                }
-
-                aiProvider = try AIProviderFactory.create(
-                    type: providerType,
-                    apiKey: apiKey
-                )
-            } else if providerType.requiresAPIKey {
-                aiProvider = AIProviderFactory.createManaged(type: providerType)
-            } else {
-                aiProvider = try AIProviderFactory.create(
-                    type: providerType,
-                    apiKey: nil
-                )
-            }
+            aiProvider = try await AIProviderResolver.resolve(
+                providerType: providerType,
+                tier: tier,
+                keychainManager: keychainManager
+            )
         } catch {
             voiceTemplate.activateVoiceControlState(withIdentifier: StateID.noConfig)
             return
@@ -250,7 +229,7 @@ final class CarPlayVoiceController {
         transcriptTask = Task { [weak self] in
             for await transcript in session.transcriptStream {
                 guard let self, !Task.isCancelled else { break }
-                self.upsertBubble(transcript)
+                self.bubbleBuffer.upsert(transcript)
                 self.refreshTranscriptTemplate()
             }
         }
@@ -304,74 +283,17 @@ final class CarPlayVoiceController {
         return .free
     }
 
-    // MARK: - TTS Engine (mirrors ConversationViewModel.buildTTSEngine, standalone keychain)
+    // MARK: - TTS Engine (delegates to shared TTSEngineBuilder, no persona in CarPlay)
 
     private func buildTTSEngine() async -> TTSEngineProtocol {
         let engineType = TTSEngineType(
             rawValue: UserDefaults.standard.string(forKey: "ttsEngine") ?? "system"
         ) ?? .system
 
-        switch engineType {
-        case .system:
-            return SystemTTS()
-
-        case .localNeural:
-            return LocalNeuralTTS()
-
-        case .openAI:
-            guard let key = try? await keychainManager.getAPIKey(for: .openAI),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            let modelRaw = UserDefaults.standard.string(forKey: "openAITTSModel") ?? OpenAITTSModel.tts1.rawValue
-            let model = OpenAITTSModel(rawValue: modelRaw) ?? .tts1
-            return OpenAITTS(apiKey: key, model: model)
-
-        case .elevenLabs:
-            guard let key = try? await keychainManager.getTTSKey(for: .elevenLabs),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            let modelRaw = UserDefaults.standard.string(forKey: "elevenLabsModel") ?? ElevenLabsModel.flash.rawValue
-            let model = ElevenLabsModel(rawValue: modelRaw) ?? .flash
-            return ElevenLabsTTS(apiKey: key, model: model)
-
-        case .humeAI:
-            guard let key = try? await keychainManager.getTTSKey(for: .humeAI),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            return HumeAITTS(apiKey: key)
-
-        case .googleCloud:
-            guard let key = try? await keychainManager.getTTSKey(for: .googleCloud),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            return GoogleCloudTTS(apiKey: key)
-
-        case .cartesia:
-            guard let key = try? await keychainManager.getTTSKey(for: .cartesia),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            return CartesiaTTS(apiKey: key)
-
-        case .amazonPolly:
-            guard let accessKey = try? await keychainManager.getTTSKey(for: .amazonPolly),
-                  let secretKey = try? await keychainManager.getTTSSecondaryKey(for: .amazonPolly),
-                  !accessKey.isEmpty, !secretKey.isEmpty else {
-                return SystemTTS()
-            }
-            return AmazonPollyTTS(accessKey: accessKey, secretKey: secretKey)
-
-        case .deepgram:
-            guard let key = try? await keychainManager.getTTSKey(for: .deepgram),
-                  !key.isEmpty else {
-                return SystemTTS()
-            }
-            return DeepgramTTS(apiKey: key)
-        }
+        return await TTSEngineBuilder.build(
+            engine: engineType,
+            keychainManager: keychainManager
+        )
     }
 
     // MARK: - Cleanup
@@ -393,12 +315,12 @@ final class CarPlayVoiceController {
     }
 
     private func refreshTranscriptTemplate() {
-        guard !bubbles.isEmpty else {
+        guard !bubbleBuffer.bubbles.isEmpty else {
             transcriptTemplate.updateSections([Self.placeholderTranscriptSection()])
             return
         }
 
-        let items = bubbles
+        let items = bubbleBuffer.bubbles
             .suffix(8)
             .map { bubble -> CPListItem in
                 let descriptor = ConversationBubbleDescriptorFactory.make(from: bubble)
@@ -412,59 +334,4 @@ final class CarPlayVoiceController {
         transcriptTemplate.updateSections([CPListSection(items: items)])
     }
 
-    private func upsertBubble(_ transcript: VoiceTranscript) {
-        let trimmed = transcript.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        let existingID: UUID?
-        switch transcript.role {
-        case .user:
-            existingID = activeUserBubbleID
-        case .assistant:
-            existingID = activeAssistantBubbleID
-        case .system:
-            existingID = nil
-        }
-
-        if let existingID,
-           let index = bubbles.firstIndex(where: { $0.id == existingID }) {
-            bubbles[index] = ConversationBubble(
-                id: existingID,
-                role: transcript.role,
-                text: trimmed,
-                isFinal: transcript.isFinal,
-                createdAt: bubbles[index].createdAt
-            )
-        } else {
-            let bubble = ConversationBubble(
-                role: transcript.role,
-                text: trimmed,
-                isFinal: transcript.isFinal
-            )
-            bubbles.append(bubble)
-            switch transcript.role {
-            case .user:
-                activeUserBubbleID = bubble.id
-            case .assistant:
-                activeAssistantBubbleID = bubble.id
-            case .system:
-                break
-            }
-        }
-
-        if transcript.isFinal {
-            switch transcript.role {
-            case .user:
-                activeUserBubbleID = nil
-            case .assistant:
-                activeAssistantBubbleID = nil
-            case .system:
-                break
-            }
-        }
-
-        if bubbles.count > 24 {
-            bubbles.removeFirst(bubbles.count - 24)
-        }
-    }
 }

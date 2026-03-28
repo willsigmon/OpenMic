@@ -24,7 +24,7 @@ struct ModelTests {
             providerType: .anthropic,
             personaName: "Test"
         )
-        #expect(conversation.title == "New Conversation")
+        #expect(conversation.title == AppConstants.Defaults.conversationTitle)
         #expect(conversation.provider == .anthropic)
         #expect(conversation.personaName == "Test")
         #expect(conversation.messages.isEmpty)

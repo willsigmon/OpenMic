@@ -24,6 +24,9 @@ Pods/
 .vscode/
 .idea/
 
+# Secrets (xcconfig with API keys)
+Secrets.xcconfig
+
 # Misc
 *.log
 *.tmp

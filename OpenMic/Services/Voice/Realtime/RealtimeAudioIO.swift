@@ -13,25 +13,35 @@ final class RealtimeAudioIO {
     let audioLevelStream: AsyncStream<Float>
 
     /// PCM16 mono at 24kHz — required by OpenAI Realtime API
-    static let captureFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
-        sampleRate: 24000,
-        channels: 1,
-        interleaved: true
-    )!
+    static var captureFormat: AVAudioFormat {
+        guard let format = AVAudioFormat(
+            commonFormat: .pcmFormatInt16,
+            sampleRate: 24000,
+            channels: 1,
+            interleaved: true
+        ) else {
+            fatalError("Failed to create PCM16 mono 24kHz capture AVAudioFormat — check AVFoundation availability")
+        }
+        return format
+    }
 
     /// Playback format matches capture
-    static let playbackFormat = AVAudioFormat(
-        commonFormat: .pcmFormatInt16,
-        sampleRate: 24000,
-        channels: 1,
-        interleaved: true
-    )!
+    static var playbackFormat: AVAudioFormat {
+        guard let format = AVAudioFormat(
+            commonFormat: .pcmFormatInt16,
+            sampleRate: 24000,
+            channels: 1,
+            interleaved: true
+        ) else {
+            fatalError("Failed to create PCM16 mono 24kHz playback AVAudioFormat — check AVFoundation availability")
+        }
+        return format
+    }
 
     init() {
-        var cont: AsyncStream<Float>.Continuation!
-        self.audioLevelStream = AsyncStream { cont = $0 }
-        self.audioLevelContinuation = cont
+        let (audioLevelStream, audioLevelContinuation) = AsyncStream.makeStream(of: Float.self)
+        self.audioLevelStream = audioLevelStream
+        self.audioLevelContinuation = audioLevelContinuation
     }
 
     deinit {

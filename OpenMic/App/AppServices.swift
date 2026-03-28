@@ -235,7 +235,7 @@ final class AppServices {
         }
 
         let persona = Persona(
-            name: json["name"] as? String ?? "Sigmon",
+            name: json["name"] as? String ?? AppConstants.Defaults.personaName,
             personality: json["personality"] as? String ?? "",
             systemPrompt: json["systemPrompt"] as? String ?? "",
             isDefault: true,

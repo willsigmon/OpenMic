@@ -1,4 +1,7 @@
 import Foundation
+import os
+
+private let logger = Logger(subsystem: "com.openmic", category: "PipelineVoiceSession")
 
 @MainActor
 final class PipelineVoiceSession: VoiceSessionProtocol {
@@ -33,17 +36,17 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
         self.aiProvider = aiProvider
         self.systemPrompt = systemPrompt
 
-        var stateCont: AsyncStream<VoiceSessionState>.Continuation!
-        self.stateStream = AsyncStream { stateCont = $0 }
-        self.stateContinuation = stateCont
+        let (stateStream, stateContinuation) = AsyncStream.makeStream(of: VoiceSessionState.self)
+        self.stateStream = stateStream
+        self.stateContinuation = stateContinuation
 
-        var transcriptCont: AsyncStream<VoiceTranscript>.Continuation!
-        self.transcriptStream = AsyncStream { transcriptCont = $0 }
-        self.transcriptContinuation = transcriptCont
+        let (transcriptStream, transcriptContinuation) = AsyncStream.makeStream(of: VoiceTranscript.self)
+        self.transcriptStream = transcriptStream
+        self.transcriptContinuation = transcriptContinuation
 
-        var audioLevelCont: AsyncStream<Float>.Continuation!
-        self.audioLevelStream = AsyncStream { audioLevelCont = $0 }
-        self.audioLevelContinuation = audioLevelCont
+        let (audioLevelStream, audioLevelContinuation) = AsyncStream.makeStream(of: Float.self)
+        self.audioLevelStream = audioLevelStream
+        self.audioLevelContinuation = audioLevelContinuation
     }
 
     deinit {
@@ -80,7 +83,11 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
         ttsEngine.stop()
         tearDownAudioObservers()
         updateState(.idle)
-        try? AudioSessionManager.shared.deactivate()
+        do {
+            try AudioSessionManager.shared.deactivate()
+        } catch {
+            logger.error("Failed to deactivate audio session on stop: \(error.localizedDescription)")
+        }
     }
 
     func interrupt() async {
@@ -137,12 +144,20 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
 
             while !Task.isCancelled {
                 updateState(.listening)
-                try? AudioSessionManager.shared.configureForListening()
+                do {
+                    try AudioSessionManager.shared.configureForListening()
+                } catch {
+                    logger.error("Failed to configure audio session for listening: \(error.localizedDescription)")
+                }
 
                 do {
                     try await sttEngine.startListening()
                 } catch {
-                    try? AudioSessionManager.shared.deactivate()
+                    do {
+                        try AudioSessionManager.shared.deactivate()
+                    } catch {
+                        logger.error("Failed to deactivate audio session after STT error: \(error.localizedDescription)")
+                    }
                     updateState(.error(error.localizedDescription))
                     return
                 }
@@ -227,7 +242,11 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
             }
         )
 
-        try? AudioSessionManager.shared.configureForSpeaking(ttsEngine.audioRequirement)
+        do {
+            try AudioSessionManager.shared.configureForSpeaking(ttsEngine.audioRequirement)
+        } catch {
+            logger.error("Failed to configure audio session for speaking: \(error.localizedDescription)")
+        }
         updateState(.speaking)
 
         var fullResponse = ""
@@ -271,10 +290,14 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
         routeChangeObserver = AudioSessionManager.shared.observeRouteChanges { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self, self.state.isActive else { return }
-                if self.state == .speaking {
-                    try? AudioSessionManager.shared.configureForSpeaking(self.ttsEngine.audioRequirement)
-                } else {
-                    try? AudioSessionManager.shared.configureForListening()
+                do {
+                    if self.state == .speaking {
+                        try AudioSessionManager.shared.configureForSpeaking(self.ttsEngine.audioRequirement)
+                    } else {
+                        try AudioSessionManager.shared.configureForListening()
+                    }
+                } catch {
+                    logger.error("Failed to reconfigure audio session after route change: \(error.localizedDescription)")
                 }
             }
         }

@@ -31,7 +31,7 @@ final class RealtimeVoiceSession: VoiceSessionProtocol {
     ) throws {
         switch provider {
         case .openAI:
-            innerSession = OpenAIRealtimeSession(
+            innerSession = try OpenAIRealtimeSession(
                 proxyBaseURL: proxyBaseURL,
                 authToken: authToken,
                 deviceID: deviceID,
@@ -40,7 +40,7 @@ final class RealtimeVoiceSession: VoiceSessionProtocol {
 
         case .gemini:
             // Gemini Live — use same proxy with different provider param
-            innerSession = OpenAIRealtimeSession(
+            innerSession = try OpenAIRealtimeSession(
                 proxyBaseURL: proxyBaseURL,
                 authToken: authToken,
                 deviceID: deviceID,

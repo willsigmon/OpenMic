@@ -8,7 +8,7 @@ private let log = Logger(subsystem: "com.willsigmon.openmic", category: "Convers
 final class ConversationStore {
     private let modelContainer: ModelContainer
 
-    var modelContext: ModelContext {
+    private var modelContext: ModelContext {
         modelContainer.mainContext
     }
 
@@ -18,7 +18,7 @@ final class ConversationStore {
 
     func create(
         providerType: AIProviderType = .openAI,
-        personaName: String = "Sigmon"
+        personaName: String = AppConstants.Defaults.personaName
     ) throws -> Conversation {
         let conversation = Conversation(
             providerType: providerType,

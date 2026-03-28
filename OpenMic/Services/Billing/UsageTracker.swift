@@ -1,5 +1,13 @@
 import Foundation
 
+struct UsageSessionSummary: Sendable {
+    let provider: String
+    let tier: SubscriptionTier
+    let durationSeconds: Int
+    let deviceID: String
+    let userID: String?
+}
+
 @Observable
 @MainActor
 final class UsageTracker {
@@ -60,21 +68,52 @@ final class UsageTracker {
         deviceID: String,
         userID: String?
     ) async {
+        guard let summary = finishSession(
+            provider: provider,
+            tier: tier,
+            deviceID: deviceID,
+            userID: userID
+        ) else {
+            return
+        }
+
+        await logFinishedSession(summary)
+    }
+
+    @discardableResult
+    func finishSession(
+        provider: String,
+        tier: SubscriptionTier,
+        deviceID: String,
+        userID: String?
+    ) -> UsageSessionSummary? {
         sessionTimer?.cancel()
         sessionTimer = nil
         isSessionActive = false
 
-        guard let start = currentSessionStart else { return }
+        guard let start = currentSessionStart else {
+            currentSessionStart = nil
+            return nil
+        }
+
         let durationSeconds = Int(Date().timeIntervalSince(start))
         currentSessionStart = nil
-
-        // Log usage event to Supabase
-        await logUsageEvent(
+        return UsageSessionSummary(
             provider: provider,
             tier: tier,
             durationSeconds: durationSeconds,
             deviceID: deviceID,
             userID: userID
+        )
+    }
+
+    func logFinishedSession(_ summary: UsageSessionSummary) async {
+        await logUsageEvent(
+            provider: summary.provider,
+            tier: summary.tier,
+            durationSeconds: summary.durationSeconds,
+            deviceID: summary.deviceID,
+            userID: summary.userID
         )
     }
 

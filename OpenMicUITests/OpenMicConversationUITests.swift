@@ -1,7 +1,7 @@
 import XCTest
 
 /// End-to-end conversation test using a seeded Anthropic key.
-/// Run via: xcodebuild test -project ... -scheme OpenMic-iOSOnly -only-testing OpenMicUITests/OpenMicConversationUITests
+/// Run via: xcodebuild test -project ... -scheme OpenMic -only-testing OpenMicUITests/OpenMicConversationUITests
 final class OpenMicConversationUITests: XCTestCase {
     var app: XCUIApplication!
 

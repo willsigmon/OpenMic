@@ -5,14 +5,32 @@ import os.log
 
 private let log = Logger(subsystem: "com.willsigmon.openmic", category: "ConversationViewModel")
 
+struct ConversationSessionBuild {
+    let voiceSession: any VoiceSessionProtocol
+    let pipelineSession: PipelineVoiceSession?
+    let provider: AIProviderType
+    let providerFallbackMessage: String?
+    let isRealtimeSession: Bool
+}
+
+typealias ConversationSessionBuilder = @MainActor () async throws -> ConversationSessionBuild
+
+private struct DetachedConversationSession {
+    let voiceSession: any VoiceSessionProtocol
+    let usageSummary: UsageSessionSummary?
+}
+
 @Observable
 @MainActor
 final class ConversationViewModel {
     private let appServices: AppServices
+    private let customSessionBuilder: ConversationSessionBuilder?
     private var voiceSession: (any VoiceSessionProtocol)?
     private var pipelineSession: PipelineVoiceSession? // For sendText/seedHistory
     private var startTask: Task<Void, Never>?
     private var sendTask: Task<Void, Never>?
+    private var startOperationID: UUID?
+    private var sendOperationID: UUID?
     private var stateTask: Task<Void, Never>?
     private var transcriptTask: Task<Void, Never>?
     private var audioLevelTask: Task<Void, Never>?
@@ -46,10 +64,14 @@ final class ConversationViewModel {
         appServices.effectiveTier
     }
 
-    init(appServices: AppServices) {
+    init(
+        appServices: AppServices,
+        sessionBuilder: ConversationSessionBuilder? = nil
+    ) {
         self.appServices = appServices
         let storedProvider = UserDefaults.standard.string(forKey: "selectedProvider")
         self.activeProvider = AIProviderType(rawValue: storedProvider ?? "") ?? .openAI
+        self.customSessionBuilder = sessionBuilder
     }
 
     // MARK: - Voice Control
@@ -74,25 +96,36 @@ final class ConversationViewModel {
             return
         }
 
+        let operationID = UUID()
+        startOperationID = operationID
         startTask = Task { [weak self] in
             guard let self else { return }
-            defer { startTask = nil }
+            var pendingSession: (any VoiceSessionProtocol)?
+            defer { finishStartOperation(operationID) }
 
             do {
-                let session = try await buildSession()
-                voiceSession = session
+                let build = try await makeSession()
+                pendingSession = build.voiceSession
+
+                guard isCurrentStartOperation(operationID) else {
+                    await build.voiceSession.stop()
+                    return
+                }
+
+                applySessionBuild(build)
+                pendingSession = nil
 
                 if conversation == nil {
                     let persona = fetchActivePersona()
                     conversation = try appServices.conversationStore.create(
-                        providerType: activeProvider,
+                        providerType: build.provider,
                         personaName: persona?.name ?? "Sigmon"
                     )
                     resetBubbleDraftState()
                     bubbles = []
                 }
 
-                observeStreams(session)
+                observeStreams(build.voiceSession)
 
                 // Seed conversation history for pipeline sessions
                 if let pipeline = pipelineSession,
@@ -111,17 +144,30 @@ final class ConversationViewModel {
                 }
 
                 let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
-                try await session.start(systemPrompt: systemPrompt)
+                try await build.voiceSession.start(systemPrompt: systemPrompt)
+
+                guard isCurrentStartOperation(operationID) else {
+                    await build.voiceSession.stop()
+                    return
+                }
+
                 appServices.usageTracker.startSession()
                 ProviderAccessPolicy.markProviderAsWorking(activeProvider)
             } catch {
+                if let pendingSession {
+                    await pendingSession.stop()
+                }
                 if Task.isCancelled { return }
+
+                guard isCurrentStartOperation(operationID) else { return }
+
                 await voiceSession?.stop()
                 voiceState = .idle
                 errorMessage = error.localizedDescription
                 tearDownObservers()
                 voiceSession = nil
                 pipelineSession = nil
+                isRealtimeSession = false
             }
         }
     }
@@ -138,33 +184,43 @@ final class ConversationViewModel {
             return
         }
 
+        let operationID = UUID()
+        sendOperationID = operationID
         sendTask = Task { [weak self] in
             guard let self else { return }
-            defer { sendTask = nil }
+            var pendingSession: (any VoiceSessionProtocol)?
+            defer { finishSendOperation(operationID) }
             var didStartUsage = false
 
             do {
-                startTask?.cancel()
-                startTask = nil
+                cancelStartOperation()
 
                 if voiceSession != nil {
                     await endCurrentSession()
                 }
 
-                let session = try await buildSession()
-                voiceSession = session
+                let build = try await makeSession()
+                pendingSession = build.voiceSession
+
+                guard isCurrentSendOperation(operationID) else {
+                    await build.voiceSession.stop()
+                    return
+                }
+
+                applySessionBuild(build)
+                pendingSession = nil
 
                 if conversation == nil {
                     let persona = fetchActivePersona()
                     conversation = try appServices.conversationStore.create(
-                        providerType: activeProvider,
+                        providerType: build.provider,
                         personaName: persona?.name ?? "Sigmon"
                     )
                     resetBubbleDraftState()
                     bubbles = []
                 }
 
-                observeStreams(session)
+                observeStreams(build.voiceSession)
 
                 // Seed history for pipeline sessions
                 if let pipeline = pipelineSession,
@@ -188,17 +244,34 @@ final class ConversationViewModel {
                     didStartUsage = true
                     let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
                     try await pipeline.sendText(text, systemPrompt: systemPrompt)
+
+                    guard isCurrentSendOperation(operationID) else {
+                        return
+                    }
+
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
                 } else {
                     // For realtime sessions, start the session and the user will speak
                     let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
-                    try await session.start(systemPrompt: systemPrompt)
+                    try await build.voiceSession.start(systemPrompt: systemPrompt)
+
+                    guard isCurrentSendOperation(operationID) else {
+                        await build.voiceSession.stop()
+                        return
+                    }
+
                     appServices.usageTracker.startSession()
                     didStartUsage = true
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
                 }
             } catch {
+                if let pendingSession {
+                    await pendingSession.stop()
+                }
                 if Task.isCancelled { return }
+
+                guard isCurrentSendOperation(operationID) else { return }
+
                 await voiceSession?.stop()
                 if didStartUsage {
                     await appServices.usageTracker.endSession(
@@ -213,20 +286,23 @@ final class ConversationViewModel {
                 tearDownObservers()
                 voiceSession = nil
                 pipelineSession = nil
+                isRealtimeSession = false
             }
         }
     }
 
     func stopListening() {
-        Task { [weak self] in
-            guard let self else { return }
-            startTask?.cancel()
-            startTask = nil
-            sendTask?.cancel()
-            sendTask = nil
-            await endCurrentSession()
-            voiceState = .idle
-            audioLevel = 0
+        cancelStartOperation()
+        cancelSendOperation()
+        let detachedSession = detachCurrentSession()
+        voiceState = .idle
+        audioLevel = 0
+
+        Task { @MainActor [usageTracker = appServices.usageTracker] in
+            guard let detachedSession else { return }
+            await detachedSession.voiceSession.stop()
+            guard let usageSummary = detachedSession.usageSummary else { return }
+            await usageTracker.logFinishedSession(usageSummary)
         }
     }
 
@@ -254,28 +330,8 @@ final class ConversationViewModel {
 
     /// Switch provider mid-conversation: tear down session, swap, insert marker, restart.
     func switchProvider(to newProvider: AIProviderType) {
-        guard newProvider != activeProvider else { return }
-
-        let wasActive = isActive
-        stopListening()
-
-        activeProvider = newProvider
-        UserDefaults.standard.set(newProvider.rawValue, forKey: "selectedProvider")
-
-        // Insert a system-style marker bubble
-        let marker = ConversationBubble(
-            role: .system,
-            text: "Switched to \(newProvider.displayName)",
-            isFinal: true
-        )
-        bubbles.append(marker)
-
-        providerFallbackMessage = nil
-        errorMessage = nil
-
-        // Restart voice session if one was active
-        if wasActive {
-            startListening()
+        Task { [weak self] in
+            await self?.switchProviderInternal(to: newProvider)
         }
     }
 
@@ -283,66 +339,29 @@ final class ConversationViewModel {
 
     /// Switch persona mid-conversation: tear down session, update default, insert marker, restart.
     func switchPersona(to persona: Persona) {
-        let currentPersona = fetchActivePersona()
-        guard persona.id != currentPersona?.id else { return }
-
-        let wasActive = isActive
-        stopListening()
-
-        // Update default persona
-        let context = appServices.modelContainer.mainContext
-        if let current = currentPersona {
-            current.isDefault = false
-        }
-        persona.isDefault = true
-        try? context.save()
-
-        // Update conversation record
-        if let conversation {
-            conversation.personaName = persona.name
-            conversation.updatedAt = Date()
-            try? context.save()
-        }
-
-        // Insert marker
-        let marker = ConversationBubble(
-            role: .system,
-            text: "Switched to \(persona.name)",
-            isFinal: true
-        )
-        bubbles.append(marker)
-
-        errorMessage = nil
-
-        if wasActive {
-            startListening()
+        Task { [weak self] in
+            await self?.switchPersonaInternal(to: persona)
         }
     }
 
     // MARK: - Conversation Resume
 
     func loadConversation(_ conversation: Conversation) {
-        stopListening()
-
-        self.conversation = conversation
-        activeProvider = conversation.provider
-        providerFallbackMessage = nil
-
-        let sorted = conversation.messages.sorted { $0.createdAt < $1.createdAt }
-        bubbles = sorted.map { msg in
-            ConversationBubble(
-                role: msg.messageRole,
-                text: msg.content,
-                isFinal: true,
-                createdAt: msg.createdAt
-            )
+        Task { [weak self] in
+            await self?.loadConversationInternal(conversation)
         }
-        resetBubbleDraftState()
     }
 
     // MARK: - Session Builder
 
-    private func buildSession() async throws -> any VoiceSessionProtocol {
+    private func makeSession() async throws -> ConversationSessionBuild {
+        if let customSessionBuilder {
+            return try await customSessionBuilder()
+        }
+        return try await buildSession()
+    }
+
+    private func buildSession() async throws -> ConversationSessionBuild {
         let requestedProvider = await resolveProviderType()
         let tier = appServices.effectiveTier
         let resolution = try await ProviderAccessPolicy.resolveProvider(
@@ -352,8 +371,6 @@ final class ConversationViewModel {
             keychainManager: appServices.keychainManager
         )
         let providerType = resolution.effective
-        activeProvider = providerType
-        providerFallbackMessage = resolution.fallbackMessage
 
         log.debug("[ProviderAccess][\(ProviderSurface.iPhone.rawValue, privacy: .public)] requested=\(requestedProvider.rawValue, privacy: .public) effective=\(providerType.rawValue, privacy: .public) reason=\(resolution.fallbackReason?.rawValue ?? "none", privacy: .public)")
 
@@ -364,9 +381,6 @@ final class ConversationViewModel {
            providerType.requiresAPIKey,
            appServices.authManager.currentUserID != nil
         {
-            isRealtimeSession = true
-            pipelineSession = nil
-
             let authToken: String
             do {
                 authToken = try await ManagedSessionTokenProvider.accessToken()
@@ -374,18 +388,23 @@ final class ConversationViewModel {
                 throw AIProviderError.configurationMissing("Unable to start a managed session")
             }
 
-            return try RealtimeVoiceSession(
+            let session = try RealtimeVoiceSession(
                 provider: providerType,
                 proxyBaseURL: SupabaseConfig.realtimeProxyURL,
                 authToken: authToken,
                 deviceID: appServices.authManager.effectiveDeviceID,
                 voice: fetchActivePersona()?.openAIRealtimeVoice ?? "alloy"
             )
+            return ConversationSessionBuild(
+                voiceSession: session,
+                pipelineSession: nil,
+                provider: providerType,
+                providerFallbackMessage: resolution.fallbackMessage,
+                isRealtimeSession: true
+            )
         }
 
         // Fall back to pipeline session (BYOK or standard tier)
-        isRealtimeSession = false
-
         let aiProvider: AIProvider
         if tier == .byok {
             let apiKey = try? await appServices.keychainManager.getAPIKey(
@@ -412,8 +431,13 @@ final class ConversationViewModel {
             ttsEngine: tts,
             aiProvider: aiProvider
         )
-        pipelineSession = pipeline
-        return pipeline
+        return ConversationSessionBuild(
+            voiceSession: pipeline,
+            pipelineSession: pipeline,
+            provider: providerType,
+            providerFallbackMessage: resolution.fallbackMessage,
+            isRealtimeSession: false
+        )
     }
 
     private func buildTTSEngine() async throws -> TTSEngineProtocol {
@@ -593,22 +617,171 @@ final class ConversationViewModel {
         audioLevelTask = nil
     }
 
+    private func applySessionBuild(_ build: ConversationSessionBuild) {
+        voiceSession = build.voiceSession
+        pipelineSession = build.pipelineSession
+        activeProvider = build.provider
+        providerFallbackMessage = build.providerFallbackMessage
+        isRealtimeSession = build.isRealtimeSession
+    }
+
+    private func isCurrentStartOperation(_ operationID: UUID) -> Bool {
+        startOperationID == operationID && !Task.isCancelled
+    }
+
+    private func isCurrentSendOperation(_ operationID: UUID) -> Bool {
+        sendOperationID == operationID && !Task.isCancelled
+    }
+
+    private func finishStartOperation(_ operationID: UUID) {
+        guard startOperationID == operationID else { return }
+        startTask = nil
+        startOperationID = nil
+    }
+
+    private func finishSendOperation(_ operationID: UUID) {
+        guard sendOperationID == operationID else { return }
+        sendTask = nil
+        sendOperationID = nil
+    }
+
+    private func cancelStartOperation() {
+        startTask?.cancel()
+        startTask = nil
+        startOperationID = nil
+    }
+
+    private func cancelSendOperation() {
+        sendTask?.cancel()
+        sendTask = nil
+        sendOperationID = nil
+    }
+
+    private func detachCurrentSession() -> DetachedConversationSession? {
+        guard let voiceSession else { return nil }
+        tearDownObservers()
+        let detachedSession = DetachedConversationSession(
+            voiceSession: voiceSession,
+            usageSummary: appServices.usageTracker.finishSession(
+                provider: activeProvider.rawValue,
+                tier: appServices.effectiveTier,
+                deviceID: appServices.authManager.effectiveDeviceID,
+                userID: appServices.authManager.currentUserID
+            )
+        )
+        self.voiceSession = nil
+        pipelineSession = nil
+        isRealtimeSession = false
+        return detachedSession
+    }
+
     // MARK: - Session Lifecycle
 
-    private func endCurrentSession() async {
-        await voiceSession?.stop()
-        tearDownObservers()
+    private func stopListeningInternal() async {
+        cancelStartOperation()
+        cancelSendOperation()
+        await endCurrentSession()
+        voiceState = .idle
+        audioLevel = 0
+    }
 
-        // Track usage
-        await appServices.usageTracker.endSession(
+    private func switchProviderInternal(to newProvider: AIProviderType) async {
+        guard newProvider != activeProvider else { return }
+
+        let wasActive = isActive || voiceSession != nil || startTask != nil || sendTask != nil
+        await stopListeningInternal()
+
+        activeProvider = newProvider
+        UserDefaults.standard.set(newProvider.rawValue, forKey: "selectedProvider")
+
+        let marker = ConversationBubble(
+            role: .system,
+            text: "Switched to \(newProvider.displayName)",
+            isFinal: true
+        )
+        bubbles.append(marker)
+
+        providerFallbackMessage = nil
+        errorMessage = nil
+
+        if wasActive {
+            startListening()
+        }
+    }
+
+    private func switchPersonaInternal(to persona: Persona) async {
+        let currentPersona = fetchActivePersona()
+        guard persona.id != currentPersona?.id else { return }
+
+        let wasActive = isActive || voiceSession != nil || startTask != nil || sendTask != nil
+        await stopListeningInternal()
+
+        let context = appServices.modelContainer.mainContext
+        if let current = currentPersona {
+            current.isDefault = false
+        }
+        persona.isDefault = true
+        try? context.save()
+
+        if let conversation {
+            conversation.personaName = persona.name
+            conversation.updatedAt = Date()
+            try? context.save()
+        }
+
+        let marker = ConversationBubble(
+            role: .system,
+            text: "Switched to \(persona.name)",
+            isFinal: true
+        )
+        bubbles.append(marker)
+
+        errorMessage = nil
+
+        if wasActive {
+            startListening()
+        }
+    }
+
+    private func loadConversationInternal(_ conversation: Conversation) async {
+        await stopListeningInternal()
+
+        self.conversation = conversation
+        activeProvider = conversation.provider
+        providerFallbackMessage = nil
+
+        let sorted = conversation.messages.sorted { $0.createdAt < $1.createdAt }
+        bubbles = sorted.map { msg in
+            ConversationBubble(
+                role: msg.messageRole,
+                text: msg.content,
+                isFinal: true,
+                createdAt: msg.createdAt
+            )
+        }
+        resetBubbleDraftState()
+    }
+
+    private func endCurrentSession() async {
+        let sessionToStop = voiceSession
+        let usageSummary = appServices.usageTracker.finishSession(
             provider: activeProvider.rawValue,
             tier: appServices.effectiveTier,
             deviceID: appServices.authManager.effectiveDeviceID,
             userID: appServices.authManager.currentUserID
         )
 
+        await sessionToStop?.stop()
+        tearDownObservers()
+
         voiceSession = nil
         pipelineSession = nil
+        isRealtimeSession = false
+
+        guard let usageSummary else { return }
+        Task { @MainActor [usageTracker = appServices.usageTracker] in
+            await usageTracker.logFinishedSession(usageSummary)
+        }
     }
 
     // MARK: - Persistence

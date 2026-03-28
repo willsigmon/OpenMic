@@ -90,6 +90,26 @@ final class AppServices {
         )
     }
 
+    static func makeForTesting() throws -> AppServices {
+        let schema = Schema([
+            Conversation.self,
+            Message.self,
+            Persona.self
+        ])
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
+        )
+        let container = try ModelContainer(
+            for: schema,
+            configurations: [config]
+        )
+        return AppServices(
+            modelContainer: container,
+            inMemoryFallback: false
+        )
+    }
+
     private init(
         modelContainer: ModelContainer,
         inMemoryFallback: Bool

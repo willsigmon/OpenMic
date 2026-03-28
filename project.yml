@@ -13,25 +13,6 @@ schemes:
     build:
       targets:
         OpenMic: all
-  OpenMic-iOSOnly:
-    build:
-      targets:
-        OpenMic: all
-    run:
-      config: Debug
-      executable: OpenMic
-    test:
-      config: Debug
-      targets:
-        - OpenMicTests
-        - OpenMicUITests
-    profile:
-      config: Release
-      executable: OpenMic
-    analyze:
-      config: Debug
-    archive:
-      config: Release
   OpenMic-iOSBuildOnly:
     build:
       targets:
@@ -142,6 +123,7 @@ targets:
       - package: SwiftAnthropic
       - package: KeychainAccess
       - package: Supabase
+      - package: FluidAudio
       - sdk: AuthenticationServices.framework
       - sdk: StoreKit.framework
       - sdk: UserNotifications.framework

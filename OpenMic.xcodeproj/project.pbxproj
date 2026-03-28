@@ -161,6 +161,7 @@
 		8167194AC9DE80C666D94E7D /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC880440A01D9CE62649834 /* Provider.swift */; };
 		820B5379BD646B7231DE7A83 /* RealtimeAudioIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D009F8BBA3A7403369C35222 /* RealtimeAudioIO.swift */; };
 		823EFDA22786B85CC824D165 /* ProviderAccessPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3ED7798226CF892DD884E2E /* ProviderAccessPolicyTests.swift */; };
+		82672893511E1DA155805CC9 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = 9BE4C2F3D7C6FF420E51DBE0 /* FluidAudio */; };
 		844D53BF484F0D41326CDB6A /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F125C835ACA6BDBD9A0360 /* MainTabView.swift */; };
 		845F4791F07ACDE5342AC45E /* CarPlayTemplateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4D430D63507C5D6515C56B /* CarPlayTemplateManager.swift */; };
 		8468B6CFB064F891E859FB6B /* OpenAIVoiceSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7F1210BC24B08B5F5CC74 /* OpenAIVoiceSettingsSection.swift */; };
@@ -568,6 +569,7 @@
 				F39E46AE6D8B78137FA58F14 /* SwiftAnthropic in Frameworks */,
 				1435949BA22F8DF36904D392 /* KeychainAccess in Frameworks */,
 				0734F65459C2EF0B184FDAC8 /* Supabase in Frameworks */,
+				82672893511E1DA155805CC9 /* FluidAudio in Frameworks */,
 				DE4B6B0DA9A753EE215CF68E /* AuthenticationServices.framework in Frameworks */,
 				300FE73F821845034DE513E7 /* StoreKit.framework in Frameworks */,
 				50C30CA04B287B22E61C4C20 /* UserNotifications.framework in Frameworks */,
@@ -1163,6 +1165,7 @@
 				43785DF3C23132FC4FD9118E /* SwiftAnthropic */,
 				1E13A3C1CD286A1A9574A271 /* KeychainAccess */,
 				0C3632D1F226E76CB5F58E97 /* Supabase */,
+				9BE4C2F3D7C6FF420E51DBE0 /* FluidAudio */,
 			);
 			productName = OpenMiciOSBuildOnly;
 			productReference = 43B107BC9CA24EE39A14A55A /* OpenMiciOSBuildOnly.app */;
@@ -2113,6 +2116,11 @@
 			productName = Supabase;
 		};
 		90AD9A1F8C67F684C95282A4 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0D25B11E5B22482F83F35548 /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
+		};
+		9BE4C2F3D7C6FF420E51DBE0 /* FluidAudio */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0D25B11E5B22482F83F35548 /* XCRemoteSwiftPackageReference "FluidAudio" */;
 			productName = FluidAudio;

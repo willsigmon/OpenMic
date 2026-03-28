@@ -23,7 +23,7 @@ Voice-first AI assistant for iOS with CarPlay, Watch app, 7 AI providers, 8 TTS 
 # With your Anthropic key in env:
 xcodebuild test \
   -project OpenMic.xcodeproj \
-  -scheme OpenMic-iOSOnly \
+  -scheme OpenMic \
   -destination "platform=iOS Simulator,name=iPhone 17 Pro" \
   -only-testing "OpenMicUITests/OpenMicConversationUITests" \
   OPENMIC_TEST_ANTHROPIC_KEY="sk-ant-..."
@@ -40,6 +40,7 @@ xcodebuild test ... OPENMIC_TEST_ANTHROPIC_KEY="$ANTHROPIC_KEY"
 - Apple Intelligence provider fails in simulator (FoundationModels not available)
 - `selectedProvider` UserDefaults key controls active AI provider
 - `byokMode` UserDefaults key enables BYOK flow (bypasses subscription check)
+- `OpenMic-iOSBuildOnly` is only for compile checks when watchOS runtime support is unavailable; use `OpenMic` for real app/UI test runs
 
 ## Commits this session
 - `e5638ea` test: add end-to-end conversation UI tests with Anthropic key seeding

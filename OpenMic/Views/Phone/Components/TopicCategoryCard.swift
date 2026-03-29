@@ -68,6 +68,7 @@ struct TopicCategoryCard: View {
                     lineWidth: 0.75
                 )
         )
+        .tiltCard()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(category.name), \(category.promptCount) prompts")
         .accessibilityHint("Opens topic category")

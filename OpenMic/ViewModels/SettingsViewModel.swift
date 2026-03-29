@@ -43,6 +43,7 @@ final class SettingsViewModel {
                 }
                 apiKeys[provider] = trimmedKey
                 keyValidationStatus[provider] = .saved
+                ToastManager.shared.showSuccess("API key saved")
             } catch {
                 keyValidationStatus[provider] = .error(error.localizedDescription)
             }

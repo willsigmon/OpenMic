@@ -4,6 +4,9 @@ struct APIKeySettingsView: View {
     @Environment(AppServices.self) private var appServices
     @State private var viewModel: SettingsViewModel?
     @State private var appeared = false
+    @AppStorage("hasSeenNotificationAsk") private var hasSeenNotificationAsk = false
+    @AppStorage("hasSetupFirstProvider") private var hasSetupFirstProvider = false
+    @State private var showProviderSetupCTA = false
 
     private var effectiveTier: SubscriptionTier {
         appServices.effectiveTier
@@ -180,6 +183,24 @@ struct APIKeySettingsView: View {
                 viewModel = SettingsViewModel(appServices: appServices)
             }
             withAnimation { appeared = true }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showProviderSetupCTA {
+                ProviderSetupNotificationCTA()
+                    .padding(OpenMicTheme.Spacing.md)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(OpenMicTheme.Animation.springy, value: showProviderSetupCTA)
+        .onChange(of: viewModel?.keyValidationStatus) { _, statuses in
+            guard let statuses,
+                  !hasSetupFirstProvider,
+                  !hasSeenNotificationAsk,
+                  statuses.values.contains(.saved) else { return }
+            hasSetupFirstProvider = true
+            withAnimation(OpenMicTheme.Animation.springy) {
+                showProviderSetupCTA = true
+            }
         }
     }
 }

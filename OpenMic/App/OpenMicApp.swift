@@ -38,6 +38,7 @@ struct OpenMicApp: App {
             appServices.seedDefaultPersonaIfNeeded()
             launchState = .ready(appServices)
             await appServices.bootstrap()
+            Haptics.startEngine()
         } catch {
             launchState = .failed(error.localizedDescription)
         }

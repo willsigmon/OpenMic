@@ -5,6 +5,8 @@ struct ConversationBubbleRow: View {
     let reaction: String?
     let onReaction: (String) -> Void
     let onCopy: () -> Void
+    /// When true, a final assistant bubble uses the typewriter reveal effect.
+    var useTypewriter: Bool = false
 
     private var isUser: Bool { bubble.role == .user }
     private var isSystem: Bool { bubble.role == .system }
@@ -61,18 +63,28 @@ struct ConversationBubbleRow: View {
                     }
                 }
 
-                Text(bubble.text)
-                    .font(
-                        isUser
-                            ? OpenMicTheme.Typography.transcriptUser
-                            : OpenMicTheme.Typography.transcriptAssistant
-                    )
-                    .foregroundStyle(
-                        isUser ? Color.white : OpenMicTheme.Colors.textPrimary
-                    )
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
+                Group {
+                    if useTypewriter && !isUser && bubble.isFinal {
+                        // Typewriter reveal on the first final assistant bubble.
+                        // Font/foreground propagate via SwiftUI environment into
+                        // the modifier's internal Text nodes.
+                        EmptyView()
+                            .typewriter(text: bubble.text)
+                    } else {
+                        Text(bubble.text)
+                    }
+                }
+                .font(
+                    isUser
+                        ? OpenMicTheme.Typography.transcriptUser
+                        : OpenMicTheme.Typography.transcriptAssistant
+                )
+                .foregroundStyle(
+                    isUser ? Color.white : OpenMicTheme.Colors.textPrimary
+                )
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
             }
             .padding(.horizontal, OpenMicTheme.Spacing.sm)
             .padding(.vertical, OpenMicTheme.Spacing.xs)

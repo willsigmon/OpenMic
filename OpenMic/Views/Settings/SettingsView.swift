@@ -40,6 +40,8 @@ struct SettingsView: View {
                                             Text("\(appServices.usageTracker.remainingMinutes) min remaining")
                                                 .font(OpenMicTheme.Typography.caption)
                                                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                                                .contentTransition(.numericText())
+                                                .animation(OpenMicTheme.Animation.smooth, value: appServices.usageTracker.remainingMinutes)
                                         } else {
                                             Text("Using your own API keys")
                                                 .font(OpenMicTheme.Typography.caption)

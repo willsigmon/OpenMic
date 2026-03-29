@@ -6,6 +6,7 @@ struct ContentView: View {
     var body: some View {
         if appServices.isOnboardingComplete {
             MainTabView()
+                .spotlightCoordinator()
                 .accessibilityIdentifier(AppAccessibilityID.rootContent)
         } else {
             OnboardingContainerView()

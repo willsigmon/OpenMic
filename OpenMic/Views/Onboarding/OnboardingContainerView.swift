@@ -159,7 +159,9 @@ private enum ReadyPhase: CaseIterable {
     var animation: Animation {
         switch self {
         case .start: .spring(response: 0.5, dampingFraction: 0.6)
-        case .scaleUp: .spring(response: 0.3, dampingFraction: 0.5)
+        // bounce token: ported from LeavnAndroid LeavnEasing.Bounce (0.68, -0.55, 0.265, 1.55).
+        // Deliberately overshoots to 1.08 before settling — signals "done" with delight.
+        case .scaleUp: OpenMicTheme.Animation.bounce
         case .wiggle: .easeInOut(duration: 0.15)
         case .settle: .spring(response: 0.4, dampingFraction: 0.8)
         }

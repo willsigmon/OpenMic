@@ -51,6 +51,17 @@ struct MicButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
+                // Ambient breathing circle: visible only in .idle, acts as a
+                // "ready" indicator that invites the user to tap.
+                if case .idle = state {
+                    BreathingCircleCanvas(
+                        color: OpenMicTheme.Colors.accent,
+                        isActive: !reduceMotion
+                    )
+                    .frame(width: size + 64, height: size + 64)
+                    .accessibilityHidden(true)
+                }
+
                 // Pulsing rings (visible when active)
                 if isActive {
                     pulsingRings

@@ -70,6 +70,10 @@
 	<key>OPENMIC_TERMS_OF_USE_URL</key>
 	<string>https://www.apple.com/legal/internet-services/itunes/dev/stdeula/</string>
 
+	<!-- Live Activities -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+
 	<!-- Export Compliance -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

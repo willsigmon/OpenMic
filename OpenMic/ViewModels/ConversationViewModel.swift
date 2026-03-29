@@ -2,6 +2,9 @@ import Foundation
 import SwiftUI
 import SwiftData
 import os.log
+#if canImport(ActivityKit) && os(iOS)
+import ActivityKit
+#endif
 
 private let log = Logger(subsystem: "com.willsigmon.openmic", category: "ConversationViewModel")
 
@@ -152,6 +155,14 @@ final class ConversationViewModel {
 
                 appServices.usageTracker.startSession()
                 ProviderAccessPolicy.markProviderAsWorking(activeProvider)
+
+                // Start the Live Activity now that the session is confirmed live.
+                let personaName = fetchActivePersona()?.name ?? AppConstants.Defaults.personaName
+                let providerShortName = build.provider.shortName
+                await liveActivityManager.startSession(
+                    personaName: personaName,
+                    providerName: providerShortName
+                )
             } catch {
                 if let pendingSession {
                     await pendingSession.stop()
@@ -240,7 +251,12 @@ final class ConversationViewModel {
                 if let pipeline = pipelineSession {
                     appServices.usageTracker.startSession()
                     didStartUsage = true
-                    let systemPrompt = fetchActivePersona()?.systemPrompt ?? ""
+                    let persona = fetchActivePersona()
+                    await liveActivityManager.startSession(
+                        personaName: persona?.name ?? AppConstants.Defaults.personaName,
+                        providerName: build.provider.shortName
+                    )
+                    let systemPrompt = persona?.systemPrompt ?? ""
                     try await pipeline.sendText(text, systemPrompt: systemPrompt)
 
                     guard isCurrentSendOperation(operationID) else {
@@ -261,6 +277,10 @@ final class ConversationViewModel {
                     appServices.usageTracker.startSession()
                     didStartUsage = true
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
+                    await liveActivityManager.startSession(
+                        personaName: fetchActivePersona()?.name ?? AppConstants.Defaults.personaName,
+                        providerName: build.provider.shortName
+                    )
                 }
             } catch {
                 if let pendingSession {
@@ -454,6 +474,9 @@ final class ConversationViewModel {
                 if case .error(let msg) = state {
                     self.errorMessage = msg
                 }
+                // Mirror every state transition into the Live Activity.
+                let count = self.bubbles.filter { $0.isFinal }.count
+                await self.liveActivityManager.updateState(state, messageCount: count)
             }
         }
 
@@ -570,6 +593,7 @@ final class ConversationViewModel {
 
         activeProvider = newProvider
         UserDefaults.standard.set(newProvider.rawValue, forKey: "selectedProvider")
+        ToastManager.shared.showVoiceState("Now using \(newProvider.displayName)")
 
         let marker = ConversationBubble(
             role: .system,
@@ -655,6 +679,9 @@ final class ConversationViewModel {
         pipelineSession = nil
         isRealtimeSession = false
 
+        // End the Live Activity alongside the session.
+        await liveActivityManager.endSession()
+
         guard let usageSummary else { return }
         Task { @MainActor [usageTracker = appServices.usageTracker] in
             await usageTracker.logFinishedSession(usageSummary)
@@ -681,6 +708,19 @@ final class ConversationViewModel {
         } catch {
             log.error("Failed to persist message: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    // MARK: - Live Activity
+
+    /// Convenience accessor that returns the live-activity manager when ActivityKit
+    /// is available, or a no-op shim otherwise.
+    private var liveActivityManager: any VoiceSessionActivityManaging {
+        #if canImport(ActivityKit) && os(iOS)
+        if #available(iOS 16.1, *) {
+            return VoiceSessionActivityManager.shared
+        }
+        #endif
+        return NoOpVoiceSessionActivityManager.shared
     }
 
     // MARK: - Helpers

@@ -4,6 +4,9 @@ struct TopicsView: View {
     let onSelectPrompt: (String) -> Void
     @State private var searchText = ""
     @State private var appeared = false
+    @State private var navBarOpacity: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var heroNamespace
 
     private var filteredCategories: [TopicCategory] {
         guard !searchText.isEmpty else {
@@ -63,38 +66,66 @@ struct TopicsView: View {
                 OpenMicTheme.Colors.background.ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: OpenMicTheme.Spacing.md) {
-                        if filteredCategories.isEmpty {
-                            emptyState
-                        } else {
-                            LazyVGrid(columns: columns, spacing: OpenMicTheme.Spacing.sm) {
-                                ForEach(Array(filteredCategories.enumerated()), id: \.element.id) { index, category in
-                                    NavigationLink {
-                                        TopicCategoryDetailView(
-                                            category: category,
-                                            onSelectPrompt: onSelectPrompt
+                    VStack(spacing: 0) {
+                        // Parallax hero banner — only shown when not searching.
+                        if searchText.isEmpty {
+                            OpenMicParallaxHeader(
+                                height: 220,
+                                reduceMotion: reduceMotion,
+                                navBarOpacity: $navBarOpacity
+                            ) {
+                                OpenMicHeroBanner(
+                                    title: "Topics",
+                                    subtitle: "Choose a subject to start a conversation"
+                                )
+                            }
+                        }
+
+                        VStack(spacing: OpenMicTheme.Spacing.md) {
+                            if filteredCategories.isEmpty {
+                                emptyState
+                            } else {
+                                LazyVGrid(columns: columns, spacing: OpenMicTheme.Spacing.sm) {
+                                    ForEach(Array(filteredCategories.enumerated()), id: \.element.id) { index, category in
+                                        NavigationLink {
+                                            TopicCategoryDetailView(
+                                                category: category,
+                                                onSelectPrompt: onSelectPrompt
+                                            )
+                                            .applyZoomTransition(
+                                                id: category.id,
+                                                namespace: heroNamespace
+                                            )
+                                        } label: {
+                                            TopicCategoryCard(category: category)
+                                                .applyZoomTransitionSource(
+                                                    id: category.id,
+                                                    namespace: heroNamespace
+                                                )
+                                        }
+                                        .buttonStyle(.plain)
+                                        .opacity(appeared ? 1 : 0)
+                                        .offset(y: appeared ? 0 : 16)
+                                        .animation(
+                                            .spring(response: 0.5, dampingFraction: 0.8)
+                                                .delay(Double(index) * 0.04),
+                                            value: appeared
                                         )
-                                    } label: {
-                                        TopicCategoryCard(category: category)
+                                        // Scroll-edge fade for cards entering/exiting viewport.
+                                        .openMicScrollTransition()
                                     }
-                                    .buttonStyle(.plain)
-                                    .opacity(appeared ? 1 : 0)
-                                    .offset(y: appeared ? 0 : 16)
-                                    .animation(
-                                        .spring(response: 0.5, dampingFraction: 0.8)
-                                            .delay(Double(index) * 0.04),
-                                        value: appeared
-                                    )
                                 }
                             }
                         }
+                        .padding(.horizontal, OpenMicTheme.Spacing.md)
+                        .padding(.top, OpenMicTheme.Spacing.sm)
+                        .padding(.bottom, OpenMicTheme.Spacing.xxxl)
                     }
-                    .padding(.horizontal, OpenMicTheme.Spacing.md)
-                    .padding(.top, OpenMicTheme.Spacing.sm)
-                    .padding(.bottom, OpenMicTheme.Spacing.xxxl)
                 }
             }
-            .navigationTitle("Topics")
+            .navigationTitle(searchText.isEmpty ? "" : "Topics")
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .modifier(OpenMicGlassNavBarModifier(opacity: navBarOpacity))
             .searchable(
                 text: $searchText,
                 placement: .navigationBarDrawer(displayMode: .always),

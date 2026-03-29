@@ -207,6 +207,12 @@ enum OpenMicTheme {
         static let standard = SwiftUI.Animation.easeInOut(duration: 0.3)
         static let smooth = SwiftUI.Animation.easeInOut(duration: 0.5)
         static let slow = SwiftUI.Animation.easeInOut(duration: 0.8)
+        /// Critically-damped 0.8s ease — contemplative, zero bounce.
+        /// Ported from LeavnAndroid `LeavnDuration.MEDITATIVE` + `LeavnEasing.Smooth`.
+        static let meditative = SwiftUI.Animation.easeInOut(duration: 0.8)
+        /// Overshoot cubic-bezier from LeavnAndroid `LeavnEasing.Bounce` (0.68, -0.55, 0.265, 1.55).
+        /// Use for completion moments where a deliberate overshoot signals delight.
+        static let bounce = SwiftUI.Animation.timingCurve(0.68, -0.55, 0.265, 1.55, duration: 0.5)
         static let breathe = SwiftUI.Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)
         static let pulse = SwiftUI.Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)
         static let springy = SwiftUI.Animation.spring(response: 0.4, dampingFraction: 0.7)

@@ -13,6 +13,9 @@ struct ConversationListView: View {
     @State private var emptyStateVisible = false
     @State private var conversationToDelete: Conversation?
     @State private var searchText = ""
+    @State private var navBarOpacity: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var heroNamespace
 
     private var filteredConversations: [Conversation] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -39,7 +42,9 @@ struct ConversationListView: View {
                     }
                 }
             }
-            .navigationTitle("History")
+            .navigationTitle(searchText.isEmpty ? "" : "History")
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .modifier(OpenMicGlassNavBarModifier(opacity: navBarOpacity))
             .searchable(text: $searchText, prompt: "Search conversations")
             .confirmationDialog(
                 "Delete Conversation?",
@@ -138,14 +143,37 @@ struct ConversationListView: View {
     @ViewBuilder
     private var conversationList: some View {
         ScrollView {
-            LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
+            VStack(spacing: 0) {
+                // Parallax hero — hidden during search to keep the focus on results.
+                if searchText.isEmpty {
+                    OpenMicParallaxHeader(
+                        height: 200,
+                        reduceMotion: reduceMotion,
+                        navBarOpacity: $navBarOpacity
+                    ) {
+                        ConversationListHeroBanner(conversationCount: conversations.count)
+                    }
+                }
+
+                LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
                 ForEach(Array(filteredConversations.enumerated()), id: \.element.id) { index, conversation in
-                    ConversationRow(conversation: conversation)
-                        .onTapGesture {
-                            Haptics.tap()
-                            onResumeConversation(conversation)
-                        }
-                        .contextMenu {
+                    NavigationLink {
+                        ConversationSummaryView(
+                            conversation: conversation,
+                            onResume: {
+                                Haptics.navigate()
+                                onResumeConversation(conversation)
+                            }
+                        )
+                        // iOS 18+: zoom the detail view out from the tapped row.
+                        .applyZoomTransition(id: conversation.id, namespace: heroNamespace)
+                    } label: {
+                        ConversationRow(conversation: conversation)
+                            // iOS 18+: mark this row as the transition source.
+                            .applyZoomTransitionSource(id: conversation.id, namespace: heroNamespace)
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
                             ShareLink(
                                 item: ConversationExporter.plainText(from: conversation),
                                 subject: Text(conversation.displayTitle),
@@ -189,8 +217,15 @@ struct ConversationListView: View {
                         .sensoryFeedback(.selection, trigger: conversation.id)
                 }
             }
-            .padding(.horizontal, OpenMicTheme.Spacing.md)
-            .padding(.top, OpenMicTheme.Spacing.sm)
+                .padding(.horizontal, OpenMicTheme.Spacing.md)
+                .padding(.top, OpenMicTheme.Spacing.sm)
+                .padding(.bottom, OpenMicTheme.Spacing.xxxl)
+            } // VStack(spacing: 0)
+        }
+        // SwiftData @Query re-evaluates automatically; a brief yield lets any
+        // pending background saves flush so the list updates after the gesture.
+        .customRefreshable {
+            try? await Task.sleep(for: .milliseconds(400))
         }
     }
 
@@ -204,7 +239,7 @@ private struct ConversationRow: View {
     var body: some View {
         GlassCard(cornerRadius: OpenMicTheme.Radius.md, padding: OpenMicTheme.Spacing.sm) {
             HStack(spacing: OpenMicTheme.Spacing.sm) {
-                // Provider icon
+                // Provider icon — tagged as the hero source by the parent NavigationLink.
                 ProviderIcon(provider: conversation.provider, size: 36)
 
                 VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xxs) {
@@ -238,5 +273,85 @@ private struct ConversationRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(conversation.displayTitle), \(conversation.personaName)")
         .accessibilityHint("Opens conversation")
+    }
+}
+
+// MARK: - Conversation Summary (push destination from History list)
+
+/// A lightweight read-only summary pushed from ConversationListView.
+/// Shows the transcript and lets the user tap "Resume" to switch to
+/// the Talk tab with the conversation loaded.
+private struct ConversationSummaryView: View {
+    let conversation: Conversation
+    let onResume: () -> Void
+
+    var body: some View {
+        ZStack {
+            OpenMicTheme.Colors.background.ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.lg) {
+                    // Hero header — provider icon zooms into here from the list row
+                    HStack(spacing: OpenMicTheme.Spacing.md) {
+                        ProviderIcon(provider: conversation.provider, size: 52)
+
+                        VStack(alignment: .leading, spacing: OpenMicTheme.Spacing.xxs) {
+                            Text(conversation.displayTitle)
+                                .font(OpenMicTheme.Typography.title)
+                                .foregroundStyle(OpenMicTheme.Colors.textPrimary)
+                                .lineLimit(2)
+
+                            Text(conversation.personaName)
+                                .font(OpenMicTheme.Typography.caption)
+                                .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
+                        }
+
+                        Spacer()
+                    }
+                    .padding(OpenMicTheme.Spacing.md)
+                    .glassBackground(cornerRadius: OpenMicTheme.Radius.lg)
+
+                    // Message transcript
+                    let sorted = conversation.messages.sorted { $0.createdAt < $1.createdAt }
+                    ForEach(sorted) { message in
+                        ConversationBubbleRow(
+                            bubble: ConversationBubble(
+                                role: message.messageRole,
+                                text: message.content,
+                                isFinal: true,
+                                createdAt: message.createdAt,
+                                provider: message.provider
+                            ),
+                            reaction: nil,
+                            onReaction: { _ in },
+                            onCopy: {
+                                #if canImport(UIKit)
+                                UIPasteboard.general.string = message.content
+                                #endif
+                                Haptics.tap()
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal, OpenMicTheme.Spacing.md)
+                .padding(.top, OpenMicTheme.Spacing.sm)
+                .padding(.bottom, OpenMicTheme.Spacing.xxxl)
+            }
+        }
+        .navigationTitle(conversation.personaName)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    onResume()
+                } label: {
+                    Label("Resume", systemImage: "mic.fill")
+                        .font(OpenMicTheme.Typography.caption.weight(.semibold))
+                }
+                .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
+                .accessibilityLabel("Resume conversation")
+                .accessibilityHint("Switches to Talk tab and continues this conversation")
+            }
+        }
     }
 }

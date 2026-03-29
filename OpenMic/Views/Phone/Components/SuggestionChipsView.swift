@@ -122,6 +122,7 @@ private struct PromptCard: View {
             )
         }
         .buttonStyle(PromptCardButtonStyle(tint: tint))
+        .modifier(TiltCardModifier())
         .accessibilityIdentifier(
             AppAccessibilityID.suggestionCard(suggestion.id)
         )

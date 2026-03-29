@@ -60,27 +60,12 @@ struct UsageDashboardView: View {
 
     private var usageGauge: some View {
         VStack(spacing: OpenMicTheme.Spacing.md) {
-            ZStack {
-                // Background ring
-                Circle()
-                    .stroke(
-                        OpenMicTheme.Colors.surfaceBorder,
-                        lineWidth: 12
-                    )
-                    .frame(width: 160, height: 160)
-
-                // Progress ring
-                Circle()
-                    .trim(from: 0, to: progress)
-                    .stroke(
-                        gaugeGradient,
-                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                    )
-                    .frame(width: 160, height: 160)
-                    .rotationEffect(.degrees(-90))
-                    .animation(OpenMicTheme.Animation.smooth, value: progress)
-
-                // Center text
+            AnimatedProgressRing(
+                progress: progress,
+                lineWidth: 12,
+                colorMode: .usage,
+                size: 160
+            ) {
                 VStack(spacing: 2) {
                     if tier == .byok {
                         Image(systemName: "infinity")
@@ -91,6 +76,7 @@ struct UsageDashboardView: View {
                             .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundStyle(OpenMicTheme.Colors.textPrimary)
                             .contentTransition(.numericText())
+                            .animation(OpenMicTheme.Animation.smooth, value: remaining)
                     }
 
                     Text("min left")
@@ -103,27 +89,14 @@ struct UsageDashboardView: View {
                 Text("\(used) of \(total) minutes used this month")
                     .font(OpenMicTheme.Typography.body)
                     .foregroundStyle(OpenMicTheme.Colors.textSecondary)
+                    .contentTransition(.numericText())
+                    .animation(OpenMicTheme.Animation.smooth, value: used)
             }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(tier == .byok
             ? "Unlimited usage, Power User mode"
             : "\(remaining) minutes remaining out of \(total)")
-    }
-
-    private var gaugeGradient: AngularGradient {
-        let color: Color = progress > 0.85
-            ? OpenMicTheme.Colors.error
-            : progress > 0.6
-                ? OpenMicTheme.Colors.processing
-                : OpenMicTheme.Colors.accentGradientStart
-
-        return AngularGradient(
-            colors: [color.opacity(0.5), color],
-            center: .center,
-            startAngle: .degrees(-90),
-            endAngle: .degrees(-90 + 360 * progress)
-        )
     }
 
     // MARK: - Plan Info
@@ -243,6 +216,7 @@ private struct UsageRow: View {
                 .font(OpenMicTheme.Typography.headline)
                 .foregroundStyle(OpenMicTheme.Colors.textPrimary)
                 .monospacedDigit()
+                .contentTransition(.numericText())
         }
     }
 }

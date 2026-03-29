@@ -10,6 +10,9 @@ struct ConversationView: View {
     @Binding var autoStartVoice: Bool
     @Environment(AppServices.self) private var appServices
     @AppStorage("audioOutputMode") private var audioOutputMode = AudioOutputMode.defaultMode.rawValue
+    @AppStorage("hasSeenNotificationAsk") private var hasSeenNotificationAsk = false
+    @AppStorage("hasCompletedFirstConversation") private var hasCompletedFirstConversation = false
+    @State private var showFirstConversationCTA = false
     @State private var viewModel: ConversationViewModel?
     @State private var showSuggestions = false
     @State private var suggestions: [PromptSuggestions.Suggestion] = []
@@ -22,10 +25,25 @@ struct ConversationView: View {
     @State private var micOffset: CGSize = .zero
     @State private var micRestPosition: CGSize = .zero
     @State private var isDraggingMic = false
+
+    // Celebration state
+    @State private var showCelebrationParticles = false
+    @State private var celebrationParticleCount = CelebrationSize.small
+    @State private var sparkleFirstMessage = false
+    @State private var sparkleProviderSwitch = false
+    /// The message count at which the last milestone was fired, to prevent double-fire.
+    @State private var lastMilestoneFiredAt = 0
+    /// Current active milestone value — drives `MilestoneCelebrationView`.
+    @State private var activeMilestone = 0
+    /// Incremented on each milestone hit to fire the keyframe animation exactly once.
+    @State private var milestoneCelebrationTrigger = 0
+
     private let micBottomPadding: CGFloat = 24
     private let micTrailingPadding: CGFloat = 16
     // Enough room for the floating mic even at bottom-right
     private let contentBottomInset: CGFloat = 110
+
+    private static let milestones: Set<Int> = [10, 50, 100]
 
     var body: some View {
         Group {
@@ -110,6 +128,7 @@ struct ConversationView: View {
                     statusIndicator(vm)
                         .padding(.top, OpenMicTheme.Spacing.xl)
                         .padding(.bottom, OpenMicTheme.Spacing.sm)
+                        .sparkle(when: sparkleFirstMessage)
 
                     if vm.bubbles.isEmpty {
                         VoiceWaveformView(level: vm.audioLevel, state: vm.voiceState)
@@ -144,6 +163,35 @@ struct ConversationView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .animation(OpenMicTheme.Animation.fast, value: vm.voiceState)
+        .overlay {
+            if showCelebrationParticles {
+                CelebrationParticleView(particleCount: celebrationParticleCount)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .onAppear {
+                        let duration = celebrationParticleCount >= CelebrationSize.large ? 2.6 : 2.0
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .seconds(duration))
+                            withAnimation(OpenMicTheme.Animation.fast) {
+                                showCelebrationParticles = false
+                            }
+                        }
+                    }
+                    .accessibilityHidden(true)
+            }
+        }
+        // Keyframe milestone badge layered on top of particles
+        .overlay(alignment: .center) {
+            if showCelebrationParticles && activeMilestone > 0 {
+                MilestoneCelebrationView(
+                    milestone: activeMilestone,
+                    triggerID: milestoneCelebrationTrigger,
+                    isParticleActive: .constant(false)  // particles handled above
+                )
+                .transition(.scale(scale: 0.8).combined(with: .opacity))
+            }
+        }
+        .animation(OpenMicTheme.Animation.bouncy, value: showCelebrationParticles)
         .overlay(alignment: .bottomTrailing) {
             MicButton(state: vm.voiceState, action: { vm.toggleListening() }, isDragging: isDraggingMic)
             .offset(x: micRestPosition.width + micOffset.width,
@@ -232,8 +280,24 @@ struct ConversationView: View {
                 withAnimation(OpenMicTheme.Animation.smooth) {
                     showSuggestions = true
                 }
+                // Show CTA after first conversation completes
+                if !hasCompletedFirstConversation, !hasSeenNotificationAsk, !vm.bubbles.isEmpty {
+                    hasCompletedFirstConversation = true
+                    withAnimation(OpenMicTheme.Animation.springy) {
+                        showFirstConversationCTA = true
+                    }
+                }
             }
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showFirstConversationCTA {
+                FirstConversationNotificationCTA()
+                    .padding(.horizontal, OpenMicTheme.Spacing.md)
+                    .padding(.bottom, OpenMicTheme.Spacing.sm)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(OpenMicTheme.Animation.springy, value: showFirstConversationCTA)
         .onAppear {
             refreshSuggestions()
             // Delayed entrance
@@ -259,6 +323,50 @@ struct ConversationView: View {
             if shouldStart {
                 autoStartVoice = false
                 vm.startListening()
+            }
+        }
+        // MARK: Celebrations
+        .onChange(of: vm.bubbles.count) { oldCount, newCount in
+            guard newCount > oldCount else { return }
+            let userBubbles = vm.bubbles.filter { $0.role == .user && $0.isFinal }
+            let userCount = userBubbles.count
+
+            // First user message sparkle
+            if userCount == 1 && oldCount < newCount {
+                sparkleFirstMessage = true
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(100))
+                    sparkleFirstMessage = false
+                }
+            }
+
+            // Milestone: particles + keyframe badge (10th, 50th, 100th message)
+            let totalMessages = vm.conversation?.messages.count ?? newCount
+            let milestone = ConversationView.milestones
+                .filter { totalMessages >= $0 && lastMilestoneFiredAt < $0 }
+                .max()
+
+            if let hit = milestone {
+                lastMilestoneFiredAt = hit
+                activeMilestone = hit
+                // Scale particle count to milestone significance
+                celebrationParticleCount = ConversationCelebrationContext
+                    .conversationMilestone(hit).particleCount
+                Haptics.celebrationPattern()
+                // Fire keyframe card animation
+                milestoneCelebrationTrigger += 1
+                withAnimation(OpenMicTheme.Animation.fast) {
+                    showCelebrationParticles = true
+                }
+            }
+        }
+        .onChange(of: vm.activeProvider) { oldProvider, newProvider in
+            guard oldProvider != newProvider else { return }
+            // Only sparkle if it wasn't the initial provider assignment
+            guard vm.conversation != nil else { return }
+            sparkleProviderSwitch = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                sparkleProviderSwitch = false
             }
         }
     }
@@ -321,8 +429,10 @@ struct ConversationView: View {
                 ProviderBadge(provider: vm.activeProvider)
             }
             .buttonStyle(.plain)
+            .sparkle(when: sparkleProviderSwitch)
             .accessibilityIdentifier(AppAccessibilityID.conversationProviderBadge)
             .accessibilityHint("Tap to switch AI provider")
+            .spotlightTarget(.providerBadge)
 
             Menu {
                 ForEach(AudioOutputMode.allCases) { mode in
@@ -387,7 +497,7 @@ struct ConversationView: View {
         ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
-                    ForEach(vm.bubbles) { bubble in
+                    ForEach(Array(vm.bubbles.enumerated()), id: \.element.id) { index, bubble in
                         ConversationBubbleRow(
                             bubble: bubble,
                             reaction: bubbleReactions[bubble.id],
@@ -397,7 +507,10 @@ struct ConversationView: View {
                             },
                             onCopy: {
                                 copyToPasteboard(bubble.text)
-                            }
+                            },
+                            // Apply typewriter to the very first assistant bubble
+                            // only — a visual flourish on fresh conversations.
+                            useTypewriter: index == 0 && bubble.role == .assistant
                         )
                         .id(bubble.id)
                     }
@@ -602,6 +715,7 @@ struct ConversationView: View {
         UIPasteboard.general.string = text
 #endif
         Haptics.tap()
+        ToastManager.shared.showInfo("Conversation copied")
     }
 
     private func fetchCurrentPersonaID(_ vm: ConversationViewModel) -> UUID? {

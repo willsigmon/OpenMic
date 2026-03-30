@@ -69,8 +69,7 @@ final class AmazonPollyTTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw AmazonPollyError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Amazon Polly HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("Amazon Polly HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw AmazonPollyError.synthesizeFailed
         }
 

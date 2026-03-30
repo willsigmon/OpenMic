@@ -63,8 +63,7 @@ final class HumeAITTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw HumeAIError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Hume AI TTS HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("Hume AI TTS HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw HumeAIError.synthesizeFailed
         }
 

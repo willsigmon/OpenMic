@@ -44,7 +44,7 @@ final class SystemTTS: NSObject, TTSEngineProtocol {
         }
 
         isSpeaking = true
-        ttsLog.info("speak() starting: \"\(text.prefix(60), privacy: .public)\"")
+        ttsLog.info("speak() starting (\(text.count, privacy: .public) chars)")
 
         await withCheckedContinuation { continuation in
             self.speakingContinuation = continuation

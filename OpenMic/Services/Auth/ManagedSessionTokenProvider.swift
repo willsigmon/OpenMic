@@ -7,14 +7,13 @@ enum ManagedSessionTokenProvider {
 
     @MainActor
     private static func tokenOnMainActor() async throws -> String {
-        if let supabase, let session = try? await supabase.auth.session {
-            return session.accessToken
+        guard let supabase else {
+            throw AIProviderError.configurationMissing("Supabase not configured")
         }
-
-        if let key = SupabaseConfig.anonKey {
-            return key
-        }
-
-        return ""
+        // This throws when no valid session exists — callers must handle the error
+        // and surface it as "sign in required". Never fall back to the anon key,
+        // which is a public credential and must not be used as a user auth token.
+        let session = try await supabase.auth.session
+        return session.accessToken
     }
 }

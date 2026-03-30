@@ -66,8 +66,11 @@ class CloudTTSBase: NSObject, TTSEngineProtocol {
         audioPlayer?.stop()
         audioPlayer?.delegate = nil
         audioPlayer = nil
-        playbackContinuation?.resume()
+        // Nil the continuation BEFORE resuming to prevent double-resume if the
+        // AVAudioPlayerDelegate callback fires concurrently after the player stops.
+        let continuation = playbackContinuation
         playbackContinuation = nil
+        continuation?.resume()
         fallbackTTS.stop()
         isSpeaking = false
     }
@@ -98,8 +101,9 @@ extension CloudTTSBase: AVAudioPlayerDelegate {
         successfully flag: Bool
     ) {
         Task { @MainActor in
-            self.playbackContinuation?.resume()
+            let continuation = self.playbackContinuation
             self.playbackContinuation = nil
+            continuation?.resume()
         }
     }
 
@@ -108,8 +112,9 @@ extension CloudTTSBase: AVAudioPlayerDelegate {
         error: (any Error)?
     ) {
         Task { @MainActor in
-            self.playbackContinuation?.resume()
+            let continuation = self.playbackContinuation
             self.playbackContinuation = nil
+            continuation?.resume()
         }
     }
 }

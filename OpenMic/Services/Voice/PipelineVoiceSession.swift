@@ -92,7 +92,9 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
 
     func interrupt() async {
         ttsEngine.stop()
-        updateState(.listening)
+        // Restart the listening loop so STT actually captures audio after barge-in.
+        // Without this the state shows .listening but no recognition task is running.
+        startListeningLoop()
     }
 
     /// Send text directly to AI (skipping STT), then speak the response.
@@ -210,9 +212,18 @@ final class PipelineVoiceSession: VoiceSessionProtocol {
                         )
                     )
                 } catch is CancellationError {
+                    // Roll back the user message that was appended before the call
+                    if conversationHistory.last?.role == .user {
+                        conversationHistory.removeLast()
+                    }
                     break
                 } catch {
+                    // Roll back the user message so the history stays consistent
+                    if conversationHistory.last?.role == .user {
+                        conversationHistory.removeLast()
+                    }
                     updateState(.error(error.localizedDescription))
+                    // Continue listening — the error state is transient
                 }
             }
         }

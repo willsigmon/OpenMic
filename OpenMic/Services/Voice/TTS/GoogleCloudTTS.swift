@@ -62,8 +62,7 @@ final class GoogleCloudTTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw GoogleCloudTTSError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Google Cloud TTS HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("Google Cloud TTS HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw GoogleCloudTTSError.synthesizeFailed
         }
 

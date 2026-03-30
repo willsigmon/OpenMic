@@ -76,7 +76,12 @@ struct OpenMicWidgetEntryView: View {
     let entry: OpenMicEntry
     @Environment(\.widgetFamily) var family
 
-    private static let voiceURL = URL(string: "openmic://voice")!
+    private static let voiceURL: URL = {
+        guard let url = URL(string: "openmic://voice") else {
+            preconditionFailure("openmic://voice is not a valid URL — check scheme configuration")
+        }
+        return url
+    }()
 
     var body: some View {
         switch family {

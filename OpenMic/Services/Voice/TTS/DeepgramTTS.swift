@@ -57,8 +57,7 @@ final class DeepgramTTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw DeepgramTTSError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Deepgram TTS HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("Deepgram TTS HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw DeepgramTTSError.synthesizeFailed
         }
 

@@ -156,9 +156,10 @@ final class OpenAIRealtimeSession: VoiceSessionProtocol {
         urlSession = nil
 
         updateState(.idle)
-        stateContinuation?.finish()
-        transcriptContinuation?.finish()
-        audioLevelContinuation?.finish()
+        // Do NOT finish the continuations here — the streams are created once in
+        // init() and must remain open across stop/start cycles for observers in
+        // ConversationViewModel. Finishing them permanently closes the AsyncStream,
+        // causing state updates to be silently dropped if start() is called again.
 
         try? AudioSessionManager.shared.deactivate()
     }

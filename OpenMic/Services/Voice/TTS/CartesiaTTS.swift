@@ -62,8 +62,7 @@ final class CartesiaTTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw CartesiaTTSError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("Cartesia TTS HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("Cartesia TTS HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw CartesiaTTSError.synthesizeFailed
         }
 

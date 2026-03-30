@@ -70,8 +70,7 @@ final class OpenAITTS: CloudTTSBase {
             if httpResponse.statusCode == 429 {
                 throw OpenAITTSError.rateLimited
             }
-            let bodyStr = String(data: data, encoding: .utf8) ?? "unknown"
-            log.error("OpenAI TTS HTTP \(httpResponse.statusCode): \(bodyStr, privacy: .public)")
+            log.error("OpenAI TTS HTTP \(httpResponse.statusCode, privacy: .public) (\(data.count, privacy: .public) bytes)")
             throw OpenAITTSError.synthesizeFailed
         }
 

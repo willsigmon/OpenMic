@@ -6,8 +6,12 @@ actor KeychainManager {
     private var inMemoryStore: [String: String]
 
     init(service: String = "com.willsigmon.openmic") {
+        // .whenUnlocked requires the device to be actively unlocked before keys
+        // can be read. .afterFirstUnlock would allow background access to API keys
+        // even when the screen is locked, which is unnecessary and broadens the
+        // attack surface if the device is lost or a malicious background process runs.
         self.keychain = Keychain(service: service)
-            .accessibility(.afterFirstUnlock)
+            .accessibility(.whenUnlocked)
         self.inMemoryStore = [:]
     }
 

@@ -13,29 +13,23 @@ final class RealtimeAudioIO {
     let audioLevelStream: AsyncStream<Float>
 
     /// PCM16 mono at 24kHz — required by OpenAI Realtime API
-    static var captureFormat: AVAudioFormat {
-        guard let format = AVAudioFormat(
+    static var captureFormat: AVAudioFormat? {
+        AVAudioFormat(
             commonFormat: .pcmFormatInt16,
             sampleRate: 24000,
             channels: 1,
             interleaved: true
-        ) else {
-            fatalError("Failed to create PCM16 mono 24kHz capture AVAudioFormat — check AVFoundation availability")
-        }
-        return format
+        )
     }
 
     /// Playback format matches capture
-    static var playbackFormat: AVAudioFormat {
-        guard let format = AVAudioFormat(
+    static var playbackFormat: AVAudioFormat? {
+        AVAudioFormat(
             commonFormat: .pcmFormatInt16,
             sampleRate: 24000,
             channels: 1,
             interleaved: true
-        ) else {
-            fatalError("Failed to create PCM16 mono 24kHz playback AVAudioFormat — check AVFoundation availability")
-        }
-        return format
+        )
     }
 
     init() {
@@ -50,14 +44,24 @@ final class RealtimeAudioIO {
 
     // MARK: - Start Capture
 
+    enum CaptureError: LocalizedError {
+        case formatUnavailable
+        var errorDescription: String? { "PCM16 24 kHz audio format is unavailable on this device" }
+    }
+
     func startCapture(onChunk: @escaping (Data) -> Void) throws {
+        guard let captureFormat = Self.captureFormat,
+              let playbackFormat = Self.playbackFormat else {
+            throw CaptureError.formatUnavailable
+        }
+
         self.onAudioChunk = onChunk
 
         engine.attach(playerNode)
         engine.connect(
             playerNode,
             to: engine.mainMixerNode,
-            format: Self.playbackFormat
+            format: playbackFormat
         )
 
         let inputNode = engine.inputNode
@@ -66,7 +70,6 @@ final class RealtimeAudioIO {
         // Capture continuations and closures by value to avoid data races:
         // the tap block fires on a private audio thread, not on MainActor.
         let audioLevelContinuation = self.audioLevelContinuation
-        let captureFormat = Self.captureFormat
 
         // Install tap on mic input
         inputNode.installTap(
@@ -104,11 +107,11 @@ final class RealtimeAudioIO {
     // MARK: - Play Audio Chunk
 
     func playAudioChunk(_ data: Data) {
-        guard !data.isEmpty else { return }
+        guard !data.isEmpty, let playbackFormat = Self.playbackFormat else { return }
 
         let frameCount = UInt32(data.count) / 2 // PCM16 = 2 bytes per sample
         guard let buffer = AVAudioPCMBuffer(
-            pcmFormat: Self.playbackFormat,
+            pcmFormat: playbackFormat,
             frameCapacity: frameCount
         ) else { return }
 
@@ -136,7 +139,7 @@ final class RealtimeAudioIO {
     private static func convertToPCM16Static(
         buffer: AVAudioPCMBuffer,
         from sourceFormat: AVAudioFormat,
-        to captureFormat: AVAudioFormat
+        to captureFormat: AVAudioFormat     // guaranteed non-nil by caller
     ) -> Data? {
         guard let converter = AVAudioConverter(
             from: sourceFormat,

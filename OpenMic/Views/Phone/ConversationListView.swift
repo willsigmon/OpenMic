@@ -14,6 +14,9 @@ struct ConversationListView: View {
     @State private var conversationToDelete: Conversation?
     @State private var searchText = ""
     @State private var navBarOpacity: Double = 0
+    /// True for one render cycle so SwiftData has a chance to deliver the
+    /// initial @Query results before we decide to show empty state vs content.
+    @State private var isInitialLoad = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var heroNamespace
 
@@ -33,12 +36,22 @@ struct ConversationListView: View {
                 OpenMicTheme.Colors.background.ignoresSafeArea()
 
                 Group {
-                    if conversations.isEmpty {
+                    if isInitialLoad {
+                        conversationListSkeletons
+                    } else if conversations.isEmpty {
                         emptyState
                     } else if filteredConversations.isEmpty {
                         noResultsState
                     } else {
                         conversationList
+                    }
+                }
+                .task {
+                    // One frame yield — lets SwiftData flush the initial @Query result
+                    // before we switch from skeletons to real content or empty state.
+                    try? await Task.sleep(for: .milliseconds(120))
+                    withAnimation(OpenMicTheme.Animation.standard) {
+                        isInitialLoad = false
                     }
                 }
             }
@@ -73,6 +86,19 @@ struct ConversationListView: View {
             } message: {
                 Text("This conversation will be permanently deleted.")
             }
+        }
+    }
+
+    @ViewBuilder
+    private var conversationListSkeletons: some View {
+        ScrollView {
+            LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
+                ForEach(0..<6, id: \.self) { index in
+                    ConversationRowSkeleton(index: index)
+                }
+            }
+            .padding(.horizontal, OpenMicTheme.Spacing.md)
+            .padding(.top, OpenMicTheme.Spacing.sm)
         }
     }
 

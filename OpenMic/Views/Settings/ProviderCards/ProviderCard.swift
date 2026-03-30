@@ -60,9 +60,12 @@ struct ProviderCard: View {
                         }
 
                         if hasKey {
-                            Image(systemName: "checkmark.seal.fill")
-                                .font(.system(size: 14))
-                                .foregroundStyle(OpenMicTheme.Colors.success)
+                            AnimatedCheckmark(
+                                isComplete: hasKey,
+                                size: 22,
+                                color: OpenMicTheme.Colors.success,
+                                lineWidth: 2
+                            )
                         }
                     }
 

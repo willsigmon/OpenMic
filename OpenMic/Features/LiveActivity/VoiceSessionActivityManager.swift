@@ -24,7 +24,7 @@ final class NoOpVoiceSessionActivityManager: VoiceSessionActivityManaging {
 
 #if canImport(ActivityKit) && os(iOS)
 
-import ActivityKit
+@preconcurrency import ActivityKit
 import os.log
 
 private let logger = Logger(subsystem: "com.willsigmon.openmic", category: "VoiceSessionActivityManager")
@@ -113,7 +113,7 @@ final class VoiceSessionActivityManager: VoiceSessionActivityManaging {
     ///   - voiceState: The new `VoiceSessionState`.
     ///   - messageCount: The running total of messages in this session.
     func updateState(_ voiceState: VoiceSessionState, messageCount: Int) async {
-        guard let activity else { return }
+        guard activity != nil else { return }
         self.messageCount = messageCount
 
         let stateString: String
@@ -131,7 +131,7 @@ final class VoiceSessionActivityManager: VoiceSessionActivityManaging {
             messageCount: messageCount
         )
 
-        await activity.update(ActivityContent(state: updatedState, staleDate: nil))
+        await self.activity?.update(ActivityContent(state: updatedState, staleDate: nil))
     }
 
     /// End the Live Activity when the pipeline stops.
@@ -143,14 +143,14 @@ final class VoiceSessionActivityManager: VoiceSessionActivityManaging {
 
     private func startElapsedTimer() {
         elapsedTask?.cancel()
-        elapsedTask = Task { [weak self] in
+        elapsedTask = Task { @MainActor [weak self] in
             // Update the elapsed counter every 5 seconds while the session is alive.
             // ActivityKit's 4 KB update budget makes frequent ticks cheap here
             // since ContentState is tiny.
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(5))
-                guard let self, let activity = self.activity,
-                      !Task.isCancelled else { break }
+                guard let self, !Task.isCancelled else { break }
+                guard let activity = self.activity else { break }
                 let elapsed = self.sessionStart.map { Int(Date().timeIntervalSince($0)) } ?? 0
                 let current = activity.content.state
                 let updated = VoiceSessionAttributes.ContentState(
@@ -166,14 +166,14 @@ final class VoiceSessionActivityManager: VoiceSessionActivityManaging {
     private func endSessionIfNeeded() async {
         elapsedTask?.cancel()
         elapsedTask = nil
-        guard let activity else { return }
+        guard activity != nil else { return }
 
         let finalState = VoiceSessionAttributes.ContentState(
             state: "idle",
             elapsedSeconds: sessionStart.map { Int(Date().timeIntervalSince($0)) } ?? 0,
             messageCount: messageCount
         )
-        await activity.end(
+        await self.activity?.end(
             ActivityContent(state: finalState, staleDate: nil),
             dismissalPolicy: .default
         )

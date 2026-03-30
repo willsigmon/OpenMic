@@ -105,6 +105,12 @@ struct APIKeySettingsView: View {
                                 : "Managed mode recommended. Keys are optional."
                         )
 
+                        if viewModel == nil {
+                            ForEach(0..<3, id: \.self) { _ in
+                                ProviderCardSkeleton()
+                            }
+                        }
+
                         ForEach(Array(visibleCloudProviders.enumerated()), id: \.element.id) { index, provider in
                             if let viewModel {
                                 ProviderCard(

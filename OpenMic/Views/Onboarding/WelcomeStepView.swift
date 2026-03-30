@@ -11,10 +11,11 @@ struct WelcomeStepView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            OpenMicTheme.Colors.background.ignoresSafeArea()
+            // Background: animated mesh gradient (iOS 18+) / blob fallback (iOS 17)
+            AnimatedMeshBackground()
+                .ignoresSafeArea()
 
-            // Ambient orbs
+            // Ambient orbs still run on top for light-mode depth
             ambientOrbs
 
             VStack(spacing: OpenMicTheme.Spacing.xxl) {

@@ -213,6 +213,15 @@ struct ReadyStepView: View {
                     } animation: { phase in
                         phase.animation
                     }
+
+                    // Animated stroke ring reinforces completion moment
+                    AnimatedCheckmark(
+                        isComplete: showCheck,
+                        size: 108,
+                        color: OpenMicTheme.Colors.success,
+                        lineWidth: 2.5
+                    )
+                    .opacity(showCheck ? 1 : 0)
                 }
 
                 VStack(spacing: OpenMicTheme.Spacing.sm) {

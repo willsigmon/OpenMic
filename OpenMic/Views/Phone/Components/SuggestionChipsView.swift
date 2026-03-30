@@ -4,6 +4,7 @@ struct SuggestionChipsView: View {
     let suggestions: [PromptSuggestions.Suggestion]
     let onTap: (PromptSuggestions.Suggestion) -> Void
     let onRefresh: (() -> Void)?
+    var isLoading: Bool = false
 
     @State private var appeared = false
 
@@ -23,21 +24,29 @@ struct SuggestionChipsView: View {
                     .font(OpenMicTheme.Typography.callout)
                     .foregroundStyle(OpenMicTheme.Colors.textSecondary)
             }
-            .opacity(appeared ? 1 : 0)
+            .opacity(appeared && !isLoading ? 1 : 0)
 
-            LazyVGrid(columns: gridColumns, spacing: 10) {
-                ForEach(Array(suggestions.enumerated()), id: \.element.id) { index, suggestion in
-                    PromptCard(suggestion: suggestion) {
-                        Haptics.tap()
-                        onTap(suggestion)
+            if isLoading {
+                LazyVGrid(columns: gridColumns, spacing: 10) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        SuggestionChipSkeleton()
                     }
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 16)
-                    .animation(
-                        .spring(response: 0.45, dampingFraction: 0.82)
-                            .delay(Double(index) * 0.05),
-                        value: appeared
-                    )
+                }
+            } else {
+                LazyVGrid(columns: gridColumns, spacing: 10) {
+                    ForEach(Array(suggestions.enumerated()), id: \.element.id) { index, suggestion in
+                        PromptCard(suggestion: suggestion) {
+                            Haptics.tap()
+                            onTap(suggestion)
+                        }
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 16)
+                        .animation(
+                            .spring(response: 0.45, dampingFraction: 0.82)
+                                .delay(Double(index) * 0.05),
+                            value: appeared
+                        )
+                    }
                 }
             }
 

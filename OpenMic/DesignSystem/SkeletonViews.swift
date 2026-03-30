@@ -43,7 +43,7 @@ struct ConversationRowSkeleton: View {
 struct SuggestionChipSkeleton: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color.quaternary)
+            .fill(.quaternary)
             .frame(height: 96)
             .shimmer()
     }

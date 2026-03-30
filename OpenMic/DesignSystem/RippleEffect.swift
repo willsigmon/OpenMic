@@ -24,7 +24,7 @@ public struct RippleEffectModifier: ViewModifier {
     @State private var ripples: [RippleData] = []
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    public init(color: Color = OpenMicTheme.Colors.accent, duration: Double = 0.55) {
+    public init(color: Color = .cyan, duration: Double = 0.55) {
         self.color = color
         self.duration = duration
     }
@@ -85,7 +85,7 @@ public extension View {
     /// Defaults to the OpenMic cyan accent.
     /// Does not consume the tap — safe to combine with Button or .onTapGesture.
     func rippleEffect(
-        color: Color = OpenMicTheme.Colors.accent,
+        color: Color = .cyan,
         duration: Double = 0.55
     ) -> some View {
         modifier(RippleEffectModifier(color: color, duration: duration))

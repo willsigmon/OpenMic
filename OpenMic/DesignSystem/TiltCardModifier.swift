@@ -29,6 +29,9 @@ struct TiltCardModifier: ViewModifier {
                 axis: (x: 1, y: 0, z: 0)
             )
             .animation(.interactiveSpring, value: rotation)
+            .onChange(of: reduceMotion) { _, reduced in
+                if reduced { rotation = .zero }
+            }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 12)
                     .onChanged { value in

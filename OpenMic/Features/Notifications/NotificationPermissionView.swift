@@ -75,6 +75,7 @@ struct NotificationPermissionView: View {
         .scaleEffect(iconScale)
         .opacity(iconOpacity)
         .glow(color: OpenMicTheme.Colors.glowCyan, radius: 16)
+        .accessibilityHidden(true)
     }
 
     // MARK: - Header
@@ -92,6 +93,7 @@ struct NotificationPermissionView: View {
                 .multilineTextAlignment(.center)
         }
         .opacity(contentOpacity)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Value Prop Card
@@ -138,6 +140,7 @@ struct NotificationPermissionView: View {
                 .foregroundStyle(color)
                 .frame(width: 38, height: 38)
                 .background(color.opacity(0.12), in: Circle())
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -149,6 +152,8 @@ struct NotificationPermissionView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(subtitle)")
     }
 
     // MARK: - Action Buttons
@@ -160,11 +165,13 @@ struct NotificationPermissionView: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "bell.badge.fill")
+                        .accessibilityHidden(true)
                     Text("Enable Notifications")
                         .font(OpenMicTheme.Typography.headline)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
                 .padding(.vertical, 16)
                 .background(
                     OpenMicTheme.Gradients.accent,
@@ -175,6 +182,8 @@ struct NotificationPermissionView: View {
             .disabled(isRequesting)
             .animation(OpenMicTheme.Animation.springy, value: isRequesting)
             .glow(color: OpenMicTheme.Colors.glowCyan, isActive: !isRequesting)
+            .accessibilityLabel("Enable Notifications")
+            .accessibilityHint("Requests permission to send push notifications")
 
             Button {
                 markSeenAndDismiss()
@@ -182,9 +191,12 @@ struct NotificationPermissionView: View {
                 Text("Not Now")
                     .font(OpenMicTheme.Typography.callout)
                     .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                    .frame(minHeight: 44)
                     .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Not Now")
+            .accessibilityHint("Dismisses this screen without enabling notifications")
 
             Text("You can enable notifications anytime in Settings.")
                 .font(OpenMicTheme.Typography.micro)

@@ -147,6 +147,7 @@ struct TopicsView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 36, weight: .light))
                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
+                .accessibilityHidden(true)
 
             Text("No topics found")
                 .font(OpenMicTheme.Typography.headline)
@@ -157,5 +158,7 @@ struct TopicsView: View {
                 .foregroundStyle(OpenMicTheme.Colors.textTertiary)
         }
         .padding(.top, OpenMicTheme.Spacing.xxxl)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No topics found. Try a different search term.")
     }
 }

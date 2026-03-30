@@ -32,10 +32,6 @@ struct TypewriterModifier: ViewModifier {
             if showCursor && !reduceMotion {
                 Text("|")
                     .opacity(cursorOpacity)
-                    .animation(
-                        .easeInOut(duration: 0.5).repeatForever(autoreverses: true),
-                        value: cursorOpacity
-                    )
             }
         }
         .onAppear { startTypewriter() }
@@ -66,9 +62,15 @@ struct TypewriterModifier: ViewModifier {
                     try? await Task.sleep(for: .milliseconds(Int(speed * 1_000)))
                 }
             }
-            // Reveal complete — show blinking cursor, fade it after 1s
+            // Reveal complete — show blinking cursor, then fade out after 1s
             showCursor = true
-            cursorOpacity = 0
+            // Defer the opacity toggle one frame so the Text has rendered
+            // before the repeating animation begins.
+            try? await Task.sleep(for: .milliseconds(16))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                cursorOpacity = 0
+            }
             try? await Task.sleep(for: .seconds(1))
             guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: 0.4)) {

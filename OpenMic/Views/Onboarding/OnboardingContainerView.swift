@@ -78,10 +78,12 @@ struct OnboardingContainerView: View {
                                 .frame(width: 36, height: 36)
                                 .glassBackground(cornerRadius: OpenMicTheme.Radius.pill)
                         }
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                         .accessibilityLabel("Go back")
                         .transition(.opacity)
                     } else {
-                        Color.clear.frame(width: 36, height: 36)
+                        Color.clear.frame(width: 44, height: 44)
                     }
 
                     Spacer()

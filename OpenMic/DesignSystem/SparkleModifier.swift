@@ -9,6 +9,7 @@ struct SparkleModifier: ViewModifier {
 
     @State private var scale: CGFloat = 1.0
     @State private var sparkles: [SparkleParticle] = []
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
@@ -20,9 +21,11 @@ struct SparkleModifier: ViewModifier {
                         .frame(width: sparkle.size, height: sparkle.size)
                         .offset(sparkle.offset)
                         .opacity(sparkle.opacity)
+                        .accessibilityHidden(true)
                 }
             }
             .onChange(of: isActive) { _, active in
+                guard !reduceMotion else { return }
                 if active { trigger() }
             }
     }
@@ -72,7 +75,8 @@ struct SparkleModifier: ViewModifier {
         }
 
         // Cleanup
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(500))
             sparkles = []
         }
     }

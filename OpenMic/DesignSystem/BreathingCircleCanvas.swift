@@ -90,6 +90,14 @@ struct BreathingCircleCanvas: View {
         .onChange(of: isActive) { _, active in
             updateAnimation(active: active)
         }
+        .onChange(of: reduceMotion) { _, reduced in
+            // If the user enables Reduce Motion mid-session, stop the animation immediately.
+            if reduced {
+                stopBreathing()
+            } else {
+                updateAnimation(active: isActive)
+            }
+        }
         .onAppear {
             updateAnimation(active: isActive)
         }

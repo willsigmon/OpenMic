@@ -91,14 +91,16 @@ struct ConversationListView: View {
 
     @ViewBuilder
     private var conversationListSkeletons: some View {
-        ScrollView {
-            LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
-                ForEach(0..<6, id: \.self) { index in
-                    ConversationRowSkeleton(index: index)
+        SkeletonLoadingContainer(label: "Loading conversations") {
+            ScrollView {
+                LazyVStack(spacing: OpenMicTheme.Spacing.sm) {
+                    ForEach(0..<6, id: \.self) { index in
+                        ConversationRowSkeleton(index: index)
+                    }
                 }
+                .padding(.horizontal, OpenMicTheme.Spacing.md)
+                .padding(.top, OpenMicTheme.Spacing.sm)
             }
-            .padding(.horizontal, OpenMicTheme.Spacing.md)
-            .padding(.top, OpenMicTheme.Spacing.sm)
         }
     }
 

@@ -246,6 +246,7 @@ private struct ShakePromptIndicatorView: View {
                     )
                 )
                 .symbolEffect(.bounce, value: iconPhase)
+                .accessibilityHidden(true)
 
             Text("Random prompt loaded")
                 .font(OpenMicTheme.Typography.headline)
@@ -255,6 +256,9 @@ private struct ShakePromptIndicatorView: View {
         .background(.ultraThickMaterial, in: RoundedRectangle(cornerRadius: OpenMicTheme.Radius.xl))
         .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
         .onAppear { iconPhase = true }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Random prompt loaded")
+        .accessibilityAddTraits(.isStaticText)
     }
 }
 
@@ -347,8 +351,7 @@ struct OpenMicInteractiveEmptyStateModifier: ViewModifier {
             Haptics.success()
 
         default:
-            if tapCount % 2 == 0 {
-                guard !reduceMotion else { return }
+            if tapCount % 2 == 0 && !reduceMotion {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     rotation += 360
                     scale = 1.1

@@ -34,6 +34,22 @@ struct ConversationRowSkeleton: View {
             }
         }
         .opacity(1.0 - Double(index) * 0.04)
+        .accessibilityHidden(true)
+    }
+}
+
+// MARK: - Loading Announcement Wrapper
+//
+// Wrap a list of skeletons in this view to give VoiceOver a single, meaningful
+// announcement instead of reading each skeleton shape.
+struct SkeletonLoadingContainer<Content: View>: View {
+    let label: String
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        content()
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
     }
 }
 
@@ -46,6 +62,7 @@ struct SuggestionChipSkeleton: View {
             .fill(.quaternary)
             .frame(height: 96)
             .shimmer()
+            .accessibilityHidden(true)
     }
 }
 

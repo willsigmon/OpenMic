@@ -5,6 +5,7 @@ struct MainTabView: View {
     @State private var pendingPrompt: String?
     @State private var pendingConversation: Conversation?
     @State private var launchVoice = false
+    @State private var micActivityState: MicActivityState = .idle
     @AppStorage("hasSeenNotificationAsk") private var hasSeenNotificationAsk = false
     @AppStorage("hasSeenSpotlight") private var hasSeenSpotlight = false
     @State private var showNotificationPermission = false
@@ -27,7 +28,10 @@ struct MainTabView: View {
             ConversationView(
                 initialPrompt: $pendingPrompt,
                 resumeConversation: $pendingConversation,
-                autoStartVoice: $launchVoice
+                autoStartVoice: $launchVoice,
+                onVoiceStateChange: { isActive in
+                    micActivityState = isActive ? .active : .idle
+                }
             )
                 .tabItem {
                     Label("Talk", systemImage: "mic.fill")
@@ -77,7 +81,7 @@ struct MainTabView: View {
             OpenMicAnimatedTabBar(
                 selection: $selectedTab,
                 tabs: Self.tabItems,
-                micState: .idle  // Wire to VoiceSession state at the call site when available
+                micState: micActivityState
             )
         }
         .toastOverlay()
@@ -89,17 +93,20 @@ struct MainTabView: View {
             NotificationPermissionView()
         }
         .task {
+            // Spotlight tour fires first (800ms). Notification ask waits until after
+            // the tour finishes or at least clears the initial delay (2.5s total),
+            // preventing both overlays from appearing simultaneously.
+            if !hasSeenSpotlight {
+                try? await Task.sleep(for: .milliseconds(800))
+                hasSeenSpotlight = true
+                spotlightCoordinator?.startTour(.firstRun)
+                // Give the tour enough time to be visible before the sheet can appear
+                try? await Task.sleep(for: .milliseconds(1700))
+            } else {
+                try? await Task.sleep(for: .milliseconds(1200))
+            }
             guard !hasSeenNotificationAsk else { return }
-            // Small delay so the main UI is visible before the sheet appears
-            try? await Task.sleep(for: .milliseconds(1200))
             showNotificationPermission = true
-        }
-        // Spotlight tour: shown once after onboarding completes
-        .task {
-            guard !hasSeenSpotlight else { return }
-            try? await Task.sleep(for: .milliseconds(800))
-            hasSeenSpotlight = true
-            spotlightCoordinator?.startTour(.firstRun)
         }
     }
 

@@ -206,7 +206,7 @@ struct OpenMicAnimatedTabBar: View {
                 }
 
                 Text(tab.title)
-                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                    .font(.system(.caption2, design: .default).weight(isSelected ? .semibold : .regular))
                     .foregroundStyle(
                         isSelected
                             ? OpenMicTheme.Colors.accentGradientStart
@@ -268,7 +268,7 @@ struct OpenMicAnimatedTabBar: View {
             }
 
             Text(tab.title)
-                .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                .font(.system(.caption2, design: .default).weight(isSelected ? .semibold : .regular))
                 .foregroundStyle(
                     isSelected
                         ? OpenMicTheme.Colors.accentGradientStart
@@ -374,7 +374,7 @@ private struct OpenMicTabBadge: View {
     var body: some View {
         if count > 0 {
             Text(count > 99 ? "99+" : "\(count)")
-                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .font(.system(.caption2, design: .rounded).weight(.bold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, count > 9 ? 5 : 0)
                 .frame(minWidth: 16, minHeight: 16)

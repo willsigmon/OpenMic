@@ -220,6 +220,10 @@ enum OpenMicTheme {
     }
 
     // MARK: - Typography
+    //
+    // All sizes use Apple's Dynamic Type text styles so they scale with
+    // the user's preferred content size. Never use `.system(size:)` directly
+    // in views — consume these tokens instead.
 
     enum Typography {
         static let heroTitle = Font.system(.largeTitle, design: .rounded).weight(.bold)
@@ -228,7 +232,8 @@ enum OpenMicTheme {
         static let body = Font.system(.subheadline)
         static let callout = Font.system(.footnote).weight(.medium)
         static let caption = Font.system(.caption).weight(.medium)
-        static let micro = Font.system(size: 10, weight: .semibold)
+        /// Smallest label style. Maps to `.caption2` for proper Dynamic Type scaling.
+        static let micro = Font.system(.caption2).weight(.semibold)
 
         static let statusLabel = Font.system(.footnote, design: .rounded).weight(.semibold)
             .monospacedDigit()

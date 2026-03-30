@@ -8,6 +8,9 @@ struct ConversationView: View {
     @Binding var initialPrompt: String?
     @Binding var resumeConversation: Conversation?
     @Binding var autoStartVoice: Bool
+    /// Called whenever the voice session active state changes.
+    /// Used to keep the tab bar mic icon in sync when the user is on another tab.
+    var onVoiceStateChange: ((Bool) -> Void)?
     @Environment(AppServices.self) private var appServices
     @AppStorage("audioOutputMode") private var audioOutputMode = AudioOutputMode.defaultMode.rawValue
     @AppStorage("hasSeenNotificationAsk") private var hasSeenNotificationAsk = false
@@ -256,6 +259,8 @@ struct ConversationView: View {
             )
         }
         .onChange(of: vm.voiceState) { oldState, newState in
+            // Keep tab bar mic icon in sync regardless of which tab is selected
+            onVoiceStateChange?(newState.isActive)
             // Haptic per state transition with sound companions
             Haptics.voiceStateChanged(to: newState)
             switch newState {
@@ -301,7 +306,8 @@ struct ConversationView: View {
         .onAppear {
             refreshSuggestions()
             // Delayed entrance
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.5))
                 withAnimation(OpenMicTheme.Animation.smooth) {
                     showSuggestions = true
                 }
@@ -365,7 +371,8 @@ struct ConversationView: View {
             // Only sparkle if it wasn't the initial provider assignment
             guard vm.conversation != nil else { return }
             sparkleProviderSwitch = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(100))
                 sparkleProviderSwitch = false
             }
         }
@@ -427,6 +434,8 @@ struct ConversationView: View {
                 }
             } label: {
                 ProviderBadge(provider: vm.activeProvider)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .sparkle(when: sparkleProviderSwitch)

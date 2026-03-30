@@ -13,6 +13,7 @@ struct CelebrationParticleView: View {
     @State private var particles: [CelebrationParticle] = []
     @State private var startDate: Date = .distantFuture
     @State private var isActive = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(particleCount: Int = 40) {
         self.particleCount = particleCount
@@ -69,7 +70,10 @@ struct CelebrationParticleView: View {
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
-        .onAppear { launch() }
+        .onAppear {
+            guard !reduceMotion else { return }
+            launch()
+        }
     }
 
     // MARK: - Launch

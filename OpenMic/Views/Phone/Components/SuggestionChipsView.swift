@@ -69,6 +69,8 @@ struct SuggestionChipsView: View {
             }
         }
         .accessibilityIdentifier(AppAccessibilityID.conversationSuggestions)
+        .accessibilityElement(children: isLoading ? .ignore : .contain)
+        .accessibilityLabel(isLoading ? "Loading suggestions" : "")
         .onAppear {
             withAnimation {
                 appeared = true

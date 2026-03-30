@@ -120,6 +120,7 @@ private struct ContextualTooltipModifier: ViewModifier {
 
     @AppStorage private var hasSeen: Bool
     @State private var showTooltip = false
+    @State private var tooltipTask: Task<Void, Never>?
 
     init(id: String, text: String, edge: TooltipEdge, condition: Bool) {
         self.id = id
@@ -143,18 +144,26 @@ private struct ContextualTooltipModifier: ViewModifier {
             }
             .onAppear {
                 guard condition, !hasSeen else { return }
-                Task { @MainActor in
+                tooltipTask = Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(800))
+                    guard !Task.isCancelled else { return }
                     withAnimation(.spring(response: 0.45, dampingFraction: 0.72)) {
                         showTooltip = true
                     }
                     try? await Task.sleep(for: .seconds(3))
+                    guard !Task.isCancelled else { return }
                     dismiss()
                 }
+            }
+            .onDisappear {
+                tooltipTask?.cancel()
+                tooltipTask = nil
             }
     }
 
     private func dismiss() {
+        tooltipTask?.cancel()
+        tooltipTask = nil
         withAnimation(.easeOut(duration: 0.2)) {
             showTooltip = false
         }

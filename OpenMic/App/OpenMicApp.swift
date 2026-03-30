@@ -55,20 +55,23 @@ private struct AppLaunchFailureView: View {
     let message: String
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: OpenMicTheme.Spacing.md) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 40))
+                .font(OpenMicTheme.Typography.heroTitle)
                 .foregroundStyle(.yellow)
+                .accessibilityHidden(true)
             Text("OpenMic couldn't launch")
-                .font(.title3.bold())
+                .font(OpenMicTheme.Typography.title)
             Text(message)
-                .font(.footnote)
+                .font(OpenMicTheme.Typography.callout)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("OpenMic couldn't launch. \(message)")
         .accessibilityIdentifier(AppAccessibilityID.rootFailure)
     }
 }

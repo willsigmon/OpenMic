@@ -108,8 +108,8 @@ targets:
         CODE_SIGN_ENTITLEMENTS: OpenMic/Resources/OpenMic.entitlements
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 49HAGQE8FB
-        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild
-        PRODUCT_NAME: OpenMic iOS Build
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic
+        PRODUCT_NAME: OpenMic
         PRODUCT_MODULE_NAME: OpenMic
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "9"
@@ -252,11 +252,11 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: "18.6"
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_NAME: OpenMicTestsiOS
-        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.tests.ios
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OpenMic iOS Build.app/OpenMic iOS Build"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OpenMic.app/OpenMic"
         BUNDLE_LOADER: "$(TEST_HOST)"
         LD_RUNPATH_SEARCH_PATHS:
           - "$(inherited)"
@@ -297,7 +297,7 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: "18.6"
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_NAME: OpenMicUITestsiOS
-        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.iosbuild.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.willsigmon.openmic.uitests.ios
         SDKROOT: iphoneos
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: x86_64

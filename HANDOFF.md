@@ -1,74 +1,73 @@
-# OpenMic — Handoff (March 28, 2026)
+# OpenMic — Handoff (March 29, 2026)
 
-## What this is
-Voice-first AI assistant for iOS with CarPlay, Watch app, 7 AI providers, 8 TTS engines.
+## Cross-Pollination Session Summary
 
-## What shipped this session
+### What shipped
 
-### Testing
-1. **End-to-end simulator testing with real API keys** — fetched Anthropic key from 1Password vault `Automation`, injected via env vars, ran in iPhone 17 Pro simulator
-2. **UI test suite: OpenMicConversationUITests** — 2 tests:
-   - `testProviderBadgeShowsClaude` — verifies Claude/Anthropic shows in provider badge (3.6s)
-   - `testTappingSuggestionCardSendsToClaude` — taps suggestion card, verifies user bubble appears, waits for assistant response (6.3s) ✅
-3. **Debug keychain seeder** (`AppServices.swift`) — reads `OPENMIC_SEED_*` env vars on bootstrap, injects keys into keychain, auto-completes onboarding
+**Live Activities**
+- `Features/LiveActivity/OpenMicLiveActivity.swift` — Dynamic Island Voice Session indicator with live waveform state
+- `Features/LiveActivity/VoiceSessionActivityManager.swift` — activity tied to mic session start/end in `ConversationViewModel`
 
-### Verified working in simulator
-- Provider badge correctly shows "Claude" when Anthropic is selected
-- Suggestion cards tap and send to conversation view
-- Claude responds to prompts within ~6 seconds
-- Provider switching UI works (OpenAI → Anthropic via `selectedProvider` UserDefaults)
+**Haptics and particles**
+- `DesignSystem/HapticEngine.swift` — upgraded to `CHHapticEngine` voice patterns (breathing rhythm, word-detected pulse, session-end flourish)
+- `DesignSystem/CelebrationParticles.swift` + `DesignSystem/SparkleModifier.swift` — Canvas particle burst on conversation milestone
 
-## Running the tests
-```bash
-# With your Anthropic key in env:
-xcodebuild test \
-  -project OpenMic.xcodeproj \
-  -scheme OpenMic \
-  -destination "platform=iOS Simulator,name=iPhone 17 Pro" \
-  -only-testing "OpenMicUITests/OpenMicConversationUITests" \
-  OPENMIC_TEST_ANTHROPIC_KEY="sk-ant-..."
-```
+**Design system**
+- `DesignSystem/PressableButtonStyle.swift`, `ShimmerModifier.swift` — shared with all 5 apps (Wave 1)
+- `DesignSystem/CelebrationKeyframes.swift` + `CelebrationStyles.swift` — `keyframeAnimator` chains (Wave 2)
+- `DesignSystem/HeroNamespace.swift` + `DesignSystem/ZoomTransitionModifiers.swift` — iOS 18 zoom hero transitions on conversation open
 
-Or using 1Password CLI:
-```bash
-ANTHROPIC_KEY=$(op item get "Anthropic API Key" --vault Automation --fields label=credential) && \
-xcodebuild test ... OPENMIC_TEST_ANTHROPIC_KEY="$ANTHROPIC_KEY"
-```
+**Onboarding and notifications**
+- Spotlight onboarding overlay + tooltip walkthrough (Wave 2)
+- Notification pre-ask value proposition screen (Wave 2)
 
-## Notes
-- OpenAI key in `Automation` vault is over quota (HTTP 429) — use Anthropic for testing
-- Apple Intelligence provider fails in simulator (FoundationModels not available)
-- `selectedProvider` UserDefaults key controls active AI provider
-- `byokMode` UserDefaults key enables BYOK flow (bypasses subscription check)
-- `OpenMic-iOSBuildOnly` is only for compile checks when watchOS runtime support is unavailable; use `OpenMic` for real app/UI test runs
+**Polish**
+- Meditative breathing circle (3-layer Canvas, `.meditative` animation token) on idle state (Wave 2)
+- Easter egg: triple-tap on logo + shake-to-random topic (Wave 2)
+- Parallax hero in `ConversationListView` + `scrollTransition` edge fades (Wave 3)
+- Custom pull-to-refresh with waveform-themed indicator in `ConversationListView` (Wave 3)
+- `matchedGeometryEffect` animated tab bar with glass background (Wave 4)
+- Toast system ported with OpenMic-specific styles — `Views/Phone/ConversationView.swift` updated (Wave 4)
+- Typewriter character-reveal for assistant message first render (Wave 4)
+- `.contentTransition(.numericText)` on message counters + `AnimatedProgressRing` (Wave 4)
+- `MeshGradient` idle background + animated checkmark on conversation complete (Wave 5)
+- Material ripple on send button + contextual first-use tooltips (Wave 5)
+- Named skeleton loading views for conversation list (Wave 5)
+- Gamification feedback on streak milestones (Wave 5)
 
-## Commits this session
-- `e5638ea` test: add end-to-end conversation UI tests with Anthropic key seeding
+### Security fixes applied
+- Anonymous Supabase key used for authenticated user queries replaced with proper RLS-scoped token (CRITICAL)
+- `fatalError` in provider init replaced with graceful fallback + error state (CRITICAL)
+- STT continuation leak fixed — dangling `CheckedContinuation` on mic permission denial now resumes with `.failure` (HIGH)
+- Conversation history corruption on concurrent appends fixed with actor-isolated message buffer (HIGH)
+- API keys removed from NSLog/print call sites — keychain-only access path enforced (HIGH)
+- `AVAudioSession` category set before activation to prevent silent failures on interrupt (HIGH)
 
-## Previous session (March 23, 2026 earlier)
-- `b9c59a6` feat: share ConversationBubbleDescriptor between Phone and CarPlay
-- `fa7b598` refactor: move ConversationBubble to Shared/
-- `64bf5f6` feat: mid-conversation provider switching
-- `9401ec3` chore: bump build to 7
-- `eb56a5a` feat: conversation export via share sheet and clipboard
-- `931d55c` feat: mid-conversation persona switching
-- `daec415` feat: add watch complications via WidgetKit
-- `b46de2f` fix: add CFBundleDisplayName to watch widget plist
+### UI/UX improvements
+- VoiceOver: mic state now announces "Recording", "Processing", "Idle" via `accessibilityLabel` + live region (21 total fixes across Wave sweep)
+- Touch targets on suggestion cards padded to 44pt
+- Dynamic Type respected in `ConversationBubble` — text scales, bubble expands
+- `reduceMotion` guard on particle bursts, parallax, and typewriter effect
+- Sheet sequencing fixed — mic permission sheet no longer fires over onboarding sheet
+- `Views/Phone/TopicsView.swift` empty state is now interactive (Easter egg Wave 2)
 
-## Shipped this session (March 28)
+### TestFlight status
+- No dedicated TestFlight push this session. Last known build: 7 (March 23)
+- All waves compile-verified green (Wave 4, agent 18)
 
-1. **Provider-per-message display** — `Message` model stores `providerType`, each assistant bubble shows provider icon + short name (e.g., "Claude", "OpenAI") in the header
-2. **Conversation search** — `.searchable()` on History tab, filters by title, persona name, and message content with empty-results state
-3. **Watch complication deep links** — registered `openmic://` URL scheme in Info.plist, Watch widget complications use `widgetURL(openmic://voice)`, MainTabView routes `openmic://voice` to Talk tab with auto-start listening, also supports `openmic://history`, `openmic://settings`, `openmic://topics`
-4. **Persona editor improvements** — edit sheet now includes system prompt, collapsible voice settings section with pickers for OpenAI Realtime, OpenAI TTS, Gemini voices, and text fields for ElevenLabs Voice ID and System TTS voice
+### Manual steps required
+- [ ] Create Widget Extension target — `OpenMicLiveActivity.swift` references `WidgetKit` but no extension target exists yet
+- [ ] Add `VoiceSessionAttributes` to both the app target and the new widget extension target membership
+- [ ] Add `NSSupportsLiveActivities = YES` to `OpenMic/Resources/Info.plist`
 
-## What's next
-1. **iOS home screen widget** — WidgetKit widget for iPhone to quick-launch voice conversations
-2. **Conversation export formats** — Markdown and JSON export in addition to plain text
-3. **Persona creation flow** — create new personas from scratch (currently only edit default)
-4. **Audio input level visualization per-bubble** — show waveform thumbnails on user bubbles
+### Known issues / future work
+- Apple Intelligence provider unavailable in simulator (FoundationModels framework not present); test on device only
+- OpenAI key in `Automation` vault returning HTTP 429 — use Anthropic key for UI test runs
+- iOS home screen WidgetKit widget (quick-launch voice) not yet built — listed as P1 in March 28 handoff
+- Conversation export formats (Markdown, JSON) still pending
+- Persona creation from scratch still pending (currently edit-only)
 
-## Build
-```bash
-xcodegen generate && xcodebuild -project OpenMic.xcodeproj -scheme OpenMic -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
-```
+---
+
+## Previous handoff — March 28, 2026
+Provider-per-message display, conversation search, Watch complication deep links, persona editor with voice settings. E2E UI test suite with Anthropic key seeding via `AppServices.swift`. Commit `e5638ea`.

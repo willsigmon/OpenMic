@@ -157,6 +157,7 @@ struct SpotlightCoordinator<Content: View>: View {
                         let rect = geometry[anchor]
                         SpotlightOverlay(
                             targetRect: rect,
+                            containerSize: geometry.size,
                             title: step.title,
                             description: step.description,
                             currentStep: viewModel.currentStepIndex + 1,

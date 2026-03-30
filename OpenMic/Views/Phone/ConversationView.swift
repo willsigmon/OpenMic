@@ -28,6 +28,7 @@ struct ConversationView: View {
     @State private var micOffset: CGSize = .zero
     @State private var micRestPosition: CGSize = .zero
     @State private var isDraggingMic = false
+    @State private var containerSize: CGSize = .zero
 
     // Celebration state
     @State private var showCelebrationParticles = false
@@ -195,6 +196,12 @@ struct ConversationView: View {
             }
         }
         .animation(OpenMicTheme.Animation.bouncy, value: showCelebrationParticles)
+        .background {
+            GeometryReader { geo in
+                Color.clear.onAppear { containerSize = geo.size }
+                    .onChange(of: geo.size) { _, newSize in containerSize = newSize }
+            }
+        }
         .overlay(alignment: .bottomTrailing) {
             MicButton(state: vm.voiceState, action: { vm.toggleListening() }, isDragging: isDraggingMic)
             .offset(x: micRestPosition.width + micOffset.width,
@@ -209,13 +216,13 @@ struct ConversationView: View {
                         micOffset = value.translation
                     }
                     .onEnded { value in
-                        // Clamp to screen bounds to prevent dragging off-screen
-                        let screenWidth = UIScreen.main.bounds.width
-                        let screenHeight = UIScreen.main.bounds.height
+                        // Clamp to container bounds to prevent dragging off-screen.
+                        // Uses containerSize captured via GeometryReader instead of
+                        // the deprecated UIScreen.main.bounds.
                         let maxOffset: CGFloat = 200
                         let newRest = CGSize(
-                            width: max(-screenWidth + maxOffset, min(0, micRestPosition.width + value.translation.width)),
-                            height: max(-screenHeight + maxOffset, min(0, micRestPosition.height + value.translation.height))
+                            width: max(-containerSize.width + maxOffset, min(0, micRestPosition.width + value.translation.width)),
+                            height: max(-containerSize.height + maxOffset, min(0, micRestPosition.height + value.translation.height))
                         )
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0.1)) {
                             micRestPosition = newRest

@@ -12,6 +12,10 @@ struct SpotlightOverlay: View {
     // MARK: - Properties
 
     let targetRect: CGRect
+    /// Container size supplied by the parent GeometryReader. Avoids the
+    /// deprecated UIScreen.main.bounds and is correct for iPad multitasking
+    /// and Stage Manager.
+    let containerSize: CGSize
     let title: String
     let description: String
     let currentStep: Int
@@ -180,11 +184,10 @@ struct SpotlightOverlay: View {
     // MARK: - Tooltip Positioning
 
     private func tooltipPosition(for rect: CGRect) -> CGPoint {
-        let screen = UIScreen.main.bounds
         let tooltipHeight: CGFloat = 210
         let margin: CGFloat = 20
 
-        let spaceBelow = screen.height - rect.maxY - 60
+        let spaceBelow = containerSize.height - rect.maxY - 60
         let spaceAbove = rect.minY - 60
 
         let rawY: CGFloat
@@ -196,14 +199,14 @@ struct SpotlightOverlay: View {
 
         let clampedY = max(
             tooltipHeight / 2 + 50,
-            min(rawY, screen.height - tooltipHeight / 2 - 50)
+            min(rawY, containerSize.height - tooltipHeight / 2 - 50)
         )
 
         // Nudge tooltip horizontally if target is near an edge
         let rawX = rect.midX
         let clampedX = max(
             tooltipMaxWidth / 2 + margin,
-            min(rawX, screen.width - tooltipMaxWidth / 2 - margin)
+            min(rawX, containerSize.width - tooltipMaxWidth / 2 - margin)
         )
 
         return CGPoint(x: clampedX, y: clampedY)

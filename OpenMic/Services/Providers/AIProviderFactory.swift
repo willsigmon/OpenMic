@@ -59,7 +59,7 @@ enum AIProviderFactory {
             )
 
         case .ollama:
-            guard let baseURL = UserDefaults.standard.string(forKey: "ollamaBaseURL"),
+            guard let baseURL = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.ollamaBaseURL),
                   !baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 throw AIProviderError.configurationMissing("Ollama base URL not configured")
             }
@@ -79,7 +79,7 @@ enum AIProviderFactory {
             #endif
 
         case .openclaw:
-            guard let baseURL = UserDefaults.standard.string(forKey: "openclawBaseURL"),
+            guard let baseURL = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.openclawBaseURL),
                   !baseURL.isEmpty else {
                 throw AIProviderError.configurationMissing("OpenClaw base URL not configured")
             }

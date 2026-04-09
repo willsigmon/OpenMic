@@ -137,9 +137,9 @@ enum AIProviderType: String, CaseIterable, Codable, Sendable, Identifiable, Hash
         switch self {
         case .grok: "https://api.x.ai/v1"
         case .ollama:
-            UserDefaults.standard.string(forKey: "ollamaBaseURL")
+            UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.ollamaBaseURL)
         case .openclaw:
-            UserDefaults.standard.string(forKey: "openclawBaseURL")
+            UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.openclawBaseURL)
         default: nil
         }
     }

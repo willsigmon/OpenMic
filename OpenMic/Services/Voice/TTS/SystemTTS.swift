@@ -28,8 +28,8 @@ final class SystemTTS: NSObject, TTSEngineProtocol {
         stop()
         try? AudioSessionManager.shared.configureForSpeaking(.speechSynthesizer)
 
-        let storedRate = UserDefaults.standard.float(forKey: "systemTTSSpeechRate")
-        let storedPitch = UserDefaults.standard.float(forKey: "systemTTSPitch")
+        let storedRate = UserDefaults.standard.float(forKey: AppConstants.UserDefaultsKeys.systemTTSSpeechRate)
+        let storedPitch = UserDefaults.standard.float(forKey: AppConstants.UserDefaultsKeys.systemTTSPitch)
 
         let utterance = AVSpeechUtterance(string: text)
         utterance.rate = storedRate > 0 ? storedRate : AVSpeechUtteranceDefaultSpeechRate

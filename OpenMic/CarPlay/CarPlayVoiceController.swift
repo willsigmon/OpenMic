@@ -287,7 +287,7 @@ final class CarPlayVoiceController {
 
     private func buildTTSEngine() async -> TTSEngineProtocol {
         let engineType = TTSEngineType(
-            rawValue: UserDefaults.standard.string(forKey: "ttsEngine") ?? "system"
+            rawValue: UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.ttsEngine) ?? "system"
         ) ?? .system
 
         return await TTSEngineBuilder.build(

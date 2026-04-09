@@ -21,5 +21,7 @@ enum AppConstants {
         static let lastWorkingProvider = "lastWorkingProvider"
         static let audioOutputMode = "audioOutputMode"
         static let deviceID = "openmic.device.id"
+        static let systemTTSSpeechRate = "systemTTSSpeechRate"
+        static let systemTTSPitch = "systemTTSPitch"
     }
 }

@@ -52,7 +52,7 @@ final class AuthManager {
     init() {
         self.deviceID = Self.getOrCreateDeviceID()
         // Check for BYOK mode
-        if UserDefaults.standard.bool(forKey: "byokMode") {
+        if UserDefaults.standard.bool(forKey: AppConstants.UserDefaultsKeys.byokMode) {
             authState = .byok
         }
     }
@@ -61,7 +61,7 @@ final class AuthManager {
 
     func restoreSession() async {
         // Check BYOK first
-        if UserDefaults.standard.bool(forKey: "byokMode") {
+        if UserDefaults.standard.bool(forKey: AppConstants.UserDefaultsKeys.byokMode) {
             authState = .byok
             return
         }
@@ -173,7 +173,7 @@ final class AuthManager {
         currentUserID = nil
         currentEmail = nil
         authState = .anonymous
-        UserDefaults.standard.set(false, forKey: "byokMode")
+        UserDefaults.standard.set(false, forKey: AppConstants.UserDefaultsKeys.byokMode)
 
         do {
             try await supabase.auth.signOut()
@@ -185,12 +185,12 @@ final class AuthManager {
     // MARK: - BYOK Mode
 
     func enableBYOKMode() {
-        UserDefaults.standard.set(true, forKey: "byokMode")
+        UserDefaults.standard.set(true, forKey: AppConstants.UserDefaultsKeys.byokMode)
         authState = .byok
     }
 
     func disableBYOKMode() {
-        UserDefaults.standard.set(false, forKey: "byokMode")
+        UserDefaults.standard.set(false, forKey: AppConstants.UserDefaultsKeys.byokMode)
         Task {
             await restoreSession()
         }

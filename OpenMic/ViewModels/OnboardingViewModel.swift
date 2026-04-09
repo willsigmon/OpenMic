@@ -66,7 +66,7 @@ final class OnboardingViewModel {
         // Only save API key if in BYOK path
         if currentStep == .apiKey || !apiKey.isEmpty {
             saveAPIKey()
-            UserDefaults.standard.set(selectedProvider.rawValue, forKey: "selectedProvider")
+            UserDefaults.standard.set(selectedProvider.rawValue, forKey: AppConstants.UserDefaultsKeys.selectedProvider)
         }
         appServices.completeOnboarding()
     }

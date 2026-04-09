@@ -39,7 +39,7 @@ final class SettingsViewModel {
                         for: provider,
                         key: trimmedKey
                     )
-                    UserDefaults.standard.set(provider.rawValue, forKey: "selectedProvider")
+                    UserDefaults.standard.set(provider.rawValue, forKey: AppConstants.UserDefaultsKeys.selectedProvider)
                 }
                 apiKeys[provider] = trimmedKey
                 keyValidationStatus[provider] = .saved

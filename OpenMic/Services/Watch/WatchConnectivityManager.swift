@@ -98,7 +98,7 @@ final class WatchConnectivityManager: NSObject {
     }
 
     private static func resolveRequestedProviderType() -> AIProviderType {
-        if let saved = UserDefaults.standard.string(forKey: "selectedProvider"),
+        if let saved = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedProvider),
            let provider = AIProviderType(rawValue: saved) {
             return provider
         }
@@ -106,7 +106,7 @@ final class WatchConnectivityManager: NSObject {
     }
 
     private static func currentTier() -> SubscriptionTier {
-        if let raw = UserDefaults.standard.string(forKey: "effectiveTier"),
+        if let raw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.effectiveTier),
            let tier = SubscriptionTier(rawValue: raw) {
             return tier
         }

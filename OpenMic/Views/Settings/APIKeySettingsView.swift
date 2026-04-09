@@ -17,7 +17,7 @@ struct APIKeySettingsView: View {
     }
 
     private var selectedProvider: AIProviderType? {
-        guard let raw = UserDefaults.standard.string(forKey: "selectedProvider") else {
+        guard let raw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedProvider) else {
             return nil
         }
         return AIProviderType(rawValue: raw)

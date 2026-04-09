@@ -178,7 +178,7 @@ final class CarPlayVoiceController {
         }
 
         // Build pipeline session
-        let systemPrompt = UserDefaults.standard.string(forKey: "carPlaySystemPrompt") ?? ""
+        let systemPrompt = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.carPlaySystemPrompt) ?? ""
         let pipeline = PipelineVoiceSession(
             sttEngine: stt,
             ttsEngine: tts,
@@ -268,7 +268,7 @@ final class CarPlayVoiceController {
     // MARK: - Provider Resolution
 
     private func resolveRequestedProviderType() -> AIProviderType {
-        if let raw = UserDefaults.standard.string(forKey: "selectedProvider"),
+        if let raw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedProvider),
            let type = AIProviderType(rawValue: raw) {
             return type
         }
@@ -276,7 +276,7 @@ final class CarPlayVoiceController {
     }
 
     private func currentTier() -> SubscriptionTier {
-        if let raw = UserDefaults.standard.string(forKey: "effectiveTier"),
+        if let raw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.effectiveTier),
            let tier = SubscriptionTier(rawValue: raw) {
             return tier
         }

@@ -214,7 +214,7 @@ struct SelfHostedProviderCard: View {
 
                         Button {
                             UserDefaults.standard.set(normalizedBaseURL, forKey: baseURLKey)
-                            UserDefaults.standard.set(provider.rawValue, forKey: "selectedProvider")
+                            UserDefaults.standard.set(provider.rawValue, forKey: AppConstants.UserDefaultsKeys.selectedProvider)
                             Haptics.tap()
                             withAnimation(OpenMicTheme.Animation.fast) {
                                 isEditing = false

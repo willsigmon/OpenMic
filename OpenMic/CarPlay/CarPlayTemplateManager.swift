@@ -29,14 +29,14 @@ final class CarPlayTemplateManager {
 
     private func checkQuota() -> Bool {
         // If tier has never been written, bootstrap hasn't run yet - allow access
-        guard let raw = UserDefaults.standard.string(forKey: "effectiveTier"),
+        guard let raw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.effectiveTier),
               let tier = SubscriptionTier(rawValue: raw) else {
             return true
         }
 
         if tier == .byok { return true }
 
-        let remaining = UserDefaults.standard.integer(forKey: "remainingMinutes")
+        let remaining = UserDefaults.standard.integer(forKey: AppConstants.UserDefaultsKeys.remainingMinutes)
         return remaining > 0
     }
 

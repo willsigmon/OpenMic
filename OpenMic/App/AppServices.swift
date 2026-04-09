@@ -128,14 +128,14 @@ final class AppServices {
         self.notificationManager = NotificationManager()
         self.usageTracker.notificationManager = self.notificationManager
         self.isOnboardingComplete = UserDefaults.standard.bool(
-            forKey: "onboardingComplete"
+            forKey: AppConstants.UserDefaultsKeys.onboardingComplete
         )
         self.isUsingInMemoryFallback = inMemoryFallback
     }
 
     func completeOnboarding() {
         isOnboardingComplete = true
-        UserDefaults.standard.set(true, forKey: "onboardingComplete")
+        UserDefaults.standard.set(true, forKey: AppConstants.UserDefaultsKeys.onboardingComplete)
     }
 
     /// Called on app launch to restore auth session and load products
@@ -176,7 +176,7 @@ final class AppServices {
             if !isOnboardingComplete {
                 completeOnboarding()
             }
-            UserDefaults.standard.set(true, forKey: "byokMode")
+            UserDefaults.standard.set(true, forKey: AppConstants.UserDefaultsKeys.byokMode)
         }
     }
     #endif
@@ -191,7 +191,7 @@ final class AppServices {
             // Best effort cleanup
         }
 
-        UserDefaults.standard.removeObject(forKey: "byokMode")
+        UserDefaults.standard.removeObject(forKey: AppConstants.UserDefaultsKeys.byokMode)
         syncTierToWatch()
     }
 
@@ -203,8 +203,8 @@ final class AppServices {
             remainingMinutes: usageTracker.remainingMinutes
         )
         // CarPlay scene delegate reads from UserDefaults since it lacks AppServices access
-        UserDefaults.standard.set(tier.rawValue, forKey: "effectiveTier")
-        UserDefaults.standard.set(usageTracker.remainingMinutes, forKey: "remainingMinutes")
+        UserDefaults.standard.set(tier.rawValue, forKey: AppConstants.UserDefaultsKeys.effectiveTier)
+        UserDefaults.standard.set(usageTracker.remainingMinutes, forKey: AppConstants.UserDefaultsKeys.remainingMinutes)
 
         // Mirror active persona's system prompt for CarPlay (no SwiftData access in CarPlay scene)
         let context = modelContainer.mainContext
@@ -212,7 +212,7 @@ final class AppServices {
             predicate: #Predicate { $0.isDefault == true }
         )
         if let persona = (try? context.fetch(descriptor))?.first {
-            UserDefaults.standard.set(persona.systemPrompt, forKey: "carPlaySystemPrompt")
+            UserDefaults.standard.set(persona.systemPrompt, forKey: AppConstants.UserDefaultsKeys.carPlaySystemPrompt)
         }
     }
 

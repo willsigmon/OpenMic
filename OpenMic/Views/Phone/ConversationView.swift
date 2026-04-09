@@ -72,7 +72,7 @@ struct ConversationView: View {
             OpenMicTheme.Colors.background.ignoresSafeArea()
 
             VStack(spacing: OpenMicTheme.Spacing.md) {
-                Image(systemName: "car.fill")
+                Image(systemName: "mic.fill")
                     .font(.system(size: 32, weight: .medium))
                     .foregroundStyle(OpenMicTheme.Gradients.accent)
                     .symbolEffect(.pulse.byLayer, options: .repeating)
@@ -392,7 +392,7 @@ struct ConversationView: View {
         HStack {
             // App branding
             HStack(spacing: OpenMicTheme.Spacing.xs) {
-                Image(systemName: "car.fill")
+                Image(systemName: "mic.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(OpenMicTheme.Colors.accentGradientStart)
                     .accessibilityHidden(true)
@@ -731,7 +731,7 @@ struct ConversationView: View {
         UIPasteboard.general.string = text
 #endif
         Haptics.tap()
-        ToastManager.shared.showInfo("Conversation copied")
+        ToastManager.shared.showInfo("Message copied")
     }
 
     private func fetchCurrentPersonaID(_ vm: ConversationViewModel) -> UUID? {

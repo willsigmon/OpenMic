@@ -72,7 +72,7 @@ final class ConversationViewModel {
         sessionBuilder: ConversationSessionBuilder? = nil
     ) {
         self.appServices = appServices
-        let storedProvider = UserDefaults.standard.string(forKey: "selectedProvider")
+        let storedProvider = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedProvider)
         self.activeProvider = AIProviderType(rawValue: storedProvider ?? "") ?? .openAI
         self.customSessionBuilder = sessionBuilder
     }
@@ -153,7 +153,7 @@ final class ConversationViewModel {
                     return
                 }
 
-                appServices.usageTracker.startSession()
+                appServices.usageTracker.startSession(tier: appServices.effectiveTier)
                 ProviderAccessPolicy.markProviderAsWorking(activeProvider)
 
                 // Start the Live Activity now that the session is confirmed live.
@@ -249,7 +249,7 @@ final class ConversationViewModel {
 
                 // sendText only works for pipeline sessions
                 if let pipeline = pipelineSession {
-                    appServices.usageTracker.startSession()
+                    appServices.usageTracker.startSession(tier: appServices.effectiveTier)
                     didStartUsage = true
                     let persona = fetchActivePersona()
                     await liveActivityManager.startSession(
@@ -274,7 +274,7 @@ final class ConversationViewModel {
                         return
                     }
 
-                    appServices.usageTracker.startSession()
+                    appServices.usageTracker.startSession(tier: appServices.effectiveTier)
                     didStartUsage = true
                     ProviderAccessPolicy.markProviderAsWorking(activeProvider)
                     await liveActivityManager.startSession(
@@ -452,7 +452,7 @@ final class ConversationViewModel {
 
     private func buildTTSEngine() async throws -> TTSEngineProtocol {
         let engineType = TTSEngineType(
-            rawValue: UserDefaults.standard.string(forKey: "ttsEngine") ?? "system"
+            rawValue: UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.ttsEngine) ?? "system"
         ) ?? .system
 
         return await TTSEngineBuilder.build(
@@ -592,7 +592,7 @@ final class ConversationViewModel {
         await stopListeningInternal()
 
         activeProvider = newProvider
-        UserDefaults.standard.set(newProvider.rawValue, forKey: "selectedProvider")
+        UserDefaults.standard.set(newProvider.rawValue, forKey: AppConstants.UserDefaultsKeys.selectedProvider)
         ToastManager.shared.showVoiceState("Now using \(newProvider.displayName)")
 
         let marker = ConversationBubble(
@@ -737,7 +737,7 @@ final class ConversationViewModel {
         if let conversation {
             return conversation.provider
         }
-        if let saved = UserDefaults.standard.string(forKey: "selectedProvider"),
+        if let saved = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.selectedProvider),
            let provider = AIProviderType(rawValue: saved) {
             return provider
         }

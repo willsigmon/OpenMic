@@ -37,11 +37,12 @@ final class UsageTracker {
 
     // MARK: - Session Tracking
 
-    func startSession() {
+    func startSession(tier: SubscriptionTier = .free) {
         guard !isSessionActive else { return }
         isSessionActive = true
         sessionCount += 1
         currentSessionStart = Date()
+        let activeTier = tier
 
         sessionTimer = Task { [weak self] in
             while !Task.isCancelled {
@@ -55,7 +56,7 @@ final class UsageTracker {
                 if self.remainingMinutes == 5 || self.remainingMinutes == 1 || self.remainingMinutes == 0 {
                     self.notificationManager?.scheduleQuotaAlert(
                         minutesRemaining: self.remainingMinutes,
-                        tier: .free
+                        tier: activeTier
                     )
                 }
             }

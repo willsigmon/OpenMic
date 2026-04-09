@@ -40,7 +40,7 @@ enum TTSEngineBuilder {
                 return SystemTTS()
             }
 
-            let modelRaw = UserDefaults.standard.string(forKey: "openAITTSModel")
+            let modelRaw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.openAITTSModel)
                 ?? OpenAITTSModel.tts1.rawValue
             let model = OpenAITTSModel(rawValue: modelRaw) ?? .tts1
 
@@ -60,7 +60,7 @@ enum TTSEngineBuilder {
                 return tts
             }
 
-            let modelRaw = UserDefaults.standard.string(forKey: "elevenLabsModel")
+            let modelRaw = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.elevenLabsModel)
                 ?? ElevenLabsModel.flash.rawValue
             let model = ElevenLabsModel(rawValue: modelRaw) ?? .flash
 
